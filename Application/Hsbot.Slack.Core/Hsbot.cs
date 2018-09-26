@@ -136,9 +136,15 @@ namespace Hsbot.Slack.Core
                 BotIsMentioned = message.MentionsBot
             };
 
+            var messageSnippet = $"{message.User.Name}: {message.Text.Substring(0, Math.Min(message.Text.Length, 25))}...";
+
             foreach (var inboundMessageHandler in _messageHandlers)
             {
-                if (!inboundMessageHandler.Handles(inboundMessage)) continue;
+                var handlerResult = inboundMessageHandler.Handles(inboundMessage);
+
+                _log.Debug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
+
+                if (!handlerResult.HandlesMessage) continue;
 
                 var responses = inboundMessageHandler.Handle(inboundMessage);
                 await SendMessage(responses);

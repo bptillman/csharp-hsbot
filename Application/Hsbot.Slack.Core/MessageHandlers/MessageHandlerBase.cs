@@ -42,14 +42,28 @@ namespace Hsbot.Slack.Core.MessageHandlers
 
       public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
 
-      public bool Handles(InboundMessage message)
+      public HandlesResult Handles(InboundMessage message)
       {
         var handlerOdds = GetHandlerOdds(message);
+          var canHandleMessage = CanHandle(message);
+          var randomRoll = RandomNumberGenerator.Generate();
 
-        return (!DirectMentionOnly || message.BotIsMentioned)
-               && (TargetedChannels == AllChannels || message.IsForChannel(TargetedChannels))
-               && (handlerOdds >= 1.0 || RandomNumberGenerator.Generate() < handlerOdds)
-               && CanHandle(message);
+          var shouldHandle = (!DirectMentionOnly || message.BotIsMentioned)
+                             && (TargetedChannels == AllChannels || message.IsForChannel(TargetedChannels))
+                             && (handlerOdds >= 1.0 || randomRoll < handlerOdds)
+                             && canHandleMessage;
+
+          return new HandlesResult
+          {
+              HandlesMessage = shouldHandle,
+              HandlerDirectionMentionOnly = DirectMentionOnly,
+              BotIsMentioned = message.BotIsMentioned,
+              HandlerTargetedChannels = TargetedChannels,
+              MessageChannel = message.ChannelName,
+              HandlerOdds = handlerOdds,
+              RandomRoll = randomRoll,
+              HandlerCanHandleResult = canHandleMessage
+          };
       }
 
       protected abstract bool CanHandle(InboundMessage message);
