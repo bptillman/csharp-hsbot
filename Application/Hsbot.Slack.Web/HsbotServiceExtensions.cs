@@ -1,10 +1,9 @@
 using System.Linq;
 using System.Reflection;
 using Hsbot.Slack.Core;
+using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 using Microsoft.Extensions.DependencyInjection;
-using SlothBot;
-using SlothBot.MessagingPipeline;
 
 namespace Hsbot.Slack.Web
 {
@@ -14,8 +13,8 @@ namespace Hsbot.Slack.Web
       {
         RegisterMessageHandlers(services);
 
-        services.AddSingleton<ISlothLog, HsbotLog>();
-        services.AddSingleton<ISlackConfig>(svc => config);
+        services.AddSingleton<IHsbotLog, HsbotLog>();
+        services.AddSingleton<IHsbotConfig>(svc => config);
         services.AddSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
         services.AddSingleton<Core.Hsbot>();
 
@@ -24,7 +23,7 @@ namespace Hsbot.Slack.Web
 
       private static void RegisterMessageHandlers(IServiceCollection services)
       {
-        var handlerInterfaceType = typeof(IMessageHandler);
+        var handlerInterfaceType = typeof(IInboundMessageHandler);
         var messageHandlerTypes = Assembly.GetAssembly(typeof(Core.Hsbot))
           .GetTypes()
           .Where(t => !t.IsAbstract && !t.IsInterface && handlerInterfaceType.IsAssignableFrom(t));
