@@ -49,7 +49,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// <returns>True if message was sent to target channel, false otherwise</returns>
         public static bool IsForChannel(this InboundMessage message, string channel)
         {
-            return message.Channel.Equals(channel, StringComparison.OrdinalIgnoreCase);
+            return message.ChannelName.Equals(channel, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

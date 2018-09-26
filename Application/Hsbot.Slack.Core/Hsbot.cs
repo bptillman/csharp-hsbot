@@ -128,6 +128,7 @@ namespace Hsbot.Slack.Core
                 Username = message.User.Name,
                 UserEmail = message.User.Email,
                 Channel = message.ChatHub.Id,
+                ChannelName = message.ChatHub.Name,
                 MessageRecipientType = message.ChatHub.Type.ToMessageRecipientType(),
                 UserChannel = userChannel,
                 BotName = Name,
