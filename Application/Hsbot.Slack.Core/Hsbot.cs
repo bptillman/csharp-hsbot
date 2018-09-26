@@ -123,7 +123,7 @@ namespace Hsbot.Slack.Core
             {
                 RawText = message.RawData,
                 FullText = message.Text,
-                TargetedText = message.GetTargetedText(AddressableNames),
+                TextWithoutBotName = message.GetTextWithoutBotName(AddressableNames),
                 UserId = message.User.Id,
                 Username = message.User.Name,
                 UserEmail = message.User.Email,

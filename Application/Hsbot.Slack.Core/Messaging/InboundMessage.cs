@@ -8,7 +8,7 @@
         public string UserEmail { get; set; }
         public string RawText { get; set; }
         public string FullText { get; set; }
-        public string TargetedText { get; set; }
+        public string TextWithoutBotName { get; set; }
         public string Channel { get; set; }
         public string ChannelName { get; set; }
         public MessageRecipientType MessageRecipientType { get; set; }

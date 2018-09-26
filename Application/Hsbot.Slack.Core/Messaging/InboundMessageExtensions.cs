@@ -13,7 +13,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// <returns>True if message.TargetedText starts with the supplied string, false otherwise</returns>
         public static bool StartsWith(this InboundMessage message, string start, StringComparison compareType = StringComparison.OrdinalIgnoreCase)
         {
-            return message.TargetedText.StartsWith(start, compareType);
+            return message.TextWithoutBotName.StartsWith(start, compareType);
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// <returns>True if message.TargetedText contains the supplied string, false otherwise</returns>
         public static bool Contains(this InboundMessage message, string text)
         {
-            return message.TargetedText.ToLowerInvariant().Contains(text.ToLowerInvariant());
+            return message.TextWithoutBotName.ToLowerInvariant().Contains(text.ToLowerInvariant());
         }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// <returns>True if message.TargetedText is matched by regex, false otherwise</returns>
         public static bool IsMatch(this InboundMessage message, Regex matchRegex)
         {
-            return matchRegex.IsMatch(message.TargetedText);
+            return matchRegex.IsMatch(message.TextWithoutBotName);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// <returns>Match object with first match in message.TargetedText</returns>
         public static Match Match(this InboundMessage message, Regex matchRegex)
         {
-            return matchRegex.Match(message.TargetedText);
+            return matchRegex.Match(message.TextWithoutBotName);
         }
 
         /// <summary>
