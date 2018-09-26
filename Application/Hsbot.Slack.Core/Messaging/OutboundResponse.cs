@@ -8,7 +8,7 @@ namespace Hsbot.Slack.Core.Messaging
         public bool IndicateTyping { get; set; }
         public string Channel { get; set; }
         public string UserId { get; set; }
-        public MessageSourceType MessageSourceType { get; set; }
+        public MessageRecipientType MessageRecipientType { get; set; }
         public List<Attachment> Attachments { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Hsbot.Slack.Core.Messaging
 {
-    public enum MessageSourceType
+    public enum MessageRecipientType
     {
         Channel,
         DirectMessage

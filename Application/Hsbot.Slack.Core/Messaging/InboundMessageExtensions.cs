@@ -78,7 +78,7 @@ namespace Hsbot.Slack.Core.Messaging
             return new OutboundResponse
             {
                 Channel = message.Channel,
-                MessageSourceType = MessageSourceType.Channel,
+                MessageRecipientType = MessageRecipientType.Channel,
                 Text = text,
                 Attachments = attachments
             };
@@ -92,7 +92,7 @@ namespace Hsbot.Slack.Core.Messaging
             return new OutboundResponse
             {
                 Channel = message.UserChannel,
-                MessageSourceType = MessageSourceType.DirectMessage,
+                MessageRecipientType = MessageRecipientType.DirectMessage,
                 UserId = message.UserId,
                 Text = text
             };
@@ -106,7 +106,7 @@ namespace Hsbot.Slack.Core.Messaging
             return new OutboundResponse
             {
                 Channel = message.Channel,
-                MessageSourceType = MessageSourceType.Channel,
+                MessageRecipientType = MessageRecipientType.Channel,
                 Text = "",
                 IndicateTyping = true
             };
@@ -120,7 +120,7 @@ namespace Hsbot.Slack.Core.Messaging
             return new OutboundResponse
             {
                 Channel = message.UserChannel,
-                MessageSourceType = MessageSourceType.DirectMessage,
+                MessageRecipientType = MessageRecipientType.DirectMessage,
                 UserId = message.UserId,
                 Text = "",
                 IndicateTyping = true

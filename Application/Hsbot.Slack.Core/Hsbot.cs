@@ -128,7 +128,7 @@ namespace Hsbot.Slack.Core
                 Username = message.User.Name,
                 UserEmail = message.User.Email,
                 Channel = message.ChatHub.Id,
-                MessageSourceType = message.ChatHub.Type.ToMessageSourceType(),
+                MessageRecipientType = message.ChatHub.Type.ToMessageRecipientType(),
                 UserChannel = userChannel,
                 BotName = Name,
                 BotId = Id,
@@ -179,13 +179,13 @@ namespace Hsbot.Slack.Core
 
         private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
         {
-            switch (response.MessageSourceType)
+            switch (response.MessageRecipientType)
             {
-                case MessageSourceType.Channel:
+                case MessageRecipientType.Channel:
                     return new SlackChatHub { Id = response.Channel };
-                case MessageSourceType.DirectMessage when string.IsNullOrEmpty(response.Channel):
+                case MessageRecipientType.DirectMessage when string.IsNullOrEmpty(response.Channel):
                     return await GetUserChatHub(response.UserId);
-                case MessageSourceType.DirectMessage:
+                case MessageRecipientType.DirectMessage:
                     return new SlackChatHub { Id = response.Channel };
                 default:
                     return new SlackChatHub { Id = response.Channel };

@@ -10,7 +10,7 @@
         public string FullText { get; set; }
         public string TargetedText { get; set; }
         public string Channel { get; set; }
-        public MessageSourceType MessageSourceType { get; set; }
+        public MessageRecipientType MessageRecipientType { get; set; }
         public bool BotIsMentioned { get; set; }
         public string BotName { get; set; }
         public string BotId { get; set; }
