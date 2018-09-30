@@ -1,5 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Newtonsoft.Json;
 
 namespace Hsbot.Slack.Core.Brain
@@ -7,6 +10,9 @@ namespace Hsbot.Slack.Core.Brain
     public class HsbotBrain : IBotBrain
     {
         private readonly ConcurrentDictionary<string, string> _brainContents = new ConcurrentDictionary<string, string>();
+        
+        private readonly Subject<HsbotBrain> _brainChanged = new Subject<HsbotBrain>();
+        public IObservable<HsbotBrain> BrainChanged => _brainChanged.AsObservable();
 
         public HsbotBrain()
         {
@@ -41,6 +47,7 @@ namespace Hsbot.Slack.Core.Brain
             where T: class
         {
             _brainContents[key] = JsonConvert.SerializeObject(value);
+            _brainChanged.OnNext(this);
         }
     }
 }
