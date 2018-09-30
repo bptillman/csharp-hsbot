@@ -15,7 +15,7 @@ namespace Hsbot.Slack.Web
 
       public Task StartAsync(CancellationToken cancellationToken)
       {
-        return _hsbot.Connect();
+          return _hsbot.Connect();
       }
 
       public Task StopAsync(CancellationToken cancellationToken)
