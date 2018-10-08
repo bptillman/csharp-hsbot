@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Hsbot.Slack.Core.Brain;
 using Hsbot.Slack.Core.Messaging;
@@ -171,16 +172,24 @@ namespace Hsbot.Slack.Core
             }
 
             Brain = await _brainStorage.Load();
-            _brainChangedSubscription = Brain.BrainChanged.Subscribe(OnBrainChanged);
+            _brainChangedSubscription = Brain.BrainChanged.Select(SaveBrain).Subscribe();
 
             _log.Info("Brain loaded from storage successfully");
         }
 
-        private void OnBrainChanged(HsbotBrain brain)
+        private async Task SaveBrain(HsbotBrain brain)
         {
             _log.Debug("Received brain change event - saving to storage");
-            _brainStorage.Save(brain);
-            _log.Debug("Received brain change event - brain saved successfully");
+            try
+            {
+                await _brainStorage.Save(brain);
+                _log.Debug("Received brain change event - brain saved successfully");
+            }
+
+            catch (Exception e)
+            {
+                _log.Error("Failed to save brain to storage: {0}", e);
+            }
         }
 
         public async Task SendMessage(IEnumerable<OutboundResponse> responses)
