@@ -172,7 +172,10 @@ namespace Hsbot.Slack.Core
             }
 
             Brain = await _brainStorage.Load();
-            _brainChangedSubscription = Brain.BrainChanged.Select(SaveBrain).Subscribe();
+            _brainChangedSubscription = Brain.BrainChanged
+                .Select(SaveBrain)
+                .Window(1) //ensure we only run 1 call to the save brain method at a given time
+                .Subscribe();
 
             _log.Info("Brain loaded from storage successfully");
         }
