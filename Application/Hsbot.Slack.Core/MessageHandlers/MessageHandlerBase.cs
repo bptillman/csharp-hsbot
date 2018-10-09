@@ -1,11 +1,10 @@
 using System.Collections.Generic;
-using Hsbot.Slack.Core.Extensions;
+using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
-using SlothBot.MessagingPipeline;
 
 namespace Hsbot.Slack.Core.MessageHandlers
 {
-    public abstract class MessageHandlerBase : IMessageHandler
+    public abstract class MessageHandlerBase : IInboundMessageHandler
     {
       protected readonly IRandomNumberGenerator RandomNumberGenerator;
 
@@ -32,7 +31,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
       /// If less than 1.0, a random roll will happen for each incoming message
       /// to the handler to determine if the handler will actually return any message.
       /// </summary>
-      public virtual double GetHandlerOdds(IncomingMessage message)
+      public virtual double GetHandlerOdds(InboundMessage message)
       {
         //there's a 110% chance this handler will run by default!
         //in other words, we avoid the whole floating-point-error
@@ -41,20 +40,34 @@ namespace Hsbot.Slack.Core.MessageHandlers
         return 1.1;
       }
 
-      public abstract IEnumerable<CommandDescription> GetSupportedCommands();
+      public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
 
-      public bool DoesHandle(IncomingMessage message)
+      public HandlesResult Handles(InboundMessage message)
       {
         var handlerOdds = GetHandlerOdds(message);
+          var canHandleMessage = CanHandle(message);
+          var randomRoll = RandomNumberGenerator.Generate();
 
-        return (!DirectMentionOnly || message.BotIsMentioned)
-               && (TargetedChannels == AllChannels || message.IsForChannel(TargetedChannels))
-               && (handlerOdds >= 1.0 || RandomNumberGenerator.Generate() < handlerOdds)
-               && ShouldHandle(message);
+          var shouldHandle = (!DirectMentionOnly || message.BotIsMentioned)
+                             && (TargetedChannels == AllChannels || message.IsForChannel(TargetedChannels))
+                             && (handlerOdds >= 1.0 || randomRoll < handlerOdds)
+                             && canHandleMessage;
+
+          return new HandlesResult
+          {
+              HandlesMessage = shouldHandle,
+              HandlerDirectionMentionOnly = DirectMentionOnly,
+              BotIsMentioned = message.BotIsMentioned,
+              HandlerTargetedChannels = TargetedChannels,
+              MessageChannel = message.ChannelName,
+              HandlerOdds = handlerOdds,
+              RandomRoll = randomRoll,
+              HandlerCanHandleResult = canHandleMessage
+          };
       }
 
-      protected abstract bool ShouldHandle(IncomingMessage message);
+      protected abstract bool CanHandle(InboundMessage message);
 
-      public abstract IEnumerable<ResponseMessage> Handle(IncomingMessage message);
+      public abstract IEnumerable<OutboundResponse> Handle(InboundMessage message);
     }
 }
