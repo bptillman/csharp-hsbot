@@ -21,7 +21,7 @@ namespace Hsbot.Slack.Web
       public void ConfigureServices(IServiceCollection services)
       {
         services.AddLogging();
-        services.AddHsbot(new HsbotConfig {SlackApiKey = _config["slack:apiKey"]});
+        services.AddHsbot(LoadConfig());
 
         //This registration is what will actually run hsbot as a background
         //process within the website.  We'll need an external keep-alive to
@@ -29,7 +29,18 @@ namespace Hsbot.Slack.Web
         services.AddSingleton<IHostedService, HsbotHostedService>();
       }
 
-      public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        private HsbotConfig LoadConfig()
+        {
+            return new HsbotConfig
+            {
+                SlackApiKey = _config["slack:apiKey"],
+                BrainName = _config["brain:name"] ?? "HsbotBrain",
+                BrainStorageConnectionString = _config["brain:connectionString"] ?? "UseDevelopmentStorage=true",
+                BrainStorageKey = _config["brain:storageKey"]
+            };
+        }
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
       {
         if (env.IsDevelopment())
         {
