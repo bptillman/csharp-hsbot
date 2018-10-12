@@ -171,13 +171,24 @@ namespace Hsbot.Slack.Core
                 return;
             }
 
-            Brain = await _brainStorage.Load();
-            _brainChangedSubscription = Brain.BrainChanged
-                .Select(SaveBrain)
-                .Window(1) //ensure we only run 1 call to the save brain method at a given time
-                .Subscribe();
+            try
+            {
+                Brain = await _brainStorage.Load();
+                _brainChangedSubscription = Brain.BrainChanged
+                    .Select(SaveBrain)
+                    .Window(1) //ensure we only run 1 call to the save brain method at a given time
+                    .Subscribe();
 
-            _log.Info("Brain loaded from storage successfully");
+                _log.Info("Brain loaded from storage successfully");
+            }
+
+            catch (Exception e)
+            {
+                _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
+                _log.Error("Brain load exception: {0}", e);
+
+                Brain = new HsbotBrain();
+            }
         }
 
         private async Task SaveBrain(HsbotBrain brain)
