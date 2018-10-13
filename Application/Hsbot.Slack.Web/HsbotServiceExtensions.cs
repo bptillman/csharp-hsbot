@@ -2,6 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Hsbot.Slack.Core;
 using Hsbot.Slack.Core.Brain;
+using Hsbot.Slack.Core.Connection;
 using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,7 @@ namespace Hsbot.Slack.Web
             services.AddSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
             services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
             services.AddSingleton<IBotBrainStorage<HsbotBrain>, AzureBrainStorage>();
+            services.AddSingleton<IHsbotChatConnector, HsbotSlackConnector>();
             services.AddSingleton<Core.Hsbot>();
 
             return services;
