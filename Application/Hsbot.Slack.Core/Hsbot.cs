@@ -71,11 +71,14 @@ namespace Hsbot.Slack.Core
             if (_disconnecting)
             {
                 _log.Info("Disconnected");
-                return Task.CompletedTask;
             }
 
-            _log.Info("Disconnected from server, attempting to reconnect");
-            return Reconnect();
+            else
+            {
+                _log.Info("Disconnected from server, attempting to reconnect automatically");
+            }
+            
+            return Task.CompletedTask;
         }
 
         public Task Disconnect()
@@ -84,12 +87,6 @@ namespace Hsbot.Slack.Core
 
             _disconnecting = true;
             return _connection.Disconnect();
-        }
-
-        private Task Reconnect()
-        {
-            _log.Info("Reconnecting");
-            return Connect();
         }
 
         private Task OnReconnecting()
