@@ -13,6 +13,7 @@ namespace Hsbot.Slack.Core.Connection
     public class HsbotSlackConnector : IHsbotChatConnector
     {
         private readonly IHsbotConfig _config;
+        private readonly IHsbotLog _log;
         private ISlackConnection _connection;
 
         public string Id { get; private set; } //internal id of the bot
@@ -25,17 +26,21 @@ namespace Hsbot.Slack.Core.Connection
         public IObservable<IHsbotChatConnector> Reconnected { get; private set; }
         public IObservable<Task<InboundMessage>> MessageReceived { get; private set; }
 
-        public HsbotSlackConnector(IHsbotConfig config)
+        public HsbotSlackConnector(IHsbotConfig config, IHsbotLog log)
         {
             _config = config;
+            _log = log;
         }
 
         public async Task Connect()
         {
             if (_connection != null)
             {
+                _log.Warn($"Connection object in {nameof(HsbotSlackConnector)} is not null. I think I'm already connected, so I'm not attempting to connect again.");
                 return;
             }
+
+            _log.Info("Connecting to Slack");
 
             var connector = new SlackConnector.SlackConnector();
             _connection = await connector.Connect(_config.SlackApiKey);
@@ -43,6 +48,8 @@ namespace Hsbot.Slack.Core.Connection
             Id = _connection?.Self?.Id;
             Name = _connection?.Self?.Name;
             AddressableNames = GetAddressableNames(Name, Id);
+
+            _log.Info($"Connected successfully with Id={Id}, Name={Name}");
 
             Disconnected = Observable.FromEvent<DisconnectEventHandler, Unit>
             (
@@ -90,6 +97,7 @@ namespace Hsbot.Slack.Core.Connection
 
         public Task Disconnect()
         {
+            _log.Info("Disconnecting from Slack");
             return _connection.Close();
         }
 
@@ -101,6 +109,7 @@ namespace Hsbot.Slack.Core.Connection
             {
                 if (response.IndicateTyping)
                 {
+                    _log.Debug($"Sending IndicateTyping message to channel {chatHub.Name}");
                     await _connection.IndicateTyping(chatHub);
                 }
 
@@ -113,6 +122,7 @@ namespace Hsbot.Slack.Core.Connection
                         Text = response.Text
                     };
 
+                    _log.Debug($"Sending message to channel {chatHub.Name} with {botMessage.Attachments.Count} attachments.  Response text='{response.Text}'");
                     await _connection.Say(botMessage);
                 }
             }
