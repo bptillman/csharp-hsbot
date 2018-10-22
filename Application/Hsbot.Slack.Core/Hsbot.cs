@@ -147,6 +147,13 @@ namespace Hsbot.Slack.Core
                 BotIsMentioned = message.MentionsBot
             };
 
+            var messageContext = new BotMessageContext
+            {
+                Bot = this,
+                Message = inboundMessage,
+                Log = _log
+            };
+
             var messageSnippet = $"{message.User.Name}: {message.Text.Substring(0, Math.Min(message.Text.Length, 25))}...";
 
             foreach (var inboundMessageHandler in _messageHandlers)
@@ -157,8 +164,7 @@ namespace Hsbot.Slack.Core
 
                 if (!handlerResult.HandlesMessage) continue;
 
-                var responses = inboundMessageHandler.Handle(inboundMessage);
-                await SendMessage(responses);
+                await inboundMessageHandler.HandleAsync(messageContext);
             }
         }
 
