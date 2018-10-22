@@ -15,6 +15,7 @@ logistics/bin
 *.pubxml.user
 *.dbmdl
 .vs/
+*.orig
 
 # ignore appsettings
 **/appsettings.development.json

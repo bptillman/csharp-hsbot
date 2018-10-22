@@ -11,38 +11,49 @@ namespace Hsbot.Slack.Web
 {
     public class Startup
     {
-      private readonly IConfiguration _config;
+        private readonly IConfiguration _config;
 
-      public Startup(IConfiguration config)
-      {
-        _config = config;
-      }
-
-      public void ConfigureServices(IServiceCollection services)
-      {
-        services.AddLogging();
-        services.AddHsbot(new HsbotConfig {SlackApiKey = _config["slack:apiKey"]});
-
-        //This registration is what will actually run hsbot as a background
-        //process within the website.  We'll need an external keep-alive to
-        //make sure the site doesn't shut down when no HTTP requests are coming in.
-        services.AddSingleton<IHostedService, HsbotHostedService>();
-      }
-
-      public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-      {
-        if (env.IsDevelopment())
+        public Startup(IConfiguration config)
         {
-            app.UseDeveloperExceptionPage();
+            _config = config;
         }
 
-        //We're not actually serving up any web content at present.
-        //This website is only acting as a host for the hsbot service,
-        //so no need to wire up anything other than a static reply.
-        app.Run(async (context) =>
+        public void ConfigureServices(IServiceCollection services)
         {
-            await context.Response.WriteAsync("Beep boop bop");
-        });
-      }
+            services.AddLogging();
+            services.AddHsbot(LoadConfig());
+
+            //This registration is what will actually run hsbot as a background
+            //process within the website.  We'll need an external keep-alive to
+            //make sure the site doesn't shut down when no HTTP requests are coming in.
+            services.AddSingleton<IHostedService, HsbotHostedService>();
+        }
+
+        private HsbotConfig LoadConfig()
+        {
+            return new HsbotConfig
+            {
+                SlackApiKey = _config["slack:apiKey"],
+                BrainName = _config["brain:name"] ?? "HsbotBrain",
+                BrainStorageConnectionString = _config["brain:connectionString"] ?? "UseDevelopmentStorage=true",
+                BrainStorageKey = _config["brain:storageKey"]
+            };
+        }
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            //We're not actually serving up any web content at present.
+            //This website is only acting as a host for the hsbot service,
+            //so no need to wire up anything other than a static reply.
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Beep boop bop");
+            });
+        }
     }
 }

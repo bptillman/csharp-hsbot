@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Hsbot.Slack.Core.Brain;
 using Hsbot.Slack.Core.Messaging;
 using SlackConnector;
 using SlackConnector.Models;
 
 namespace Hsbot.Slack.Core
 {
-    public class Hsbot
+    public class Hsbot : IDisposable
     {
         private readonly IHsbotConfig _hsbotConfig;
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
+        private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
+
+        private IDisposable _brainChangedSubscription;
 
         private ISlackConnection _connection;
         private bool _disconnecting = false;
@@ -21,17 +26,23 @@ namespace Hsbot.Slack.Core
         public string Name { get; private set; } //official handle of the bot
         public string[] AddressableNames { get; private set; } //names by which the bot may be addressed in the chat app
 
+        public HsbotBrain Brain { get; private set; }
+        
         public Hsbot(IHsbotConfig hsbotConfig,
-        IHsbotLog log,
-        IEnumerable<IInboundMessageHandler> messageHandlers)
+            IHsbotLog log,
+            IEnumerable<IInboundMessageHandler> messageHandlers,
+            IBotBrainStorage<HsbotBrain> brainStorage)
         {
             _hsbotConfig = hsbotConfig;
             _log = log;
             _messageHandlers = messageHandlers;
+            _brainStorage = brainStorage;
         }
 
         public async Task Connect()
         {
+            await InitializeBrain();
+
             _log.Info("Connecting to messaging service");
 
             var connector = new SlackConnector.SlackConnector();
@@ -151,6 +162,50 @@ namespace Hsbot.Slack.Core
             }
         }
 
+        private async Task InitializeBrain()
+        {
+            _log.Info("Initializing brain");
+            if (Brain != null)
+            {
+                _log.Info("Brain already initialized, skipping");
+                return;
+            }
+
+            try
+            {
+                Brain = await _brainStorage.Load();
+                _brainChangedSubscription = Brain.BrainChanged
+                    .Select(SaveBrain)
+                    .Window(1) //ensure we only run 1 call to the save brain method at a given time
+                    .Subscribe();
+
+                _log.Info("Brain loaded from storage successfully");
+            }
+
+            catch (Exception e)
+            {
+                _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
+                _log.Error("Brain load exception: {0}", e);
+
+                Brain = new HsbotBrain();
+            }
+        }
+
+        private async Task SaveBrain(HsbotBrain brain)
+        {
+            _log.Debug("Received brain change event - saving to storage");
+            try
+            {
+                await _brainStorage.Save(brain);
+                _log.Debug("Received brain change event - brain saved successfully");
+            }
+
+            catch (Exception e)
+            {
+                _log.Error("Failed to save brain to storage: {0}", e);
+            }
+        }
+
         public async Task SendMessage(IEnumerable<OutboundResponse> responses)
         {
             foreach (var outboundResponse in responses)
@@ -233,6 +288,11 @@ namespace Hsbot.Slack.Core
                 $"@{botName}:",
                 $"@{botName}",
             };
+        }
+
+        public void Dispose()
+        {
+            _brainChangedSubscription?.Dispose();
         }
     }
 }
