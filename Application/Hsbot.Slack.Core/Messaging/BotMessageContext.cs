@@ -1,13 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Slack.Core.Brain;
 
 namespace Hsbot.Slack.Core.Messaging
 {
     public class BotMessageContext
     {
-        public Hsbot Bot { get; set; }
-        public IHsbotLog Log { get; set; }
-        public InboundMessage Message { get; set; }
+        public BotMessageContext(IBotBrain brain, 
+            IHsbotLog log, 
+            InboundMessage message,
+            Func<OutboundResponse, Task> sendMessageFunc)
+        {
+            Brain = brain;
+            Log = log;
+            Message = message;
+            SendMessage = sendMessageFunc;
+        }
+
+        public IBotBrain Brain { get; }
+        public IHsbotLog Log { get; }
+        public InboundMessage Message { get; }
+        public Func<OutboundResponse, Task> SendMessage { get; }
     }
 
     public static class BotMessageContextExtensions
@@ -18,7 +32,7 @@ namespace Hsbot.Slack.Core.Messaging
         public static Task ReplyToChannel(this BotMessageContext context, string text, Attachment attachment = null)
         {
             var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
-            return context.Bot.SendMessage(context.Message.ReplyToChannel(text, attachments));
+            return context.SendMessage(context.Message.ReplyToChannel(text, attachments));
         }
 
         /// <summary>
@@ -26,7 +40,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// </summary>
         public static Task ReplyToChannel(this BotMessageContext context, string text, List<Attachment> attachments)
         {
-            return context.Bot.SendMessage
+            return context.SendMessage
             (
                 new OutboundResponse
                 {
@@ -43,7 +57,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// </summary>
         public static Task ReplyDirectlyToUser(this BotMessageContext context, InboundMessage message, string text)
         {
-            return context.Bot.SendMessage
+            return context.SendMessage
             (
                 new OutboundResponse
                 {
@@ -60,7 +74,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// </summary>
         public static Task IndicateTypingOnChannel(this BotMessageContext context, InboundMessage message)
         {
-            return context.Bot.SendMessage
+            return context.SendMessage
             (
                 new OutboundResponse
                 {
@@ -77,7 +91,7 @@ namespace Hsbot.Slack.Core.Messaging
         /// </summary>
         public static Task IndicateTypingOnDirectMessage(this BotMessageContext context, InboundMessage message)
         {
-            return context.Bot.SendMessage
+            return context.SendMessage
             (
                 new OutboundResponse
                 {

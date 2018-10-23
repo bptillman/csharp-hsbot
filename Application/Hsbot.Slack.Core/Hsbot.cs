@@ -27,7 +27,7 @@ namespace Hsbot.Slack.Core
         public string[] AddressableNames { get; private set; } //names by which the bot may be addressed in the chat app
 
         public HsbotBrain Brain { get; private set; }
-        
+
         public Hsbot(IHsbotConfig hsbotConfig,
             IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
@@ -147,12 +147,7 @@ namespace Hsbot.Slack.Core
                 BotIsMentioned = message.MentionsBot
             };
 
-            var messageContext = new BotMessageContext
-            {
-                Bot = this,
-                Message = inboundMessage,
-                Log = _log
-            };
+            var messageContext = new BotMessageContext(Brain, _log, inboundMessage, SendMessage);
 
             var messageSnippet = $"{message.User.Name}: {message.Text.Substring(0, Math.Min(message.Text.Length, 25))}...";
 
