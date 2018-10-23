@@ -17,12 +17,12 @@ namespace Hsbot.Slack.Core.MessageHandlers
         {
             return new[]
             {
-          new MessageHandlerDescriptor
-          {
-            Command = CommandText,
-            Description = "Replies to user who sent the message with 'Pong!'"
-          }
-        };
+                new MessageHandlerDescriptor
+                {
+                    Command = CommandText,
+                    Description = "Replies to user who sent the message with 'Pong!'"
+                }
+            };
         }
 
         protected override bool CanHandle(InboundMessage message)
@@ -32,7 +32,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
 
         public override Task HandleAsync(BotMessageContext context)
         {
-            return context.ReplyToChannel("Pong!");
+            return ReplyToChannel(context, "Pong!");
         }
     }
 }

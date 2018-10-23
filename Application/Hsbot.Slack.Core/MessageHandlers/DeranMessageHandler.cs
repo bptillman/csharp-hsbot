@@ -26,7 +26,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
 
         public override Task HandleAsync(BotMessageContext context)
         {
-            return context.ReplyToChannel("http://i.imgur.com/reDPhBx.jpg");
+            return ReplyToChannel(context, "http://i.imgur.com/reDPhBx.jpg");
         }
 
         protected override bool CanHandle(InboundMessage message)
