@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Hsbot.Slack.Core.Messaging
 {
@@ -6,7 +7,7 @@ namespace Hsbot.Slack.Core.Messaging
     {
         IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
         HandlesResult Handles(InboundMessage message);
-        IEnumerable<OutboundResponse> Handle(InboundMessage message);
+        Task HandleAsync(BotMessageContext context);
     }
 
     public class HandlesResult

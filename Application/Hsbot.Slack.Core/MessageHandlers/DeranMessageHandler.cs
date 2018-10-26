@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 
@@ -23,9 +24,9 @@ namespace Hsbot.Slack.Core.MessageHandlers
             yield break;
         }
 
-        public override IEnumerable<OutboundResponse> Handle(InboundMessage message)
+        public override Task HandleAsync(BotMessageContext context)
         {
-            yield return message.ReplyToChannel("http://i.imgur.com/reDPhBx.jpg");
+            return ReplyToChannel(context, "http://i.imgur.com/reDPhBx.jpg");
         }
 
         protected override bool CanHandle(InboundMessage message)

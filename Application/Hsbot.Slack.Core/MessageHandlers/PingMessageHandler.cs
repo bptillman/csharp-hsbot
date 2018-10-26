@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 
@@ -16,12 +17,12 @@ namespace Hsbot.Slack.Core.MessageHandlers
         {
             return new[]
             {
-          new MessageHandlerDescriptor
-          {
-            Command = CommandText,
-            Description = "Replies to user who sent the message with 'Pong!'"
-          }
-        };
+                new MessageHandlerDescriptor
+                {
+                    Command = CommandText,
+                    Description = "Replies to user who sent the message with 'Pong!'"
+                }
+            };
         }
 
         protected override bool CanHandle(InboundMessage message)
@@ -29,9 +30,9 @@ namespace Hsbot.Slack.Core.MessageHandlers
             return message.StartsWith(CommandText);
         }
 
-        public override IEnumerable<OutboundResponse> Handle(InboundMessage message)
+        public override Task HandleAsync(BotMessageContext context)
         {
-            yield return message.ReplyToChannel("Pong!");
+            return ReplyToChannel(context, "Pong!");
         }
     }
 }
