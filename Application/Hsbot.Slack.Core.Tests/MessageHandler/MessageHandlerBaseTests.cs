@@ -8,7 +8,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
     {
         public void ShouldHandleWhenAllConditionsMet()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             var inboundMessage = GetInboundMessage();
 
@@ -18,7 +18,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldHandleWhenAllConditionsMetAndBotIsMentioned()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             handler.DirectMentionOnlyValue = true;
 
@@ -31,7 +31,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldHandleWhenAllConditionsMetAndRandomRollIsLessThanHandlerOdds()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.1};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.1};
             var handler = GetTestMessageHandler(rng);
             handler.HandlerOddsValue = 0.11;
 
@@ -43,7 +43,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldHandleWhenAllConditionsMetAndMessageIsInTargetedChannel()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             handler.TargetedChannelsValue = new[] {"somechannel", "someotherchannel"};
 
@@ -56,7 +56,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldNotHandleWhenCanHandleIsFalse()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             handler.CanHandleReturnValue = false;
 
@@ -68,7 +68,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldNotHandleWhenBotIsNotMentioned()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             handler.DirectMentionOnlyValue = true;
 
@@ -81,7 +81,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldNotHandleWhenRandomRollIsGreaterThanOrEqualToHandlerOdds()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.11};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.11};
             var handler = GetTestMessageHandler(rng);
             handler.HandlerOddsValue = 0.10;
 
@@ -93,7 +93,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 
         public void ShouldNotHandleWhenMessageIsInUntargetedChannel()
         {
-            var rng = new TestRandomNumberGenerator {NextDoubleValue = 0.0};
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
             handler.TargetedChannelsValue = new[] {"somechannel", "someotherchannel"};
 
@@ -104,9 +104,9 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
             handleResult.HandlesMessage.ShouldBe(false);
         }
 
-        private static TestMessageHandler GetTestMessageHandler(TestRandomNumberGenerator rng)
+        private static MessageHandlerFake GetTestMessageHandler(RandomNumberGeneratorFake rng)
         {
-            var handler = new TestMessageHandler(rng)
+            var handler = new MessageHandlerFake(rng)
             {
                 CanHandleReturnValue = true,
                 DirectMentionOnlyValue = false,

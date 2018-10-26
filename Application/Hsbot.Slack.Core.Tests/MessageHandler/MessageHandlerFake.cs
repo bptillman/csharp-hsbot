@@ -8,7 +8,7 @@ using Hsbot.Slack.Core.Random;
 
 namespace Hsbot.Slack.Core.Tests.MessageHandler
 {
-    public class TestMessageHandler : MessageHandlerBase
+    public class MessageHandlerFake : MessageHandlerBase
     {
         public string[] TargetedChannelsValue { get; set; } = AllChannels;
         public bool DirectMentionOnlyValue { get; set; } = true;
@@ -23,7 +23,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
             return HandlerOddsValue;
         }
 
-        public TestMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
+        public MessageHandlerFake(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
         }
 

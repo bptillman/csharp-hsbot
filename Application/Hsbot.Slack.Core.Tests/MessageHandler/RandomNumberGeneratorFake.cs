@@ -2,7 +2,7 @@
 
 namespace Hsbot.Slack.Core.Tests.MessageHandler
 {
-    public class TestRandomNumberGenerator : IRandomNumberGenerator
+    public class RandomNumberGeneratorFake : IRandomNumberGenerator
     {
         public double NextDoubleValue { get; set; }
 
