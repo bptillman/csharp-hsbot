@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack.Web", "Hsbot.Slack.Web\Hsbot.Slack.Web.csproj", "{03B176DF-306F-4BA0-8A4B-077A14D7C6CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Hosting.Web", "Hsbot.Hosting.Web\Hsbot.Hosting.Web.csproj", "{03B176DF-306F-4BA0-8A4B-077A14D7C6CD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack.Core", "Hsbot.Slack.Core\Hsbot.Slack.Core.csproj", "{3934F514-D4D9-4D92-8F4C-B6DCBEBA6516}"
 EndProject
