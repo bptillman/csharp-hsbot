@@ -24,7 +24,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
             yield break;
         }
 
-        public override Task HandleAsync(BotMessageContext context)
+        public override Task HandleAsync(IBotMessageContext context)
         {
             return ReplyToChannel(context, "http://i.imgur.com/reDPhBx.jpg");
         }

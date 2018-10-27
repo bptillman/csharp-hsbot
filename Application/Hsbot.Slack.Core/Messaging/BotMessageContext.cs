@@ -4,7 +4,7 @@ using Hsbot.Slack.Core.Brain;
 
 namespace Hsbot.Slack.Core.Messaging
 {
-    public class BotMessageContext
+    public class BotMessageContext : IBotMessageContext
     {
         public BotMessageContext(IBotBrain brain, 
             IHsbotLog log, 

@@ -30,7 +30,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
             return message.StartsWith(CommandText);
         }
 
-        public override Task HandleAsync(BotMessageContext context)
+        public override Task HandleAsync(IBotMessageContext context)
         {
             return ReplyToChannel(context, "Pong!");
         }

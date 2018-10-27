@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Hsbot.Slack.Core.Brain;
 using Hsbot.Slack.Core.Connection;
 using Hsbot.Slack.Core.Messaging;
 using Moq;
-using Shouldly;
 
 namespace Hsbot.Slack.Core.Tests
 {
@@ -82,7 +80,7 @@ namespace Hsbot.Slack.Core.Tests
             chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
 
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<BotMessageContext>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<IBotMessageContext>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
@@ -90,7 +88,7 @@ namespace Hsbot.Slack.Core.Tests
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<BotMessageContext>()), Times.Once);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<IBotMessageContext>()), Times.Once);
         }
 
         public async Task ShouldNotCallHandlerWhenItDoesNotHandleMessage()
@@ -120,7 +118,7 @@ namespace Hsbot.Slack.Core.Tests
 
             var outboundResponse = new OutboundResponse();
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<BotMessageContext>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<IBotMessageContext>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
@@ -128,7 +126,7 @@ namespace Hsbot.Slack.Core.Tests
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<BotMessageContext>()), Times.Never);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<IBotMessageContext>()), Times.Never);
             chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Never);
         }
 

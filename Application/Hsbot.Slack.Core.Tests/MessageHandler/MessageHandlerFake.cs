@@ -37,7 +37,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
             return CanHandleReturnValue;
         }
 
-        public override Task HandleAsync(BotMessageContext context)
+        public override Task HandleAsync(IBotMessageContext context)
         {
             return Task.CompletedTask;
         }
