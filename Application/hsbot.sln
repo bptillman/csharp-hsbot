@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack.Web", "Hsbot.Sl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack.Core", "Hsbot.Slack.Core\Hsbot.Slack.Core.csproj", "{3934F514-D4D9-4D92-8F4C-B6DCBEBA6516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Slack.Core.Tests", "Hsbot.Slack.Core.Tests\Hsbot.Slack.Core.Tests.csproj", "{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Core.Tests", "Hsbot.Core.Tests\Hsbot.Core.Tests.csproj", "{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hsbot.Slack.Core\Hsbot.Slack.Core.csproj" />
+    <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
   </ItemGroup>
 
 </Project>
