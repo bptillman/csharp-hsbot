@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="SlackConnector" Version="4.2.71" />
+    <PackageReference Include="System.Reactive" Version="4.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
+  </ItemGroup>
+
+</Project>

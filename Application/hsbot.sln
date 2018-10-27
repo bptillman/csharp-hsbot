@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Core", "Hsbot.Core\Hs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Core.Tests", "Hsbot.Core.Tests\Hsbot.Core.Tests.csproj", "{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Slack", "Hsbot.Slack\Hsbot.Slack.csproj", "{72DD27E5-6FAB-413C-BFD6-7197810C8637}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72DD27E5-6FAB-413C-BFD6-7197810C8637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72DD27E5-6FAB-413C-BFD6-7197810C8637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72DD27E5-6FAB-413C-BFD6-7197810C8637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72DD27E5-6FAB-413C-BFD6-7197810C8637}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
