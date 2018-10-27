@@ -5,6 +5,7 @@ using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
+using Hsbot.Slack;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Hsbot.Hosting.Web
