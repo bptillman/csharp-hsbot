@@ -1,4 +1,4 @@
-using Hsbot.Slack.Core;
+using Hsbot.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;

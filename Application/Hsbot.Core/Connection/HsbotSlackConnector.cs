@@ -3,12 +3,12 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.Messaging;
+using Hsbot.Core.Messaging;
 using SlackConnector;
 using SlackConnector.EventHandlers;
 using SlackConnector.Models;
 
-namespace Hsbot.Slack.Core.Connection
+namespace Hsbot.Core.Connection
 {
     public class HsbotSlackConnector : IHsbotChatConnector
     {

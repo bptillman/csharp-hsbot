@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Hsbot.Slack.Core.Brain
+namespace Hsbot.Core.Brain
 {
     public class AzureBrainStorage : IBotBrainStorage<HsbotBrain>
     {

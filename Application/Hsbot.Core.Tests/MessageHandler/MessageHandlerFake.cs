@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.MessageHandlers;
-using Hsbot.Slack.Core.Messaging;
-using Hsbot.Slack.Core.Random;
+using Hsbot.Core.MessageHandlers;
+using Hsbot.Core.Messaging;
+using Hsbot.Core.Random;
 
 namespace Hsbot.Core.Tests.MessageHandler
 {

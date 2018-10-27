@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Hsbot.Slack.Core.Brain
+namespace Hsbot.Core.Brain
 {
     public class JsonBrainSerializer : IBotBrainSerializer<HsbotBrain>
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.MessageHandlers;
+using Hsbot.Core.MessageHandlers;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.MessageHandler

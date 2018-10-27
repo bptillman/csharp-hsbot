@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Hsbot.Slack.Core.Messaging
+namespace Hsbot.Core.Messaging
 {
     public interface IInboundMessageHandler
     {

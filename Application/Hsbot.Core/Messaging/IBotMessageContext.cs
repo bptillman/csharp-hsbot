@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.Brain;
+using Hsbot.Core.Brain;
 
-namespace Hsbot.Slack.Core.Messaging
+namespace Hsbot.Core.Messaging
 {
     public interface IBotMessageContext
     {

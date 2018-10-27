@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SlackConnector.Models;
 
-namespace Hsbot.Slack.Core.Messaging
+namespace Hsbot.Core.Messaging
 {
     internal static class SlackMessageExtensions
     {

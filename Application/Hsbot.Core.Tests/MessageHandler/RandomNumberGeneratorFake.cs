@@ -1,4 +1,4 @@
-﻿using Hsbot.Slack.Core.Random;
+﻿using Hsbot.Core.Random;
 
 namespace Hsbot.Core.Tests.MessageHandler
 {

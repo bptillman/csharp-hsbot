@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Hsbot.Slack.Core.Brain
+namespace Hsbot.Core.Brain
 {
     public interface IBotBrain
     {

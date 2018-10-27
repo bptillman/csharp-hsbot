@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core;
-using Hsbot.Slack.Core.Brain;
-using Hsbot.Slack.Core.Messaging;
+using Hsbot.Core.Brain;
+using Hsbot.Core.Messaging;
 using Moq;
 
 namespace Hsbot.Core.Tests.MessageHandler

@@ -6,9 +6,9 @@ namespace Hsbot.Hosting.Web
 {
     public class HsbotHostedService : IHostedService
     {
-      private readonly Slack.Core.Hsbot _hsbot;
+      private readonly Core.Hsbot _hsbot;
 
-      public HsbotHostedService(Slack.Core.Hsbot hsbot)
+      public HsbotHostedService(Core.Hsbot hsbot)
       {
         _hsbot = hsbot;
       }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Hsbot.Slack.Core.Messaging
+namespace Hsbot.Core.Messaging
 {
     internal static class InboundMessageExtensions
     {

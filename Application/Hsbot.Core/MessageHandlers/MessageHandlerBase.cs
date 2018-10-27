@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.Messaging;
-using Hsbot.Slack.Core.Random;
+using Hsbot.Core.Messaging;
+using Hsbot.Core.Random;
 
-namespace Hsbot.Slack.Core.MessageHandlers
+namespace Hsbot.Core.MessageHandlers
 {
     public abstract class MessageHandlerBase : IInboundMessageHandler
     {

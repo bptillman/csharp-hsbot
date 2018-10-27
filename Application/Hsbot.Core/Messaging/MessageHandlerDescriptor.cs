@@ -1,4 +1,4 @@
-﻿namespace Hsbot.Slack.Core.Messaging
+﻿namespace Hsbot.Core.Messaging
 {
     public class MessageHandlerDescriptor
     {

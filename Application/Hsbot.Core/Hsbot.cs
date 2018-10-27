@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.Brain;
-using Hsbot.Slack.Core.Connection;
-using Hsbot.Slack.Core.Messaging;
+using Hsbot.Core.Brain;
+using Hsbot.Core.Connection;
+using Hsbot.Core.Messaging;
 
-namespace Hsbot.Slack.Core
+namespace Hsbot.Core
 {
     public class Hsbot : IDisposable
     {

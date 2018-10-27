@@ -1,4 +1,4 @@
-﻿namespace Hsbot.Slack.Core.Brain
+﻿namespace Hsbot.Core.Brain
 {
     public interface IBotBrainSerializer<T>
         where T: IBotBrain

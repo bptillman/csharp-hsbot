@@ -1,4 +1,4 @@
-﻿namespace Hsbot.Slack.Core.Random
+﻿namespace Hsbot.Core.Random
 {
   public class RandomNumberGenerator : IRandomNumberGenerator
   {

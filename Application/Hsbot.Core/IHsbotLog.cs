@@ -1,4 +1,4 @@
-﻿namespace Hsbot.Slack.Core
+﻿namespace Hsbot.Core
 {
     public interface IHsbotLog
     {

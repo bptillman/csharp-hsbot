@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Newtonsoft.Json;
 
-namespace Hsbot.Slack.Core.Brain
+namespace Hsbot.Core.Brain
 {
     public class HsbotBrain : IBotBrain
     {

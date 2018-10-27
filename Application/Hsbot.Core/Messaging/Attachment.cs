@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using SlackConnector.Models;
 
-namespace Hsbot.Slack.Core.Messaging
+namespace Hsbot.Core.Messaging
 {
     public class Attachment
     {

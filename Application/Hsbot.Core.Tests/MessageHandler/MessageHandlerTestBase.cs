@@ -1,5 +1,5 @@
 ﻿using System;
-using Hsbot.Slack.Core.MessageHandlers;
+using Hsbot.Core.MessageHandlers;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.MessageHandler

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Hsbot.Slack.Core.Brain;
+using Hsbot.Core.Brain;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.Brain

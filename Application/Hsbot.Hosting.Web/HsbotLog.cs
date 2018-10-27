@@ -1,4 +1,4 @@
-using Hsbot.Slack.Core;
+using Hsbot.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Hsbot.Hosting.Web

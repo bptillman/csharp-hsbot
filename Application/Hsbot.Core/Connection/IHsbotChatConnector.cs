@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core.Messaging;
+using Hsbot.Core.Messaging;
 
-namespace Hsbot.Slack.Core.Connection
+namespace Hsbot.Core.Connection
 {
     public interface IHsbotChatConnector
     {

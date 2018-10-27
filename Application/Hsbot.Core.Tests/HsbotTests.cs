@@ -2,10 +2,9 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Hsbot.Slack.Core;
-using Hsbot.Slack.Core.Brain;
-using Hsbot.Slack.Core.Connection;
-using Hsbot.Slack.Core.Messaging;
+using Hsbot.Core.Brain;
+using Hsbot.Core.Connection;
+using Hsbot.Core.Messaging;
 using Moq;
 
 namespace Hsbot.Core.Tests
@@ -18,7 +17,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
 
             brainStorageMock.Verify(x => x.Load(), Times.Once);
@@ -31,7 +30,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -47,7 +46,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -85,7 +84,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -123,7 +122,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -137,7 +136,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Slack.Core.Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
             await hsbot.Connect();
             
             var outboundResponse = new OutboundResponse();
