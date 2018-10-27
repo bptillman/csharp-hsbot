@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27703.2047
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Hosting.Web", "Hsbot.Hosting.Web\Hsbot.Hosting.Web.csproj", "{03B176DF-306F-4BA0-8A4B-077A14D7C6CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack.Core", "Hsbot.Slack.Core\Hsbot.Slack.Core.csproj", "{3934F514-D4D9-4D92-8F4C-B6DCBEBA6516}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Core", "Hsbot.Core\Hsbot.Core.csproj", "{3934F514-D4D9-4D92-8F4C-B6DCBEBA6516}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Core.Tests", "Hsbot.Core.Tests\Hsbot.Core.Tests.csproj", "{42AE2D9C-8F32-4621-808F-BA0AE3B52EE1}"
 EndProject
