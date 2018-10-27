@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using Hsbot.Slack.Core.Brain;
 using Shouldly;
 
-namespace Hsbot.Slack.Core.Tests.Brain
+namespace Hsbot.Core.Tests.Brain
 {
     public class JsonBrainSerializerTests
     {

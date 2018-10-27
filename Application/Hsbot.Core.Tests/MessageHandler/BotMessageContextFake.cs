@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Slack.Core;
 using Hsbot.Slack.Core.Brain;
 using Hsbot.Slack.Core.Messaging;
 using Moq;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public class BotMessageContextFake : IBotMessageContext
     {

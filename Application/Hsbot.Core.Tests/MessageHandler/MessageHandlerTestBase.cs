@@ -2,7 +2,7 @@
 using Hsbot.Slack.Core.MessageHandlers;
 using Shouldly;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public abstract class MessageHandlerTestBase<T> where T: MessageHandlerBase
     {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Hsbot.Slack.Core.MessageHandlers;
 using Hsbot.Slack.Core.Messaging;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public static class MessageHandlerBaseTestExtensions
     {

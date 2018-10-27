@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Hsbot.Slack.Core.MessageHandlers;
 using Shouldly;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public class DeranMessageHandlerTests : MessageHandlerTestBase<DeranMessageHandler>
     {

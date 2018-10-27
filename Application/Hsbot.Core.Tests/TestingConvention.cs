@@ -1,6 +1,6 @@
 ﻿using Fixie;
 
-namespace Hsbot.Slack.Core.Tests
+namespace Hsbot.Core.Tests
 {
     public class TestingConvention : Discovery, Execution
     {

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Slack.Core.MessageHandlers;
 using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public class MessageHandlerFake : MessageHandlerBase
     {

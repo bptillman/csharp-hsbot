@@ -1,6 +1,6 @@
 ﻿using Hsbot.Slack.Core.Random;
 
-namespace Hsbot.Slack.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler
 {
     public class RandomNumberGeneratorFake : IRandomNumberGenerator
     {
