@@ -1,7 +1,7 @@
 using Hsbot.Slack.Core;
 using Microsoft.Extensions.Logging;
 
-namespace Hsbot.Slack.Web
+namespace Hsbot.Hosting.Web
 {
     public class HsbotLog : IHsbotLog
     {

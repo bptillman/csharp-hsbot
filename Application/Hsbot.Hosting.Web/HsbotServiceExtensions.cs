@@ -7,7 +7,7 @@ using Hsbot.Slack.Core.Messaging;
 using Hsbot.Slack.Core.Random;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Hsbot.Slack.Web
+namespace Hsbot.Hosting.Web
 {
     public static class HsbotServiceExtensions
     {
@@ -21,7 +21,7 @@ namespace Hsbot.Slack.Web
             services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
             services.AddSingleton<IBotBrainStorage<HsbotBrain>, AzureBrainStorage>();
             services.AddSingleton<IHsbotChatConnector, HsbotSlackConnector>();
-            services.AddSingleton<Core.Hsbot>();
+            services.AddSingleton<Slack.Core.Hsbot>();
 
             return services;
         }
@@ -29,7 +29,7 @@ namespace Hsbot.Slack.Web
         private static void RegisterMessageHandlers(IServiceCollection services)
         {
             var handlerInterfaceType = typeof(IInboundMessageHandler);
-            var messageHandlerTypes = Assembly.GetAssembly(typeof(Core.Hsbot))
+            var messageHandlerTypes = Assembly.GetAssembly(typeof(Slack.Core.Hsbot))
               .GetTypes()
               .Where(t => !t.IsAbstract && !t.IsInterface && handlerInterfaceType.IsAssignableFrom(t));
 

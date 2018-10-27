@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
-namespace Hsbot.Slack.Web
+namespace Hsbot.Hosting.Web
 {
     public class Startup
     {

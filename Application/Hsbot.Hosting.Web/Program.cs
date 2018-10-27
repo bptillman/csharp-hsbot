@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Hsbot.Slack.Web
+namespace Hsbot.Hosting.Web
 {
     public class Program
     {

@@ -2,13 +2,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace Hsbot.Slack.Web
+namespace Hsbot.Hosting.Web
 {
     public class HsbotHostedService : IHostedService
     {
-      private readonly Core.Hsbot _hsbot;
+      private readonly Slack.Core.Hsbot _hsbot;
 
-      public HsbotHostedService(Core.Hsbot hsbot)
+      public HsbotHostedService(Slack.Core.Hsbot hsbot)
       {
         _hsbot = hsbot;
       }
