@@ -18,7 +18,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
                 var message = messageHandler.GetTestMessageThatWillBeHandled(messageText);
 
                 var handleResult = messageHandler.Handles(message);
-                handleResult.HandlesMessage.ShouldBeTrue();
+                handleResult.HandlesMessage.ShouldBeTrue($"{typeof(T).Name}.{nameof(messageHandler.Handles)}(\"{messageText}\") method returned false for a message it should handle");
             }
         }
 
@@ -31,7 +31,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
                 var message = messageHandler.GetTestMessageThatWillBeHandled(messageText);
 
                 var handleResult = messageHandler.Handles(message);
-                handleResult.HandlesMessage.ShouldBeFalse();
+                handleResult.HandlesMessage.ShouldBeFalse($"{typeof(T).Name}.{nameof(messageHandler.Handles)}(\"{messageText}\") method returned true for a message it should not handle");
             }
         }
 
