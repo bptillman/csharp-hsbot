@@ -38,8 +38,8 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
         protected T GetHandlerInstance()
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
-            //always succeed, meaning the random roll will not prevent the result of ShouldHandle
-            //from being false
+            //always succeed, meaning the random roll will not cause the result of ShouldHandle
+            //to be false
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0}; 
 
             return (T) Activator.CreateInstance(typeof(T), rng);
