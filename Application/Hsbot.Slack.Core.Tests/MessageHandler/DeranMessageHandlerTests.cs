@@ -13,7 +13,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
         public async Task ShouldSayHiDeran()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("fake");
+            var response = await messageHandler.HandleAsync();
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Text.ShouldBe("http://i.imgur.com/reDPhBx.jpg");
         }

@@ -7,7 +7,7 @@ namespace Hsbot.Slack.Core.Tests.MessageHandler
 {
     public static class MessageHandlerBaseTestExtensions
     {
-        public static Task<BotMessageContextFake> HandleAsync(this MessageHandlerBase handler, string messageText)
+        public static Task<BotMessageContextFake> HandleAsync(this MessageHandlerBase handler, string messageText = "fake message text")
         {
             var message = handler.GetTestMessageThatWillBeHandled(messageText);
             return handler.HandleAsync(message);
