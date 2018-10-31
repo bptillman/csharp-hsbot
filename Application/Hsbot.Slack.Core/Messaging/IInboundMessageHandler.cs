@@ -7,7 +7,7 @@ namespace Hsbot.Slack.Core.Messaging
     {
         IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
         HandlesResult Handles(InboundMessage message);
-        Task HandleAsync(BotMessageContext context);
+        Task HandleAsync(IBotMessageContext context);
     }
 
     public class HandlesResult

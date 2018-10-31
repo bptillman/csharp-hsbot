@@ -1,42 +1,39 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Hsbot.Slack.Core.Brain;
+using Hsbot.Slack.Core.Connection;
 using Hsbot.Slack.Core.Messaging;
-using SlackConnector;
-using SlackConnector.Models;
 
 namespace Hsbot.Slack.Core
 {
     public class Hsbot : IDisposable
     {
-        private readonly IHsbotConfig _hsbotConfig;
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
         private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
 
         private IDisposable _brainChangedSubscription;
+        private IDisposable _onDisconnectSubscription;
+        private IDisposable _onReconnectingSubscription;
+        private IDisposable _onReconnectedSubscription;
+        private IDisposable _onMessageReceivedSubscription;
 
-        private ISlackConnection _connection;
+        private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
-
-        public string Id { get; private set; } //internal id of the bot
-        public string Name { get; private set; } //official handle of the bot
-        public string[] AddressableNames { get; private set; } //names by which the bot may be addressed in the chat app
 
         public HsbotBrain Brain { get; private set; }
 
-        public Hsbot(IHsbotConfig hsbotConfig,
-            IHsbotLog log,
+        public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
-            IBotBrainStorage<HsbotBrain> brainStorage)
+            IBotBrainStorage<HsbotBrain> brainStorage,
+            IHsbotChatConnector connection)
         {
-            _hsbotConfig = hsbotConfig;
             _log = log;
             _messageHandlers = messageHandlers;
             _brainStorage = brainStorage;
+            _connection = connection;
         }
 
         public async Task Connect()
@@ -45,22 +42,31 @@ namespace Hsbot.Slack.Core
 
             _log.Info("Connecting to messaging service");
 
-            var connector = new SlackConnector.SlackConnector();
-            _connection = await connector.Connect(_hsbotConfig.SlackApiKey);
+            await _connection.Connect();
+            _onDisconnectSubscription =_connection.Disconnected
+                .Select(conn => Observable.FromAsync(ct => OnDisconnect()))
+                .Concat()
+                .Subscribe();
 
-            _connection.OnDisconnect += OnDisconnect;
-            _connection.OnReconnecting += OnReconnecting;
-            _connection.OnReconnect += OnReconnect;
-            _connection.OnMessageReceived += OnMessageReceived;
+            _onReconnectingSubscription = _connection.Reconnecting
+                .Select(conn => Observable.FromAsync(ct => OnReconnecting()))
+                .Concat()
+                .Subscribe();
 
-            Id = _connection?.Self?.Id;
-            Name = _connection?.Self?.Name;
-            AddressableNames = GetAddressableNames(Name, Id);
+            _onReconnectedSubscription = _connection.Reconnected
+                .Select(conn => Observable.FromAsync(ct => OnReconnect()))
+                .Concat()
+                .Subscribe();
+
+            _onMessageReceivedSubscription = _connection.MessageReceived
+                .Select(msg => Observable.FromAsync(async f => await OnMessageReceived(await msg)))
+                .Concat()
+                .Subscribe();
 
             _log.Info("Connected successfully");
         }
 
-        private void OnDisconnect()
+        private Task OnDisconnect()
         {
             if (_disconnecting)
             {
@@ -69,49 +75,18 @@ namespace Hsbot.Slack.Core
 
             else
             {
-                _log.Info("Disconnected from server, attempting to reconnect");
-                Reconnect();
+                _log.Info("Disconnected from server, attempting to reconnect automatically");
             }
+            
+            return Task.CompletedTask;
         }
 
-        public async Task Disconnect()
+        public Task Disconnect()
         {
             _log.Info("Disconnecting");
 
             _disconnecting = true;
-            if (_connection?.IsConnected == true)
-            {
-                await _connection.Close();
-            }
-        }
-
-        private void Reconnect()
-        {
-            _log.Info("Reconnecting");
-            if (_connection != null)
-            {
-                _connection.OnDisconnect += OnDisconnect;
-                _connection.OnReconnecting += OnReconnecting;
-                _connection.OnReconnect += OnReconnect;
-                _connection.OnMessageReceived += OnMessageReceived;
-                _connection = null;
-            }
-
-            _disconnecting = false;
-
-            Connect()
-                .ContinueWith(task =>
-                {
-                    if (task.IsCompleted && !task.IsCanceled && !task.IsFaulted)
-                    {
-                        _log.Info("Connection restored.");
-                    }
-
-                    else
-                    {
-                        _log.Error("Error while reconnecting: {0}", task.Exception);
-                    }
-                });
+            return _connection.Disconnect();
         }
 
         private Task OnReconnecting()
@@ -126,34 +101,15 @@ namespace Hsbot.Slack.Core
             return Task.CompletedTask;
         }
 
-        private async Task OnMessageReceived(SlackMessage message)
+        private async Task OnMessageReceived(InboundMessage message)
         {
-            var userChannel = await GetUserChannel(message);
+            var messageContext = new BotMessageContext(Brain, _log, message, SendMessage);
 
-            var inboundMessage = new InboundMessage
-            {
-                RawText = message.RawData,
-                FullText = message.Text,
-                TextWithoutBotName = message.GetTextWithoutBotName(AddressableNames),
-                UserId = message.User.Id,
-                Username = message.User.Name,
-                UserEmail = message.User.Email,
-                Channel = message.ChatHub.Id,
-                ChannelName = message.ChatHub.Name,
-                MessageRecipientType = message.ChatHub.Type.ToMessageRecipientType(),
-                UserChannel = userChannel,
-                BotName = Name,
-                BotId = Id,
-                BotIsMentioned = message.MentionsBot
-            };
-
-            var messageContext = new BotMessageContext(Brain, _log, inboundMessage, SendMessage);
-
-            var messageSnippet = $"{message.User.Name}: {message.Text.Substring(0, Math.Min(message.Text.Length, 25))}...";
+            var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
 
             foreach (var inboundMessageHandler in _messageHandlers)
             {
-                var handlerResult = inboundMessageHandler.Handles(inboundMessage);
+                var handlerResult = inboundMessageHandler.Handles(message);
 
                 _log.Debug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
 
@@ -178,6 +134,7 @@ namespace Hsbot.Slack.Core
                 _brainChangedSubscription = Brain.BrainChanged
                     .Select(SaveBrain)
                     .Window(1) //ensure we only run 1 call to the save brain method at a given time
+                    .Concat()
                     .Subscribe();
 
                 _log.Info("Brain loaded from storage successfully");
@@ -215,85 +172,18 @@ namespace Hsbot.Slack.Core
             }
         }
 
-        public async Task SendMessage(OutboundResponse response)
+        public Task SendMessage(OutboundResponse response)
         {
-            var chatHub = await GetChatHub(response);
-
-            if (chatHub != null)
-            {
-                if (response.IndicateTyping)
-                {
-                    await _connection.IndicateTyping(chatHub);
-                }
-
-                else
-                {
-                    var botMessage = new BotMessage
-                    {
-                        ChatHub = chatHub,
-                        Attachments = response.Attachments.ToSlackAttachments(),
-                        Text = response.Text
-                    };
-
-                    await _connection.Say(botMessage);
-                }
-            }
-        }
-
-        private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
-        {
-            switch (response.MessageRecipientType)
-            {
-                case MessageRecipientType.Channel:
-                    return new SlackChatHub { Id = response.Channel };
-                case MessageRecipientType.DirectMessage when string.IsNullOrEmpty(response.Channel):
-                    return await GetUserChatHub(response.UserId);
-                case MessageRecipientType.DirectMessage:
-                    return new SlackChatHub { Id = response.Channel };
-                default:
-                    return new SlackChatHub { Id = response.Channel };
-            }
-        }
-
-        private async Task<SlackChatHub> GetUserChatHub(string userId, bool joinChannel = true)
-        {
-            SlackChatHub chatHub = null;
-
-            if (_connection.UserCache.ContainsKey(userId))
-            {
-                var username = "@" + _connection.UserCache[userId].Name;
-                chatHub = _connection.ConnectedDMs().FirstOrDefault(x => x.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (chatHub == null && joinChannel)
-            {
-                chatHub = await _connection.JoinDirectMessageChannel(userId);
-            }
-
-            return chatHub;
-        }
-
-        private async Task<string> GetUserChannel(SlackMessage message)
-        {
-            return (await GetUserChatHub(message.User.Id, joinChannel: false) ?? new SlackChatHub()).Id;
-        }
-
-        private static string[] GetAddressableNames(string botName, string botId)
-        {
-            return new []
-            {
-                $"{botName}:",
-                botName,
-                $"<@{botId}>:",
-                $"<@{botId}>",
-                $"@{botName}:",
-                $"@{botName}",
-            };
+            return _connection.SendMessage(response);
         }
 
         public void Dispose()
         {
             _brainChangedSubscription?.Dispose();
+            _onDisconnectSubscription?.Dispose();
+            _onReconnectedSubscription?.Dispose();
+            _onReconnectingSubscription?.Dispose();
+            _onMessageReceivedSubscription?.Dispose();
         }
     }
 }

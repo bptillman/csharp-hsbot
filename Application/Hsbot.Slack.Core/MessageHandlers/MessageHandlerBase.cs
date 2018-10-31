@@ -68,12 +68,12 @@ namespace Hsbot.Slack.Core.MessageHandlers
         }
 
         protected abstract bool CanHandle(InboundMessage message);
-        public abstract Task HandleAsync(BotMessageContext context);
+        public abstract Task HandleAsync(IBotMessageContext context);
 
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        protected Task ReplyToChannel(BotMessageContext context, string text, Attachment attachment = null)
+        protected Task ReplyToChannel(IBotMessageContext context, string text, Attachment attachment = null)
         {
             var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
             return context.SendMessage(context.Message.ReplyToChannel(text, attachments));
@@ -82,7 +82,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        protected Task ReplyToChannel(BotMessageContext context, string text, List<Attachment> attachments)
+        protected Task ReplyToChannel(IBotMessageContext context, string text, List<Attachment> attachments)
         {
             return context.SendMessage
             (
@@ -99,7 +99,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
         /// <summary>
         /// Will send a DirectMessage reply to the use who sent the message
         /// </summary>
-        protected Task ReplyDirectlyToUser(BotMessageContext context, InboundMessage message, string text)
+        protected Task ReplyDirectlyToUser(IBotMessageContext context, InboundMessage message, string text)
         {
             return context.SendMessage
             (
@@ -116,7 +116,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
         /// <summary>
         /// Will display on Slack that the bot is typing on the current channel. Good for letting the end users know the bot is doing something.
         /// </summary>
-        protected Task IndicateTypingOnChannel(BotMessageContext context, InboundMessage message)
+        protected Task IndicateTypingOnChannel(IBotMessageContext context, InboundMessage message)
         {
             return context.SendMessage
             (
@@ -133,7 +133,7 @@ namespace Hsbot.Slack.Core.MessageHandlers
         /// <summary>
         /// Indicates on the DM channel that the bot is typing. Good for letting the end users know the bot is doing something.
         /// </summary>
-        protected Task IndicateTypingOnDirectMessage(BotMessageContext context, InboundMessage message)
+        protected Task IndicateTypingOnDirectMessage(IBotMessageContext context, InboundMessage message)
         {
             return context.SendMessage
             (
