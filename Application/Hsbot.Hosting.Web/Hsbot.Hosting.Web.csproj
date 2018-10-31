@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hsbot.Azure\Hsbot.Azure.csproj" />
     <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
     <ProjectReference Include="..\Hsbot.Slack\Hsbot.Slack.csproj" />
   </ItemGroup>

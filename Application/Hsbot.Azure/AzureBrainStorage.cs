@@ -1,9 +1,11 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Hsbot.Core;
+using Hsbot.Core.Brain;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
-namespace Hsbot.Core.Brain
+namespace Hsbot.Azure
 {
     public class AzureBrainStorage : IBotBrainStorage<HsbotBrain>
     {

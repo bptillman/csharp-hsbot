@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Reflection;
+using Hsbot.Azure;
 using Hsbot.Core;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
