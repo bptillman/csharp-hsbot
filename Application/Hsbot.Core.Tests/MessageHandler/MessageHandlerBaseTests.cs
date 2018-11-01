@@ -1,5 +1,6 @@
 ﻿using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.MessageHandler

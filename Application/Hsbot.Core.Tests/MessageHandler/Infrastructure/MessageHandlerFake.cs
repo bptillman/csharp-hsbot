@@ -4,7 +4,7 @@ using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
 
-namespace Hsbot.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class MessageHandlerFake : MessageHandlerBase
     {

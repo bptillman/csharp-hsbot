@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
 
-namespace Hsbot.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public static class MessageHandlerBaseTestExtensions
     {

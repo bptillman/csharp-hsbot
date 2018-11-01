@@ -2,7 +2,7 @@
 using Hsbot.Core.MessageHandlers;
 using Shouldly;
 
-namespace Hsbot.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public abstract class MessageHandlerTestBase<T> where T: MessageHandlerBase
     {

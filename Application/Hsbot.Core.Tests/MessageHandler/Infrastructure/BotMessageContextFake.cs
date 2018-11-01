@@ -5,7 +5,7 @@ using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Moq;
 
-namespace Hsbot.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class BotMessageContextFake : IBotMessageContext
     {

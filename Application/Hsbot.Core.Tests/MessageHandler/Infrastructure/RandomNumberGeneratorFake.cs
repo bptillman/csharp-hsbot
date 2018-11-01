@@ -1,6 +1,6 @@
 ﻿using Hsbot.Core.Random;
 
-namespace Hsbot.Core.Tests.MessageHandler
+namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class RandomNumberGeneratorFake : IRandomNumberGenerator
     {
