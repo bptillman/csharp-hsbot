@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hsbot.Azure\Hsbot.Azure.csproj" />
+    <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
+    <ProjectReference Include="..\Hsbot.Slack\Hsbot.Slack.csproj" />
+  </ItemGroup>
+
+</Project>

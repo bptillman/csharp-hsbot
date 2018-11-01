@@ -1,9 +1,0 @@
-﻿namespace Hsbot.Slack.Core.Brain
-{
-    public interface IBotBrainSerializer<T>
-        where T: IBotBrain
-    {
-        T Deserialize(string serializedBrain);
-        string Serialize(T brain);
-    }
-}
