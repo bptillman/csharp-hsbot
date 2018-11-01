@@ -4,7 +4,7 @@ It's your good buddy hsbot, now in C# (robots don't care for coffee) and on Slac
 
 # Developing Locally
 
-Copy the appSettings.json file in Application\Hsbot.Slack.Web to Application\Hsbot.Slack.Web\appSettings.Development.json.  
+Copy the appSettings.json file in Application\Hsbot.Hosting.Web to Application\Hsbot.Hosting.Web\appSettings.Development.json.  
 Update the file with the *devbot* API key and you're off to the races.
 
 # Licensing
