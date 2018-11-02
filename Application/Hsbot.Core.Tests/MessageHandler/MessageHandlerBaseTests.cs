@@ -107,29 +107,29 @@ namespace Hsbot.Core.Tests.MessageHandler
             handleResult.HandlesMessage.ShouldBe(false);
         }
 
-        public void ShouldThrowExceptionIfBarksIsNotSet()
+        public void ShouldThrowExceptionIfCannedResponsesIsNotSet()
         {
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
 
-            Should.Throw<Exception>(() => { handler.GetRandomBark(); }).Message.ShouldBe("Barks list cannot be empty");
+            Should.Throw<Exception>(() => { handler.GetRandomCannedResponse(); }).Message.ShouldBe("CannedResponses list cannot be empty");
         }
 
-        public void ShouldThrowExceptionIfBarksIsNull()
+        public void ShouldThrowExceptionIfCannedResponsesIsNull()
         {
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
-            handler.BarksValue = null;
+            handler.CannedResponsesValue = null;
 
-            Should.Throw<Exception>(() => { handler.GetRandomBark(); }).Message.ShouldBe("Barks list cannot be empty");
+            Should.Throw<Exception>(() => { handler.GetRandomCannedResponse(); }).Message.ShouldBe("CannedResponses list cannot be empty");
         }
 
         public void ShouldReturnBarkForSetBarkList()
         {
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var handler = GetTestMessageHandler(rng);
-            handler.BarksValue = new[] {"Test Bark 1", "Test Bark 2"};
-            handler.GetRandomBark().ShouldContain("Test Bark");
+            handler.CannedResponsesValue = new[] {"Test Bark 1", "Test Bark 2"};
+            handler.GetRandomCannedResponse().ShouldContain("Test Bark");
         }
 
         private static MessageHandlerFake GetTestMessageHandler(RandomNumberGeneratorFake rng)
@@ -140,7 +140,7 @@ namespace Hsbot.Core.Tests.MessageHandler
                 DirectMentionOnlyValue = false,
                 HandlerOddsValue = 1.0,
                 TargetedChannelsValue = MessageHandlerBase.AllChannels,
-                BarksValue = new string[0]
+                CannedResponsesValue = new string[0]
             };
 
             return handler;

@@ -39,7 +39,7 @@ namespace Hsbot.Core.MessageHandlers
             {"spicewood", "http://i.imgur.com/UMxipTc.png"}
         };
 
-        public override string[] Barks { get; } =
+        public override string[] CannedResponses { get; } =
         {
             "I only know how to find conference rooms.",
             "I don't think {0} is a conference room.",
@@ -79,7 +79,7 @@ namespace Hsbot.Core.MessageHandlers
 
             if (!_rooms.ContainsKey(roomSearch))
             {
-                return ReplyToChannel(context, string.Format(GetRandomBark(), roomSearch));
+                return ReplyToChannel(context, string.Format(GetRandomCannedResponse(), roomSearch));
             }
 
             var room = _rooms[roomSearch];

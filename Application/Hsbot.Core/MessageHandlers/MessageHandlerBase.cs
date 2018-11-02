@@ -12,7 +12,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public static readonly string[] AllChannels = null;
         public static readonly string[] FunChannels = { "#general", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
-        public virtual string[] Barks => new string[0];
+        public virtual string[] CannedResponses => new string[0];
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
@@ -43,14 +43,14 @@ namespace Hsbot.Core.MessageHandlers
             return 1.1;
         }
 
-        public string GetRandomBark()
+        public string GetRandomCannedResponse()
         {
-            if (Barks == null || Barks.Length == 0)
+            if (CannedResponses == null || CannedResponses.Length == 0)
             {
-                throw new Exception("Barks list cannot be empty");
+                throw new Exception("CannedResponses list cannot be empty");
             }
 
-            return Barks[RandomNumberGenerator.Generate(0, Barks.Length)];
+            return CannedResponses[RandomNumberGenerator.Generate(0, CannedResponses.Length)];
         }
 
         public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
