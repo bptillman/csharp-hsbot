@@ -45,7 +45,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public string GetRandomBark()
         {
-            if (Barks.Length == 0)
+            if (Barks == null || Barks.Length == 0)
             {
                 throw new Exception("Barks list cannot be empty");
             }

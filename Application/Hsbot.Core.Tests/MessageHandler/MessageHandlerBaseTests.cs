@@ -115,6 +115,15 @@ namespace Hsbot.Core.Tests.MessageHandler
             Should.Throw<Exception>(() => { handler.GetRandomBark(); }).Message.ShouldBe("Barks list cannot be empty");
         }
 
+        public void ShouldThrowExceptionIfBarksIsNull()
+        {
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
+            var handler = GetTestMessageHandler(rng);
+            handler.BarksValue = null;
+
+            Should.Throw<Exception>(() => { handler.GetRandomBark(); }).Message.ShouldBe("Barks list cannot be empty");
+        }
+
         public void ShouldReturnBarkForSetBarkList()
         {
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
