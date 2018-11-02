@@ -55,7 +55,7 @@ namespace Hsbot.Core.MessageHandlers
 
         protected override bool CanHandle(InboundMessage message)
         {
-            return message.TextWithoutBotName.StartsWith("will") && message.TextWithoutBotName.EndsWith("?");
+            return message.StartsWith("will") && message.EndsWith("?");
         }
     }
 }
