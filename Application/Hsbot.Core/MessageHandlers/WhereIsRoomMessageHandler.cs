@@ -8,7 +8,6 @@ namespace Hsbot.Core.MessageHandlers
     public class WhereIsRoomMessageHandler : MessageHandlerBase
     {
         private const string CommandText = "where is";
-        private readonly IRandomNumberGenerator _randomNumberGenerator;
 
         private readonly Dictionary<string, string> _rooms = new Dictionary<string, string>
         {
@@ -40,7 +39,7 @@ namespace Hsbot.Core.MessageHandlers
             {"spicewood", "http://i.imgur.com/UMxipTc.png"}
         };
 
-        private readonly List<string> _barks = new List<string>
+        public override string[] Barks { get; } =
         {
             "I only know how to find conference rooms.",
             "I don't think {0} is a conference room.",
@@ -49,7 +48,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public WhereIsRoomMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
-            _randomNumberGenerator = randomNumberGenerator;
+
         }
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
@@ -67,11 +66,6 @@ namespace Hsbot.Core.MessageHandlers
         protected override bool CanHandle(InboundMessage message)
         {
             return message.StartsWith(CommandText);
-        }
-
-        private string GetRandomBark()
-        {
-            return _barks[_randomNumberGenerator.Generate(0, _barks.Count)];
         }
 
         public override Task HandleAsync(IBotMessageContext context)

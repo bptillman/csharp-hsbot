@@ -12,9 +12,11 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
         public bool DirectMentionOnlyValue { get; set; } = true;
         public double HandlerOddsValue { get; set; } = 1.1;
         public bool CanHandleReturnValue { get; set; } = true;
+        public string[] BarksValue { get; set; }
 
         public override string[] TargetedChannels => TargetedChannelsValue;
         public override bool DirectMentionOnly => DirectMentionOnlyValue;
+        public override string[] Barks => BarksValue;
 
         public override double GetHandlerOdds(InboundMessage message)
         {

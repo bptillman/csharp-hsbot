@@ -1,4 +1,6 @@
-﻿using Hsbot.Core.MessageHandlers;
+﻿using System;
+using Fixie.Internal.Listeners;
+using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
@@ -105,6 +107,22 @@ namespace Hsbot.Core.Tests.MessageHandler
             handleResult.HandlesMessage.ShouldBe(false);
         }
 
+        public void ShouldThrowExceptionIfBarksIsNotSet()
+        {
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
+            var handler = GetTestMessageHandler(rng);
+
+            Should.Throw<Exception>(() => { handler.GetRandomBark(); }).Message.ShouldBe("Barks list cannot be empty");
+        }
+
+        public void ShouldReturnBarkForSetBarkList()
+        {
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
+            var handler = GetTestMessageHandler(rng);
+            handler.BarksValue = new[] {"Test Bark 1", "Test Bark 2"};
+            handler.GetRandomBark().ShouldContain("Test Bark");
+        }
+
         private static MessageHandlerFake GetTestMessageHandler(RandomNumberGeneratorFake rng)
         {
             var handler = new MessageHandlerFake(rng)
@@ -113,6 +131,7 @@ namespace Hsbot.Core.Tests.MessageHandler
                 DirectMentionOnlyValue = false,
                 HandlerOddsValue = 1.0,
                 TargetedChannelsValue = MessageHandlerBase.AllChannels,
+                BarksValue = new string[0]
             };
 
             return handler;
