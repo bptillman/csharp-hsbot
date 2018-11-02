@@ -16,6 +16,11 @@ namespace Hsbot.Core.Messaging
             return message.TextWithoutBotName.StartsWith(start, compareType);
         }
 
+        public static bool EndsWith(this InboundMessage message, string end, StringComparison compareType = StringComparison.OrdinalIgnoreCase)
+        {
+            return message.TextWithoutBotName.EndsWith(end, compareType);
+        }
+
         /// <summary>
         /// Determines if message.TargetedText contains the supplied string (case insensitive)
         /// </summary>

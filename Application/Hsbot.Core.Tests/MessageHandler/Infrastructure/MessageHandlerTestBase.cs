@@ -1,5 +1,6 @@
 ﻿using System;
 using Hsbot.Core.MessageHandlers;
+using Hsbot.Core.Random;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
@@ -43,6 +44,11 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0}; 
 
             return (T) Activator.CreateInstance(typeof(T), rng);
+        }
+
+        protected T GetHandlerInstance(IRandomNumberGenerator rng)
+        {
+            return (T)Activator.CreateInstance(typeof(T), rng);
         }
     }
 }
