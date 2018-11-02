@@ -43,14 +43,15 @@ namespace Hsbot.Core.MessageHandlers
             return 1.1;
         }
 
-        public string GetRandomCannedResponse()
+        public string GetRandomCannedResponse(params object[] args)
         {
             if (CannedResponses == null || CannedResponses.Length == 0)
             {
                 throw new Exception("CannedResponses list cannot be empty");
             }
 
-            return CannedResponses[RandomNumberGenerator.Generate(0, CannedResponses.Length)];
+            var randomCannedResponse = CannedResponses[RandomNumberGenerator.Generate(0, CannedResponses.Length)];
+            return string.Format(randomCannedResponse, args);
         }
 
         public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();

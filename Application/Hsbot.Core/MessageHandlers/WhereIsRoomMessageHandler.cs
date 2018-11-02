@@ -79,7 +79,7 @@ namespace Hsbot.Core.MessageHandlers
 
             if (!_rooms.ContainsKey(roomSearch))
             {
-                return ReplyToChannel(context, string.Format(GetRandomCannedResponse(), roomSearch));
+                return ReplyToChannel(context, GetRandomCannedResponse(roomSearch));
             }
 
             var room = _rooms[roomSearch];
