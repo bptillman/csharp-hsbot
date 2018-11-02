@@ -20,5 +20,11 @@
     {
       return _rng.NextDouble();
     }
+
+    /// <inheritdoc />
+    public int Generate(int minValue, int maxValue)
+    {
+        return _rng.Next(minValue, maxValue);
+    }
   }
 }
