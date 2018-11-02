@@ -21,7 +21,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
         {
-            yield break;
+            yield return new MessageHandlerDescriptor { Command = "will <ask your question with a question mark>?", Description = "Ask the Magic 8 ball to predict the future!!" };
         }
 
         public static readonly string[] Answer = {
