@@ -58,7 +58,7 @@ namespace Hsbot.Core.MessageHandlers
                 new MessageHandlerDescriptor
                 {
                     Command = CommandText,
-                    Description = "Shows where a room is in the office."
+                    Description = "Shows where a room is in the office. e.g. where is <room name>"
                 }
             };
         }
