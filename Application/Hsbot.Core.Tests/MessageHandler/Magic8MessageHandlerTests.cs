@@ -9,7 +9,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 {
     public class Magic8MessageHandlerTests : MessageHandlerTestBase<Magic8MessageHandler>
     {
-        protected override string[] MessageTextsThatShouldBeHandled => new[] { "Am I going to be famous?", "Will I go to Peru?" };
+        protected override string[] MessageTextsThatShouldBeHandled => new[] { "Wil I be famous?", "Will I go to Peru?" };
         protected override string[] MessageTextsThatShouldNotBeHandled => new[] { "Yo yo yo HSBot!" };
 
         public async Task ShouldReturnMagic8Answer()
