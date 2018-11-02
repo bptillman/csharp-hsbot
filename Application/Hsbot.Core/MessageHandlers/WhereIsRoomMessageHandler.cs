@@ -28,7 +28,7 @@ namespace Hsbot.Core.MessageHandlers
             {"lustre pearl", "https://i.imgur.com/nf6jOSt.png"},
 
             //Not rooms
-            {"coffee", "(jura)"},
+            {"coffee", ":jura:"},
             {"jimmy", "https://s3.amazonaws.com/grabbagoftimg/jimmy.png"},
 
             //Houston
@@ -76,18 +76,31 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(IBotMessageContext context)
         {
-            var match = context.Message.Match(new Regex(@"/where ?[i']s ([^\?]*)[\?]*"));
+            var match = context.Message.Match(new Regex(@"where ?[i']s ([^\?]*)[\?]*"));
 
-            if (match.Value == string.Empty)
+            if (match.Value == string.Empty || match.Groups.Count < 2)
             {
                 return ReplyToChannel(context, "Gimme a room name to look for!");
             }
 
-            var roomName = match.Value.ToLower();
+            var roomSearch = match.Groups[1].Value.ToLower();
 
-            return ReplyToChannel(context, !_rooms.ContainsKey(roomName) 
-                ? string.Format(GetRandomBark(), roomName) 
-                : _rooms[roomName]);
+            if (!_rooms.ContainsKey(roomSearch))
+            {
+                return ReplyToChannel(context, string.Format(GetRandomBark(), roomSearch));
+            }
+
+            var room = _rooms[roomSearch];
+
+            if (room.StartsWith("http"))
+            {
+                return ReplyToChannel(context, null, new Attachment
+                {
+                    ImageUrl = room
+                });
+            }
+
+            return ReplyToChannel(context, room);
         }
     }
 }
