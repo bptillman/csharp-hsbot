@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
@@ -9,6 +8,7 @@ namespace Hsbot.Core.MessageHandlers
     public class WhereIsRoomMessageHandler : MessageHandlerBase
     {
         private const string CommandText = "where is";
+        private readonly IRandomNumberGenerator _randomNumberGenerator;
 
         private readonly Dictionary<string, string> _rooms = new Dictionary<string, string>
         {
@@ -49,6 +49,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public WhereIsRoomMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
+            _randomNumberGenerator = randomNumberGenerator;
         }
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
@@ -70,20 +71,17 @@ namespace Hsbot.Core.MessageHandlers
 
         private string GetRandomBark()
         {
-            var random = new System.Random();
-            return _barks[random.Next(0, _barks.Count)];
+            return _barks[_randomNumberGenerator.Generate(0, _barks.Count)];
         }
 
         public override Task HandleAsync(IBotMessageContext context)
         {
-            var match = context.Message.Match(new Regex(@"where ?[i']s ([^\?]*)[\?]*"));
+            var roomSearch = context.Message.TextWithoutBotName.Replace("where is", "").Trim();
 
-            if (match.Value == string.Empty || match.Groups.Count < 2)
+            if (string.IsNullOrEmpty(roomSearch))
             {
                 return ReplyToChannel(context, "Gimme a room name to look for!");
             }
-
-            var roomSearch = match.Groups[1].Value.ToLower();
 
             if (!_rooms.ContainsKey(roomSearch))
             {
