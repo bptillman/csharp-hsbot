@@ -12,7 +12,7 @@ namespace Hsbot.Core.MessageHandlers
         }
 
         public override string[] TargetedChannels => AllChannels;
-        public override bool DirectMentionOnly => false;
+        public override bool DirectMentionOnly => true;
 
         public override double GetHandlerOdds(InboundMessage message)
         {
