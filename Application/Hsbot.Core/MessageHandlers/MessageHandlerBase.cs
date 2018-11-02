@@ -11,7 +11,7 @@ namespace Hsbot.Core.MessageHandlers
         protected readonly IRandomNumberGenerator RandomNumberGenerator;
 
         public static readonly string[] AllChannels = null;
-        public static readonly string[] FunChannels = { "#general", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
+        public static readonly string[] FunChannels = { "#general", "#headspring", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
         public virtual string[] CannedResponses => new string[0];
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
