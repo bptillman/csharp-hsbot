@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
@@ -11,6 +12,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public static readonly string[] AllChannels = null;
         public static readonly string[] FunChannels = { "#general", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
+        public virtual string[] CannedResponses => new string[0];
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
@@ -39,6 +41,17 @@ namespace Hsbot.Core.MessageHandlers
             //thing by returning a value much greater than 1 to ensure
             //the handler always runs in the default case
             return 1.1;
+        }
+
+        public string GetRandomCannedResponse(params object[] args)
+        {
+            if (CannedResponses == null || CannedResponses.Length == 0)
+            {
+                throw new Exception("CannedResponses list cannot be empty");
+            }
+
+            var randomCannedResponse = CannedResponses[RandomNumberGenerator.Generate(0, CannedResponses.Length)];
+            return string.Format(randomCannedResponse, args);
         }
 
         public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
