@@ -9,7 +9,7 @@ namespace Hsbot.Core.Tests.MessageHandler
     public class WhereIsRoomMessageHandlerTests : MessageHandlerTestBase<WhereIsRoomMessageHandler>
     {
         protected override string[] MessageTextsThatShouldBeHandled => new [] {"where is promethium", "where is"};
-        protected override string[] MessageTextsThatShouldNotBeHandled => new[] {"where my cat", "were is"};
+        protected override string[] MessageTextsThatShouldNotBeHandled => new[] {"where my cat", "were is", "test where is test"};
 
         public async Task ShouldReturnImageForPromethiumLocation()
         {
