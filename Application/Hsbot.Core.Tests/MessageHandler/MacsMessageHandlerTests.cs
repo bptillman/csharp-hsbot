@@ -16,7 +16,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.HandleAsync();
             response.SentMessages.Count.ShouldBe(1);
-            messageHandler.Pics.ShouldContain(response.SentMessages.First().Text);
+            messageHandler.CannedResponses.ShouldContain(response.SentMessages.First().Text);
         }
     }
 }

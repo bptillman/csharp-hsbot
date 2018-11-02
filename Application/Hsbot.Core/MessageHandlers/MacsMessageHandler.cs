@@ -7,7 +7,7 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class MacsMessageHandler : MessageHandlerBase
     {
-        public string[] Pics =
+        public override string[] CannedResponses => new[]
         {
             "http://i.imgur.com/fEbhFJs.png",
             "http://i.imgur.com/NSj5Yed.jpg",
@@ -44,9 +44,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(IBotMessageContext context)
         {
-            var index = RandomNumberGenerator.Generate(0, Pics.Length - 1);
-
-            return ReplyToChannel(context, Pics[index]);
+            return ReplyToChannel(context, GetRandomCannedResponse());
         }
     }
 }
