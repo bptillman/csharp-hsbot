@@ -20,15 +20,17 @@ namespace Hsbot.Core.MessageHandlers
             "https://i.imgur.com/flyMHi1.gif"
         };
 
-        public override string[] TargetedChannels => FunChannels;
-
         public GlennDanceMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
         }
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
         {
-            yield break;
+            return new[]
+            {
+                new MessageHandlerDescriptor { Command = "make glenn dance", Description = "Spread the joy of Glenn dancing to everyone."},
+                new MessageHandlerDescriptor { Command = "glenn dance bomb <N>", Description = "Spread the joy of Glenn dancing to everyone - N times."},
+            };
         }
 
         protected override bool CanHandle(InboundMessage message)
@@ -44,6 +46,7 @@ namespace Hsbot.Core.MessageHandlers
             {
                 repliesNumber = 1;
             }
+
             else if (context.Message.StartsWith(GlennDanceBombCommand))
             {
                 repliesNumber = AnimatedFiles.Length;
