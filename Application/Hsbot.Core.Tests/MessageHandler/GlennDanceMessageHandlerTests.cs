@@ -34,6 +34,15 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public Func<GlennDanceMessageHandler, string[]> AnimatedFiles = x => x.AnimatedFiles;
 
+        public void ShouldAnimatedFilesHaveItems()
+        {
+            var messageHandler = GetHandlerInstance();
+            var animatedFiles = AnimatedFiles(messageHandler);
+
+            animatedFiles.ShouldNotBeNull();
+            animatedFiles.Length.ShouldBeGreaterThan(0);
+        }
+
         public async Task ShouldMakeGlennDanceAsManyTimesAsExpected()
         {
             var messageHandler = GetHandlerInstance();
