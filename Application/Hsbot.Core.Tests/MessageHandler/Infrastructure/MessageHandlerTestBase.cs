@@ -1,5 +1,6 @@
 ﻿using System;
 using Hsbot.Core.MessageHandlers;
+using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
 using Shouldly;
 
@@ -33,6 +34,20 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
                 var handleResult = messageHandler.Handles(message);
                 handleResult.HandlesMessage.ShouldBeFalse($"{typeof(T).Name}.{nameof(messageHandler.Handles)}(\"{messageText}\") method returned true for a message it should not handle");
+            }
+        }
+
+        public void CommandDescriptorsShouldNotBeNullOrEmpty()
+        {
+            var messageHandler = GetHandlerInstance();
+
+            var descriptors = messageHandler.GetCommandDescriptors();
+            descriptors.ShouldNotBeNull($"Do not return null from {nameof(MessageHandlerBase.GetCommandDescriptors)}. If there's no command for this handler, yield break instead.");
+
+            foreach (var messageHandlerDescriptor in descriptors)
+            {
+                messageHandlerDescriptor.ShouldNotBeNull($"Do not return null from {nameof(MessageHandlerBase.GetCommandDescriptors)}. If there's no command for this handler, yield break instead.");
+                messageHandlerDescriptor.Command.ShouldNotBeEmpty($"{nameof(MessageHandlerDescriptor.Command)} should not be null or empty.");
             }
         }
 
