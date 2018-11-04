@@ -130,7 +130,7 @@ namespace Hsbot.Core
                 return;
             }
 
-            var messageContext = new BotMessageContext(Brain, _log, message, SendMessage);
+            var messageContext = new BotMessageContext(message);
 
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
 
