@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Messaging.Formatting;
 using Moq;
 
 namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class BotProvidedServicesFake : IBotProvidedServices
     {
-        public BotProvidedServicesFake(HsbotBrain brain = null, Mock<IHsbotLog> logMock = null, Action<OutboundResponse> sendMessageAction = null)
+        public BotProvidedServicesFake(HsbotBrain brain = null, Mock<IHsbotLog> logMock = null, Action<OutboundResponse> sendMessageAction = null, IChatMessageTextFormatter messageTextFormatter = null)
         {
             SendMessage = response =>
             {
@@ -22,6 +23,8 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             LogMock = logMock ?? MockLog();
 
             Brain = brain ?? new HsbotBrain();
+
+            MessageTextFormatter = messageTextFormatter ?? new InlineChatMessageTextFormatter();
         }
 
         public Mock<IHsbotLog> LogMock { get; }
@@ -30,6 +33,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
         public IBotBrain Brain { get; }
         public IHsbotLog Log => LogMock.Object;
         public Func<OutboundResponse, Task> SendMessage { get; }
+        public IChatMessageTextFormatter MessageTextFormatter { get; }
 
         private Mock<IHsbotLog> MockLog()
         {
