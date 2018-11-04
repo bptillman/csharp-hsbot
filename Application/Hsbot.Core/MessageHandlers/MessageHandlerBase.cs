@@ -115,7 +115,7 @@ namespace Hsbot.Core.MessageHandlers
         protected Task ReplyToChannel(IBotMessageContext context, string text, Attachment attachment = null)
         {
             var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
-            return context.SendMessage(context.Message.ReplyToChannel(text, attachments));
+            return SendMessage(context.Message.ReplyToChannel(text, attachments));
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Hsbot.Core.MessageHandlers
         /// </summary>
         protected Task ReplyToChannel(IBotMessageContext context, string text, List<Attachment> attachments)
         {
-            return context.SendMessage
+            return SendMessage
             (
                 new OutboundResponse
                 {
@@ -140,7 +140,7 @@ namespace Hsbot.Core.MessageHandlers
         /// </summary>
         protected Task ReplyDirectlyToUser(IBotMessageContext context, InboundMessage message, string text)
         {
-            return context.SendMessage
+            return SendMessage
             (
                 new OutboundResponse
                 {
@@ -157,7 +157,7 @@ namespace Hsbot.Core.MessageHandlers
         /// </summary>
         protected Task IndicateTypingOnChannel(IBotMessageContext context, InboundMessage message)
         {
-            return context.SendMessage
+            return SendMessage
             (
                 new OutboundResponse
                 {
@@ -174,7 +174,7 @@ namespace Hsbot.Core.MessageHandlers
         /// </summary>
         protected Task IndicateTypingOnDirectMessage(IBotMessageContext context, InboundMessage message)
         {
-            return context.SendMessage
+            return SendMessage
             (
                 new OutboundResponse
                 {

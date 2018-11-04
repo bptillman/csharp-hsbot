@@ -68,6 +68,10 @@ namespace Hsbot.Core.Tests.MessageHandler
                 {
                     sentMessage.Text.ShouldBeOneOf(messageHandler.CannedResponses);
                 }
+
+                //clear out response messages on every iteration -- otherwise it would
+                //accumulate messages from all iterations.
+                response.SentMessages.Clear();
             }
         }
     }
