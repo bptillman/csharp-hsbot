@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
 
@@ -13,6 +14,22 @@ namespace Hsbot.Core.MessageHandlers
         public static readonly string[] AllChannels = null;
         public static readonly string[] FunChannels = { "#general", "#headspring", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
         public virtual string[] CannedResponses => new string[0];
+
+        private IBotProvidedServices _botProvidedServices = null;
+        public IBotProvidedServices BotProvidedServices
+        {
+            get => _botProvidedServices;
+            set 
+            {
+                if (value == null || value.Brain == null || value.Log == null || value.SendMessage == null)
+                    throw new ArgumentException("All bot-provided services must be non-null");
+
+                _botProvidedServices = value;
+            }
+        }
+        protected IHsbotLog Log => BotProvidedServices.Log;
+        protected IBotBrain Brain => BotProvidedServices.Brain;
+        protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
@@ -56,8 +73,17 @@ namespace Hsbot.Core.MessageHandlers
 
         public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
 
+        private void AssertExecutionBotProvidedServicesHaveBeenConfigured()
+        {
+            if (BotProvidedServices == null)
+                throw new InvalidOperationException($"{nameof(BotProvidedServices)} must be set before this handler can process inbound messages");
+        }
+
+
         public HandlesResult Handles(InboundMessage message)
         {
+            AssertExecutionBotProvidedServicesHaveBeenConfigured();
+
             var handlerOdds = GetHandlerOdds(message);
             var canHandleMessage = CanHandle(message);
             var randomRoll = RandomNumberGenerator.Generate();
@@ -82,7 +108,7 @@ namespace Hsbot.Core.MessageHandlers
 
         protected abstract bool CanHandle(InboundMessage message);
         public abstract Task HandleAsync(IBotMessageContext context);
-
+        
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>

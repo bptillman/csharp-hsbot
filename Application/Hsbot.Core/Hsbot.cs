@@ -48,6 +48,8 @@ namespace Hsbot.Core
         {
             await InitializeBrain();
 
+            ConfigureMessageHandlers();
+
             _log.Info("Connecting to messaging service");
 
             await _connection.Connect();
@@ -72,6 +74,16 @@ namespace Hsbot.Core
                 .Subscribe();
 
             _log.Info("Connected successfully");
+        }
+
+        private void ConfigureMessageHandlers()
+        {
+            _log.Info("Configuring message handlers with access to brain and log facilities");
+            var botProvidedServices = new BotProvidedServices(Brain, _log, SendMessage);
+            foreach (var inboundMessageHandler in _messageHandlers)
+            {
+                inboundMessageHandler.BotProvidedServices = botProvidedServices;
+            }
         }
 
         private Task OnDisconnect()

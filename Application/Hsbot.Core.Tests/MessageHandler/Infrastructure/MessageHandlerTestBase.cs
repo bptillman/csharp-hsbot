@@ -56,14 +56,19 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
             //to be false
-            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0}; 
+            var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
+            var instance = (T) Activator.CreateInstance(typeof(T), rng);
+            instance.BotProvidedServices = new BotProvidedServicesFake();
 
-            return (T) Activator.CreateInstance(typeof(T), rng);
+            return instance;
         }
 
         protected T GetHandlerInstance(IRandomNumberGenerator rng)
         {
-            return (T)Activator.CreateInstance(typeof(T), rng);
+            var instance = (T) Activator.CreateInstance(typeof(T), rng);
+            instance.BotProvidedServices = new BotProvidedServicesFake();
+
+            return instance;
         }
     }
 }
