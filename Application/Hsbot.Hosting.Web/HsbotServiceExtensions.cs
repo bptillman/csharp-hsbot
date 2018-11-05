@@ -5,6 +5,7 @@ using Hsbot.Core;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
 using Hsbot.Slack;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,7 @@ namespace Hsbot.Hosting.Web
             services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
             services.AddSingleton<IBotBrainStorage<HsbotBrain>, AzureBrainStorage>();
             services.AddSingleton<IHsbotChatConnector, HsbotSlackConnector>();
+            services.AddSingleton<IChatMessageTextFormatter, SlackChatMessageTextFormatter>();
             services.AddSingleton<Core.Hsbot>();
 
             return services;
