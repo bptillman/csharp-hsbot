@@ -56,24 +56,25 @@ namespace Hsbot.Core.MessageHandlers
 
         private async Task ReminderTimerElapsed()
         {
-            do
+            var remindersToSend = new List<Reminder>();
+            lock (_remindersLock)
             {
-                Reminder reminder;
-                lock (_remindersLock)
+                while (_reminders.Count > 0 && _reminders[0].ReminderDateInUtc <= SystemClock.UtcNow)
                 {
-                    if (_reminders.Count > 0 && _reminders[0].ReminderDateInUtc <= SystemClock.UtcNow)
-                    {
-                        reminder = _reminders[0];
-                        _reminders.RemoveAt(0);
-                        Brain.SetItem(BrainStorageKey, _reminders);
-                    }
-
-                    else
-                    {
-                        break;
-                    }
+                    var reminder = _reminders[0];
+                    remindersToSend.Add(reminder);
+                    _reminders.RemoveAt(0);
+                    
                 }
 
+                if (remindersToSend.Count > 0)
+                {
+                    Brain.SetItem(BrainStorageKey, _reminders);
+                }
+            }
+
+            foreach (var reminder in remindersToSend)
+            {
                 var messageText = $"{MessageTextFormatter.FormatUserMention(reminder.UserId)} you asked me to remind you to {reminder.Message}";
 
                 var outboundResponse = new OutboundResponse
@@ -85,8 +86,7 @@ namespace Hsbot.Core.MessageHandlers
                 };
 
                 await SendMessage(outboundResponse);
-
-            } while (true);
+            }
         }
 
         protected override bool CanHandle(InboundMessage message)
