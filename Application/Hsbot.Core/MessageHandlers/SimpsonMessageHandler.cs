@@ -57,7 +57,8 @@
 
                 if (images.Length > 0)
                 {
-                    var selectedImage = images[RandomNumberGenerator.Generate(0, images.Length)];
+                    var selectedIndex = images.Length > 10 ? 10 : RandomNumberGenerator.Generate(0, images.Length);
+                    var selectedImage = images[selectedIndex];
                     message = await GetCommandResponse(command, selectedImage);
 
                     if (!string.IsNullOrEmpty(command.Meme))
