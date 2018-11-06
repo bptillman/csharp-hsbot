@@ -20,6 +20,8 @@
 
         private static readonly Regex SimpsonMeRegex = new Regex("^(simpson me) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex SimpsonGifMeRegex = new Regex("^(simpson gif me) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex SimpsonMeWithMemeRegex = new Regex("^(simpson me) (.*) with meme (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex SimpsonGifMeWithMemeRegex = new Regex("^(simpson gif me) (.*) with meme (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public SimpsonMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
@@ -29,8 +31,8 @@
         {
             return new List<MessageHandlerDescriptor>
             {
-                new MessageHandlerDescriptor { Command = SimpsonMeCommand + " <quote>", Description = "Get a simpsons image related to the quote you passed it." },
-                new MessageHandlerDescriptor { Command = SimpsonGifMeCommand + " <quote>", Description = "Get a simpsons gif related to the quote you passed it." }
+                new MessageHandlerDescriptor { Command = SimpsonMeCommand + " <quote> with meme <caption>", Description = "Get a simpsons image related to the quote you passed it and an optional caption." },
+                new MessageHandlerDescriptor { Command = SimpsonGifMeCommand + " <quote> with meme <caption>", Description = "Get a simpsons gif related to the quote you passed it and an optional caption." }
             };
         }
 
@@ -57,6 +59,11 @@
                 {
                     var selectedImage = images[RandomNumberGenerator.Generate(0, images.Length)];
                     message = await GetCommandResponse(command, selectedImage);
+
+                    if (!string.IsNullOrEmpty(command.Meme))
+                    {
+                        message += $"?b64lines={Base64Encode(command.Meme)}";
+                    }
                 }
             }
             catch (Exception e)
@@ -94,22 +101,37 @@
             Match match;
             var commandType = CommandType.None;
             string quote = null;
+            string meme = null;
 
             if ((match = context.Message.Match(SimpsonMeRegex)).Success)
             {
                 commandType = CommandType.Image;
                 quote = match.Groups[2].Value;
+
+                if ((match = context.Message.Match(SimpsonMeWithMemeRegex)).Success)
+                {
+                    quote = match.Groups[2].Value;
+                    meme = match.Groups[3].Value;
+                }
             }
+
             else if ((match = context.Message.Match(SimpsonGifMeRegex)).Success)
             {
                 commandType = CommandType.Gif;
                 quote = match.Groups[2].Value;
+
+                if ((match = context.Message.Match(SimpsonGifMeWithMemeRegex)).Success)
+                {
+                    quote = match.Groups[2].Value;
+                    meme = match.Groups[3].Value;
+                }
             }
 
             return new Command
             {
                 CommandType = commandType,
-                Quote = quote
+                Quote = quote,
+                Meme = meme
             };
         }
 
@@ -141,10 +163,17 @@
             return $"https://frinkiac.com/gif/{selectedImage.Episode}/{startTimeStamp}/{endTimeStamp}.gif";
         }
 
+        public static string Base64Encode(string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return Convert.ToBase64String(plainTextBytes);
+        }
+
         public class Command
         {
             public CommandType CommandType { get; set; }
             public string Quote { get; set; }
+            public string Meme { get; set; }
 
             public string GetResourceTypeName() => $"{CommandType.ToString().ToLower()}s";
         }
