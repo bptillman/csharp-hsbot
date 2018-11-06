@@ -59,12 +59,12 @@ namespace Hsbot.Core.MessageHandlers
             var remindersToSend = new List<Reminder>();
             lock (_remindersLock)
             {
+                //since the list is always sorted, we can be sure that we only need to look
+                //at the front of the list to find expired items
                 while (_reminders.Count > 0 && _reminders[0].ReminderDateInUtc <= SystemClock.UtcNow)
                 {
-                    var reminder = _reminders[0];
-                    remindersToSend.Add(reminder);
+                    remindersToSend.Add(_reminders[0]);
                     _reminders.RemoveAt(0);
-                    
                 }
 
                 if (remindersToSend.Count > 0)
@@ -114,7 +114,10 @@ namespace Hsbot.Core.MessageHandlers
             lock (_remindersLock)
             {
                 _reminders.Add(reminder);
-                SortRemindersByDate();
+
+                //always sort after adding a new entry so we can be sure that the
+                //front of the list is next to expire
+                SortRemindersByDate(); 
                 Brain.SetItem(BrainStorageKey, _reminders);
             }
 
