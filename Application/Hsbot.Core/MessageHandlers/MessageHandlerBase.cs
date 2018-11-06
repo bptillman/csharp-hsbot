@@ -27,6 +27,8 @@ namespace Hsbot.Core.MessageHandlers
                     throw new ArgumentException("All bot-provided services must be non-null");
 
                 _botProvidedServices = value;
+
+                OnBotProvidedServicesConfigured();
             }
         }
         protected IHsbotLog Log => BotProvidedServices.Log;
@@ -112,7 +114,11 @@ namespace Hsbot.Core.MessageHandlers
 
         protected abstract bool CanHandle(InboundMessage message);
         public abstract Task HandleAsync(IBotMessageContext context);
-        
+
+        protected virtual void OnBotProvidedServicesConfigured()
+        {
+        }
+
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
