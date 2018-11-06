@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
+using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
@@ -32,6 +33,7 @@ namespace Hsbot.Core.MessageHandlers
         protected IBotBrain Brain => BotProvidedServices.Brain;
         protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
         protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
+        protected ISystemClock SystemClock => BotProvidedServices.SystemClock;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {

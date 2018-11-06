@@ -2,15 +2,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
+using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
+using Hsbot.Core.Tests.Infrastructure;
 using Moq;
 
 namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class BotProvidedServicesFake : IBotProvidedServices
     {
-        public BotProvidedServicesFake(HsbotBrain brain = null, Mock<IHsbotLog> logMock = null, Action<OutboundResponse> sendMessageAction = null, IChatMessageTextFormatter messageTextFormatter = null)
+        public BotProvidedServicesFake(HsbotBrain brain = null, 
+            Mock<IHsbotLog> logMock = null, 
+            Action<OutboundResponse> sendMessageAction = null, 
+            IChatMessageTextFormatter messageTextFormatter = null,
+            ISystemClock systemClock = null)
         {
             SendMessage = response =>
             {
@@ -21,10 +27,9 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             };
 
             LogMock = logMock ?? MockLog();
-
             Brain = brain ?? new HsbotBrain();
-
             MessageTextFormatter = messageTextFormatter ?? new InlineChatMessageTextFormatter();
+            SystemClock = systemClock ?? new TestSystemClock();
         }
 
         public Mock<IHsbotLog> LogMock { get; }
@@ -34,6 +39,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
         public IHsbotLog Log => LogMock.Object;
         public Func<OutboundResponse, Task> SendMessage { get; }
         public IChatMessageTextFormatter MessageTextFormatter { get; }
+        public ISystemClock SystemClock { get; }
 
         private Mock<IHsbotLog> MockLog()
         {
