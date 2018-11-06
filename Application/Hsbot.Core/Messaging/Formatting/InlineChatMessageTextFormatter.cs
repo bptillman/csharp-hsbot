@@ -15,5 +15,15 @@ namespace Hsbot.Core.Messaging.Formatting
 
             return date.ToString(formatString);
         }
+
+        public string FormatUserMention(string userId)
+        {
+            return userId;
+        }
+
+        public string FormatChannelMention(string channelName)
+        {
+            return channelName;
+        }
     }
 }

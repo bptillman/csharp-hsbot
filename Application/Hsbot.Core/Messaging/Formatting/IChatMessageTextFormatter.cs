@@ -8,5 +8,7 @@ namespace Hsbot.Core.Messaging.Formatting
     public interface IChatMessageTextFormatter
     {
         string FormatDate(DateTime date, string format);
+        string FormatUserMention(string userId);
+        string FormatChannelMention(string channelName);
     }
 }
