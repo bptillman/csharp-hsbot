@@ -31,16 +31,14 @@ namespace Hsbot.Core.Tests.MessageHandler
             "I want to see glenn dance bomb 5",
             "Do glenn dance bomb"
         };
-
-        public Func<GlennDanceMessageHandler, string[]> AnimatedFiles = x => x.AnimatedFiles;
-
-        public void ShouldAnimatedFilesHaveItems()
+        
+        public void CannedResponsesShouldHaveItems()
         {
             var messageHandler = GetHandlerInstance();
-            var animatedFiles = AnimatedFiles(messageHandler);
+            var cannedResponses = messageHandler.CannedResponses;
 
-            animatedFiles.ShouldNotBeNull();
-            animatedFiles.Length.ShouldBeGreaterThan(0);
+            cannedResponses.ShouldNotBeNull();
+            cannedResponses.Length.ShouldBeGreaterThan(0);
         }
 
         public async Task ShouldMakeGlennDanceAsManyTimesAsExpected()
@@ -50,13 +48,13 @@ namespace Hsbot.Core.Tests.MessageHandler
             {
                 1,
                 1,
-                AnimatedFiles(messageHandler).Length,
+                messageHandler.CannedResponses.Length,
                 3,
-                AnimatedFiles(messageHandler).Length,
+                messageHandler.CannedResponses.Length,
                 10,
-                AnimatedFiles(messageHandler).Length,
+                messageHandler.CannedResponses.Length,
                 0,
-                AnimatedFiles(messageHandler).Length
+                messageHandler.CannedResponses.Length
             };
 
             MessageTextsThatShouldBeHandled.Length.ShouldBe(sentRepliesPerMessageText.Length);
@@ -68,7 +66,7 @@ namespace Hsbot.Core.Tests.MessageHandler
                 response.SentMessages.Count.ShouldBe(sentRepliesPerMessageText[i]);
                 foreach (var sentMessage in response.SentMessages)
                 {
-                    sentMessage.Text.ShouldBeOneOf(AnimatedFiles(messageHandler));
+                    sentMessage.Text.ShouldBeOneOf(messageHandler.CannedResponses);
                 }
             }
         }

@@ -19,7 +19,8 @@ namespace Hsbot.Core.MessageHandlers
             yield return new MessageHandlerDescriptor { Command = "will <ask your question with a question mark>?", Description = "Ask the Magic 8 ball to predict the future!!" };
         }
 
-        public static readonly string[] Answer = {
+        public override string[] CannedResponses => new []
+        {
             "It is certain",
             "It is decidedly so",
             "Without a doubt",
@@ -44,8 +45,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(IBotMessageContext context)
         {
-            var random = RandomNumberGenerator.Generate(0, Answer.Length);
-            return ReplyToChannel(context, Answer[random]);
+            return ReplyToChannel(context, GetRandomCannedResponse());
         }
 
         protected override bool CanHandle(InboundMessage message)

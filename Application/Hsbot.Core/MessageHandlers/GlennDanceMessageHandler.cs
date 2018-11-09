@@ -10,7 +10,7 @@ namespace Hsbot.Core.MessageHandlers
         private const string MakeGlennDanceCommand = "make glenn dance";
         private const string GlennDanceBombCommand = "glenn dance bomb";
 
-        public string[] AnimatedFiles { get; } =
+        public override string[] CannedResponses => new[]
         {
             "https://i.imgur.com/0G6Bdvs.gif",
             "https://i.imgur.com/3YveU2X.gif",
@@ -49,7 +49,7 @@ namespace Hsbot.Core.MessageHandlers
 
             else if (context.Message.StartsWith(GlennDanceBombCommand))
             {
-                repliesNumber = AnimatedFiles.Length;
+                repliesNumber = CannedResponses.Length;
 
                 var bombCountText = context.Message.TextWithoutBotName.Substring(GlennDanceBombCommand.Length, context.Message.TextWithoutBotName.Length - GlennDanceBombCommand.Length);
                 if (int.TryParse(bombCountText, out var bombCount))
@@ -60,7 +60,7 @@ namespace Hsbot.Core.MessageHandlers
 
             for (var i = 0; i < repliesNumber; i++)
             {
-                await ReplyToChannel(context, AnimatedFiles[RandomNumberGenerator.Generate(0, AnimatedFiles.Length)]);
+                await ReplyToChannel(context, GetRandomCannedResponse());
             }
         }
     }

@@ -50,7 +50,7 @@ namespace Hsbot.Core.MessageHandlers
                 throw new Exception("CannedResponses list cannot be empty");
             }
 
-            var randomCannedResponse = CannedResponses[RandomNumberGenerator.Generate(0, CannedResponses.Length)];
+            var randomCannedResponse = RandomNumberGenerator.GetRandomValue(CannedResponses);
             return string.Format(randomCannedResponse, args);
         }
 
