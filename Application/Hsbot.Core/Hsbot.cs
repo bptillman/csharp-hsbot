@@ -137,8 +137,6 @@ namespace Hsbot.Core
                 return;
             }
 
-            var messageContext = new BotMessageContext(message);
-
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
 
             foreach (var inboundMessageHandler in _messageHandlers)
@@ -149,7 +147,7 @@ namespace Hsbot.Core
 
                 if (!handlerResult.HandlesMessage) continue;
 
-                await inboundMessageHandler.HandleAsync(messageContext);
+                await inboundMessageHandler.HandleAsync(message);
             }
         }
 

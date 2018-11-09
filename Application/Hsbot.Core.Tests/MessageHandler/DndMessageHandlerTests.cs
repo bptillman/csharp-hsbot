@@ -15,7 +15,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             var rng = new RandomNumberGeneratorFake {NextIntValue = 5};
             var handler = GetHandlerInstance(rng);
 
-            var result = await handler.HandleAsync("roll d6");
+            var result = await handler.TestHandleAsync("roll d6");
             result.SentMessages.Count.ShouldBe(1);
             result.SentMessages[0].Text.ShouldBe("rolled a 5 (5)+0");
         }
@@ -25,7 +25,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             var rng = new RandomNumberGeneratorFake {RandomIntValues = new []{ 1, 2, 3, 4, 5, 6}};
             var handler = GetHandlerInstance(rng);
 
-            var result = await handler.HandleAsync("roll 6d6");
+            var result = await handler.TestHandleAsync("roll 6d6");
             result.SentMessages.Count.ShouldBe(1);
             result.SentMessages[0].Text.ShouldBe("rolled a 21 (1, 2, 3, 4, 5, 6)+0");
         }
@@ -35,7 +35,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             var rng = new RandomNumberGeneratorFake {RandomIntValues = new []{ 1, 2, 3, 4, 5, 6}};
             var handler = GetHandlerInstance(rng);
 
-            var result = await handler.HandleAsync("roll 6d6+4");
+            var result = await handler.TestHandleAsync("roll 6d6+4");
             result.SentMessages.Count.ShouldBe(1);
             result.SentMessages[0].Text.ShouldBe("rolled a 25 (1, 2, 3, 4, 5, 6)+4");
         }

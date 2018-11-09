@@ -38,20 +38,20 @@ namespace Hsbot.Core.MessageHandlers
             return message.StartsWith(MakeGlennDanceCommand) || message.StartsWith(GlennDanceBombCommand);
         }
 
-        public override async Task HandleAsync(IBotMessageContext context)
+        public override async Task HandleAsync(InboundMessage message)
         {
             var repliesNumber = 0;
 
-            if (context.Message.StartsWith(MakeGlennDanceCommand))
+            if (message.StartsWith(MakeGlennDanceCommand))
             {
                 repliesNumber = 1;
             }
 
-            else if (context.Message.StartsWith(GlennDanceBombCommand))
+            else if (message.StartsWith(GlennDanceBombCommand))
             {
                 repliesNumber = CannedResponses.Length;
 
-                var bombCountText = context.Message.TextWithoutBotName.Substring(GlennDanceBombCommand.Length, context.Message.TextWithoutBotName.Length - GlennDanceBombCommand.Length);
+                var bombCountText = message.TextWithoutBotName.Substring(GlennDanceBombCommand.Length, message.TextWithoutBotName.Length - GlennDanceBombCommand.Length);
                 if (int.TryParse(bombCountText, out var bombCount))
                 {
                     if (bombCount >= 0) repliesNumber = bombCount;
@@ -60,7 +60,7 @@ namespace Hsbot.Core.MessageHandlers
 
             for (var i = 0; i < repliesNumber; i++)
             {
-                await ReplyToChannel(context, GetRandomCannedResponse());
+                await ReplyToChannel(message, GetRandomCannedResponse());
             }
         }
     }

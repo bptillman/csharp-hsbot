@@ -14,7 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         {
             var handler = GetHandlerInstance();
 
-            var result = await handler.HandleAsync("flip test");
+            var result = await handler.TestHandleAsync("flip test");
             result.SentMessages.Count.ShouldBe(1);
             result.SentMessages[0].Text.ShouldBe("(╯°□°）╯︵ ʇǝsʇ");
         }
@@ -33,7 +33,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 ┻┻┻┻┻┻";
             var handler = GetHandlerInstance();
 
-            var result = await handler.HandleAsync("megaflip test");
+            var result = await handler.TestHandleAsync("megaflip test");
             result.SentMessages.Count.ShouldBe(1);
             result.SentMessages[0].Text.ShouldBe(expectedResult);
         }

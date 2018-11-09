@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
@@ -61,7 +60,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             for (var i = 0; i < MessageTextsThatShouldBeHandled.Length; i++)
             {
-                var response = await messageHandler.HandleAsync(MessageTextsThatShouldBeHandled[i]);
+                var response = await messageHandler.TestHandleAsync(MessageTextsThatShouldBeHandled[i]);
 
                 response.SentMessages.Count.ShouldBe(sentRepliesPerMessageText[i]);
                 foreach (var sentMessage in response.SentMessages)

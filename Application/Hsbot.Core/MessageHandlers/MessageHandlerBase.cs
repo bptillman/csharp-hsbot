@@ -113,7 +113,7 @@ namespace Hsbot.Core.MessageHandlers
         }
 
         protected abstract bool CanHandle(InboundMessage message);
-        public abstract Task HandleAsync(IBotMessageContext context);
+        public abstract Task HandleAsync(InboundMessage message);
 
         protected virtual void OnBotProvidedServicesConfigured()
         {
@@ -122,22 +122,22 @@ namespace Hsbot.Core.MessageHandlers
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        protected Task ReplyToChannel(IBotMessageContext context, string text, Attachment attachment = null)
+        protected Task ReplyToChannel(InboundMessage message, string text, Attachment attachment = null)
         {
             var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
-            return SendMessage(context.Message.ReplyToChannel(text, attachments));
+            return SendMessage(message.ReplyToChannel(text, attachments));
         }
 
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        protected Task ReplyToChannel(IBotMessageContext context, string text, List<Attachment> attachments)
+        protected Task ReplyToChannel(InboundMessage message, string text, List<Attachment> attachments)
         {
             return SendMessage
             (
                 new OutboundResponse
                 {
-                    Channel = context.Message.Channel,
+                    Channel = message.Channel,
                     MessageRecipientType = MessageRecipientType.Channel,
                     Text = text,
                     Attachments = attachments
@@ -148,7 +148,7 @@ namespace Hsbot.Core.MessageHandlers
         /// <summary>
         /// Will send a DirectMessage reply to the use who sent the message
         /// </summary>
-        protected Task ReplyDirectlyToUser(IBotMessageContext context, InboundMessage message, string text)
+        protected Task ReplyDirectlyToUser(InboundMessage message, string text)
         {
             return SendMessage
             (
@@ -165,7 +165,7 @@ namespace Hsbot.Core.MessageHandlers
         /// <summary>
         /// Will display on Slack that the bot is typing on the current channel. Good for letting the end users know the bot is doing something.
         /// </summary>
-        protected Task IndicateTypingOnChannel(IBotMessageContext context, InboundMessage message)
+        protected Task IndicateTypingOnChannel(InboundMessage message)
         {
             return SendMessage
             (
@@ -182,7 +182,7 @@ namespace Hsbot.Core.MessageHandlers
         /// <summary>
         /// Indicates on the DM channel that the bot is typing. Good for letting the end users know the bot is doing something.
         /// </summary>
-        protected Task IndicateTypingOnDirectMessage(IBotMessageContext context, InboundMessage message)
+        protected Task IndicateTypingOnDirectMessage(InboundMessage message)
         {
             return SendMessage
             (
