@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
@@ -12,6 +14,7 @@ namespace Hsbot.Core
     {
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
+        private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
         private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
 
         private IDisposable _brainChangedSubscription;
@@ -34,6 +37,11 @@ namespace Hsbot.Core
             _messageHandlers = messageHandlers;
             _brainStorage = brainStorage;
             _connection = connection;
+
+            _messageHandlerDescriptors = _messageHandlers
+                .SelectMany(mh => mh.GetCommandDescriptors())
+                .OrderBy(d => d.Command)
+                .ToList();
         }
 
         public async Task Connect()
@@ -103,6 +111,13 @@ namespace Hsbot.Core
 
         private async Task OnMessageReceived(InboundMessage message)
         {
+            if (message.StartsWith("help"))
+            {
+                var response = GetHelpResponse(message);
+                await SendMessage(response);
+                return;
+            }
+
             var messageContext = new BotMessageContext(Brain, _log, message, SendMessage);
 
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
@@ -117,6 +132,20 @@ namespace Hsbot.Core
 
                 await inboundMessageHandler.HandleAsync(messageContext);
             }
+        }
+
+        private OutboundResponse GetHelpResponse(InboundMessage message)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Available commands:");
+            sb.AppendLine();
+
+            foreach (var messageHandlerDescriptor in _messageHandlerDescriptors)
+            {
+                sb.AppendLine($"{messageHandlerDescriptor.Command} - {messageHandlerDescriptor.Description}");
+            }
+
+            return message.ReplyToChannel(sb.ToString());
         }
 
         private async Task InitializeBrain()
