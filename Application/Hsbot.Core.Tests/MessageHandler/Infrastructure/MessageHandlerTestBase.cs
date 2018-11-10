@@ -70,5 +70,13 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
             return instance;
         }
+
+        protected T GetHandlerInstance(IRandomNumberGenerator rng, IBotProvidedServices botProvidedServices)
+        {
+            var instance = (T) Activator.CreateInstance(typeof(T), rng);
+            instance.BotProvidedServices = botProvidedServices;
+
+            return instance;
+        }
     }
 }
