@@ -137,7 +137,7 @@ namespace Hsbot.Core.MessageHandlers
             _reminderTimerHandle?.Dispose();
         }
 
-        internal class Reminder
+        public class Reminder
         {
             public string UserId { get; set; }
             public string ChannelId { get; set; }
