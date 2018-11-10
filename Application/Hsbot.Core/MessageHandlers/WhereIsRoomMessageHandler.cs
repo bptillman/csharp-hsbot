@@ -74,25 +74,25 @@ namespace Hsbot.Core.MessageHandlers
 
             if (string.IsNullOrEmpty(roomSearch))
             {
-                return ReplyToChannel(message, "Gimme a room name to look for!");
+                return SendMessage(message.CreateResponse("Gimme a room name to look for!"));
             }
 
             if (!_rooms.ContainsKey(roomSearch))
             {
-                return ReplyToChannel(message, GetRandomCannedResponse(roomSearch));
+                return SendMessage(message.CreateResponse(GetRandomCannedResponse(roomSearch)));
             }
 
             var room = _rooms[roomSearch];
 
             if (room.StartsWith("http"))
             {
-                return ReplyToChannel(message, null, new Attachment
+                return SendMessage(message.CreateResponse(null, new Attachment
                 {
                     ImageUrl = room
-                });
+                }));
             }
 
-            return ReplyToChannel(message, room);
+            return SendMessage(message.CreateResponse(room));
         }
     }
 }

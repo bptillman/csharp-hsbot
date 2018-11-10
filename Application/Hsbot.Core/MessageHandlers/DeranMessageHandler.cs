@@ -26,7 +26,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(message, "http://i.imgur.com/reDPhBx.jpg");
+            return SendMessage(message.CreateResponse("http://i.imgur.com/reDPhBx.jpg"));
         }
 
         protected override bool CanHandle(InboundMessage message)

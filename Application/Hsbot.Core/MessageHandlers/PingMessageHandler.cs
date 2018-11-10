@@ -32,7 +32,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(message, "Pong!");
+            return SendMessage(message.CreateResponse("Pong!"));
         }
     }
 }

@@ -44,7 +44,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(message, GetRandomCannedResponse());
+            return SendMessage(message.CreateResponse(GetRandomCannedResponse()));
         }
     }
 }

@@ -73,16 +73,16 @@ namespace Hsbot.Core.Messaging
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        public static OutboundResponse ReplyToChannel(this InboundMessage message, string text, Attachment attachment = null)
+        public static OutboundResponse CreateResponse(this InboundMessage message, string text, Attachment attachment = null)
         {
             var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
-            return message.ReplyToChannel(text, attachments);
+            return message.CreateResponse(text, attachments);
         }
 
         /// <summary>
         /// Will generate a message to be sent the current channel the message arrived from
         /// </summary>
-        public static OutboundResponse ReplyToChannel(this InboundMessage message, string text, List<Attachment> attachments)
+        public static OutboundResponse CreateResponse(this InboundMessage message, string text, List<Attachment> attachments)
         {
             return new OutboundResponse
             {
@@ -94,43 +94,14 @@ namespace Hsbot.Core.Messaging
         }
 
         /// <summary>
-        /// Will send a DirectMessage reply to the use who sent the message
-        /// </summary>
-        public static OutboundResponse ReplyDirectlyToUser(this InboundMessage message, string text)
-        {
-            return new OutboundResponse
-            {
-                Channel = message.UserChannel,
-                MessageRecipientType = MessageRecipientType.DirectMessage,
-                UserId = message.UserId,
-                Text = text
-            };
-        }
-
-        /// <summary>
         /// Will display on Slack that the bot is typing on the current channel. Good for letting the end users know the bot is doing something.
         /// </summary>
-        public static OutboundResponse IndicateTypingOnChannel(this InboundMessage message)
+        public static OutboundResponse CreateTypingOnChannelResponse(this InboundMessage message)
         {
             return new OutboundResponse
             {
                 Channel = message.Channel,
                 MessageRecipientType = MessageRecipientType.Channel,
-                Text = "",
-                IndicateTyping = true
-            };
-        }
-
-        /// <summary>
-        /// Indicates on the DM channel that the bot is typing. Good for letting the end users know the bot is doing something.
-        /// </summary>
-        public static OutboundResponse IndicateTypingOnDirectMessage(this InboundMessage message)
-        {
-            return new OutboundResponse
-            {
-                Channel = message.UserChannel,
-                MessageRecipientType = MessageRecipientType.DirectMessage,
-                UserId = message.UserId,
                 Text = "",
                 IndicateTyping = true
             };

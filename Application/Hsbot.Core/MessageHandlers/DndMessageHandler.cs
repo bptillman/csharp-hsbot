@@ -52,7 +52,7 @@ namespace Hsbot.Core.MessageHandlers
                 total += rolls[i];
             }
 
-            return ReplyToChannel(message, $"rolled a {total} ({string.Join(", ", rolls)})+{mod}");
+            return SendMessage(message.CreateResponse($"rolled a {total} ({string.Join(", ", rolls)})+{mod}"));
         }
     }
 }

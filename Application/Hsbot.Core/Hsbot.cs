@@ -162,7 +162,7 @@ namespace Hsbot.Core
                 sb.AppendLine($"{messageHandlerDescriptor.Command} - {messageHandlerDescriptor.Description}");
             }
 
-            return message.ReplyToChannel(sb.ToString());
+            return message.CreateResponse(sb.ToString());
         }
 
         private async Task InitializeBrain()
