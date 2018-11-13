@@ -6,6 +6,7 @@ namespace Hsbot.Core
         string BrainStorageConnectionString { get; }
         string BrainStorageKey { get; }
         string BrainName { get; }
+        string GoogleApiKey { get; set; }
     }
 
     public class HsbotConfig : IHsbotConfig
@@ -14,5 +15,6 @@ namespace Hsbot.Core
       public string BrainStorageConnectionString { get; set; }
       public string BrainStorageKey { get; set; }
       public string BrainName { get; set; }
+      public string GoogleApiKey { get; set; }
     }
 }
