@@ -43,9 +43,9 @@ namespace Hsbot.Core.MessageHandlers
             "Very doubtful"
         };
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(context, GetRandomCannedResponse());
+            return SendMessage(message.CreateResponse(GetRandomCannedResponse()));
         }
 
         protected override bool CanHandle(InboundMessage message)

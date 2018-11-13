@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Core.Brain;
+using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
 
 namespace Hsbot.Core.MessageHandlers
@@ -13,6 +16,26 @@ namespace Hsbot.Core.MessageHandlers
         public static readonly string[] AllChannels = null;
         public static readonly string[] FunChannels = { "#general", "#headspring", "#developers", "#austin", "#houston", "#dallas", "#monterrey", "#hsbottesting" };
         public virtual string[] CannedResponses => new string[0];
+
+        private IBotProvidedServices _botProvidedServices = null;
+        public IBotProvidedServices BotProvidedServices
+        {
+            get => _botProvidedServices;
+            set 
+            {
+                if (value == null || value.Brain == null || value.Log == null || value.SendMessage == null)
+                    throw new ArgumentException("All bot-provided services must be non-null");
+
+                _botProvidedServices = value;
+
+                OnBotProvidedServicesConfigured();
+            }
+        }
+        protected IHsbotLog Log => BotProvidedServices.Log;
+        protected IBotBrain Brain => BotProvidedServices.Brain;
+        protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
+        protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
+        protected ISystemClock SystemClock => BotProvidedServices.SystemClock;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
@@ -56,8 +79,17 @@ namespace Hsbot.Core.MessageHandlers
 
         public abstract IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
 
+        private void AssertExecutionBotProvidedServicesHaveBeenConfigured()
+        {
+            if (BotProvidedServices == null)
+                throw new InvalidOperationException($"{nameof(BotProvidedServices)} must be set before this handler can process inbound messages");
+        }
+
+
         public HandlesResult Handles(InboundMessage message)
         {
+            AssertExecutionBotProvidedServicesHaveBeenConfigured();
+
             var handlerOdds = GetHandlerOdds(message);
             var canHandleMessage = CanHandle(message);
             var randomRoll = RandomNumberGenerator.Generate();
@@ -81,84 +113,10 @@ namespace Hsbot.Core.MessageHandlers
         }
 
         protected abstract bool CanHandle(InboundMessage message);
-        public abstract Task HandleAsync(IBotMessageContext context);
+        public abstract Task HandleAsync(InboundMessage message);
 
-        /// <summary>
-        /// Will generate a message to be sent the current channel the message arrived from
-        /// </summary>
-        protected Task ReplyToChannel(IBotMessageContext context, string text, Attachment attachment = null)
+        protected virtual void OnBotProvidedServicesConfigured()
         {
-            var attachments = attachment == null ? new List<Attachment>() : new List<Attachment> {attachment};
-            return context.SendMessage(context.Message.ReplyToChannel(text, attachments));
-        }
-
-        /// <summary>
-        /// Will generate a message to be sent the current channel the message arrived from
-        /// </summary>
-        protected Task ReplyToChannel(IBotMessageContext context, string text, List<Attachment> attachments)
-        {
-            return context.SendMessage
-            (
-                new OutboundResponse
-                {
-                    Channel = context.Message.Channel,
-                    MessageRecipientType = MessageRecipientType.Channel,
-                    Text = text,
-                    Attachments = attachments
-                }
-            );
-        }
-
-        /// <summary>
-        /// Will send a DirectMessage reply to the use who sent the message
-        /// </summary>
-        protected Task ReplyDirectlyToUser(IBotMessageContext context, InboundMessage message, string text)
-        {
-            return context.SendMessage
-            (
-                new OutboundResponse
-                {
-                    Channel = message.UserChannel,
-                    MessageRecipientType = MessageRecipientType.DirectMessage,
-                    UserId = message.UserId,
-                    Text = text
-                }
-            );
-        }
-
-        /// <summary>
-        /// Will display on Slack that the bot is typing on the current channel. Good for letting the end users know the bot is doing something.
-        /// </summary>
-        protected Task IndicateTypingOnChannel(IBotMessageContext context, InboundMessage message)
-        {
-            return context.SendMessage
-            (
-                new OutboundResponse
-                {
-                    Channel = message.Channel,
-                    MessageRecipientType = MessageRecipientType.Channel,
-                    Text = "",
-                    IndicateTyping = true
-                }
-            );
-        }
-
-        /// <summary>
-        /// Indicates on the DM channel that the bot is typing. Good for letting the end users know the bot is doing something.
-        /// </summary>
-        protected Task IndicateTypingOnDirectMessage(IBotMessageContext context, InboundMessage message)
-        {
-            return context.SendMessage
-            (
-                new OutboundResponse
-                {
-                    Channel = message.UserChannel,
-                    MessageRecipientType = MessageRecipientType.DirectMessage,
-                    UserId = message.UserId,
-                    Text = "",
-                    IndicateTyping = true
-                }
-            );
         }
     }
 }

@@ -143,6 +143,8 @@ namespace Hsbot.Core.Tests.MessageHandler
                 CannedResponsesValue = new string[0]
             };
 
+            handler.BotProvidedServices = new BotProvidedServicesFake();
+
             return handler;
         }
 

@@ -24,9 +24,9 @@ namespace Hsbot.Core.MessageHandlers
             yield break;
         }
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(context, "http://i.imgur.com/reDPhBx.jpg");
+            return SendMessage(message.CreateResponse("http://i.imgur.com/reDPhBx.jpg"));
         }
 
         protected override bool CanHandle(InboundMessage message)

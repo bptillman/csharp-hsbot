@@ -37,7 +37,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             return CanHandleReturnValue;
         }
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public override Task HandleAsync(InboundMessage message)
         {
             return Task.CompletedTask;
         }

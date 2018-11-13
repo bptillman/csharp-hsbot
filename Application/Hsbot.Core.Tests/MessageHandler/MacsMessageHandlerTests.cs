@@ -14,7 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         public async Task ShouldReturnUrl()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync();
+            var response = await messageHandler.TestHandleAsync();
             response.SentMessages.Count.ShouldBe(1);
             messageHandler.CannedResponses.ShouldContain(response.SentMessages.First().Text);
         }

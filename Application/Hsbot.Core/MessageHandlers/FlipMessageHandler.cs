@@ -43,19 +43,19 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(FlipRegex) || message.IsMatch(MegaflipRegex);
         }
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public override Task HandleAsync(InboundMessage message)
         {
-            var match = context.Message.Match(FlipRegex);
+            var match = message.Match(FlipRegex);
             var responseText = FlipResponse;
 
             if (!match.Success)
             {
-                match = context.Message.Match(MegaflipRegex);
+                match = message.Match(MegaflipRegex);
                 responseText = MegaflipResponse;
             }
 
             var flippedText = FlipText(match.Groups[1].Value);
-            return ReplyToChannel(context, string.Format(responseText, flippedText));
+            return SendMessage(message.CreateResponse(string.Format(responseText, flippedText)));
         }
 
         private string FlipText(string text)

@@ -42,9 +42,9 @@ namespace Hsbot.Core.MessageHandlers
             return message.Contains("it just works");
         }
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public override Task HandleAsync(InboundMessage message)
         {
-            return ReplyToChannel(context, GetRandomCannedResponse());
+            return SendMessage(message.CreateResponse(GetRandomCannedResponse()));
         }
     }
 }

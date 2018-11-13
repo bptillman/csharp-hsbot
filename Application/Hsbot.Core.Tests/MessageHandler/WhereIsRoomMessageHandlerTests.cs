@@ -14,7 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         public async Task ShouldReturnImageForPromethiumLocation()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("where is promethium");
+            var response = await messageHandler.TestHandleAsync("where is promethium");
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Attachments.First().ImageUrl.ShouldBe("https://i.imgur.com/1S6ieRs.png");
         }
@@ -22,7 +22,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         public async Task ShouldReturnBarkForMissingRoom()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("where is");
+            var response = await messageHandler.TestHandleAsync("where is");
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Text.ShouldBe("Gimme a room name to look for!");
         }
@@ -30,7 +30,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         public async Task ShouldReturnBarkForRoomNotFound()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("where is tiger");
+            var response = await messageHandler.TestHandleAsync("where is tiger");
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Text.ShouldNotBeNullOrEmpty();
             response.SentMessages.First().Attachments.ShouldBeEmpty();
@@ -39,7 +39,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         public async Task ShouldReturnJuraForCofeeRoom()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("where is coffee");
+            var response = await messageHandler.TestHandleAsync("where is coffee");
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Text.ShouldBe(":jura:");
         }

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Messaging.Formatting;
+using Hsbot.Core.Tests.Infrastructure;
 using Moq;
 using Shouldly;
 
@@ -19,7 +21,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             brainStorageMock.Verify(x => x.Load(), Times.Once);
@@ -32,7 +34,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -48,7 +50,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -82,15 +84,15 @@ namespace Hsbot.Core.Tests
             chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
 
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<IBotMessageContext>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<IBotMessageContext>()), Times.Once);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Once);
         }
 
         public async Task ShouldNotCallHandlersWhenHelpMessageReceived()
@@ -124,15 +126,15 @@ namespace Hsbot.Core.Tests
                 .Callback<OutboundResponse>(msg => sentMessages.Add(msg));
 
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<IBotMessageContext>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Never);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<IBotMessageContext>()), Times.Never);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Never);
             sentMessages.Count.ShouldBe(1);
             sentMessages.First().Text.ShouldStartWith("Available commands:");
         }
@@ -164,15 +166,15 @@ namespace Hsbot.Core.Tests
 
             var outboundResponse = new OutboundResponse();
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<IBotMessageContext>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<IBotMessageContext>()), Times.Never);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Never);
             chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Never);
         }
 
@@ -182,7 +184,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object);
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
             await hsbot.Connect();
             
             var outboundResponse = new OutboundResponse();

@@ -7,7 +7,9 @@ namespace Hsbot.Core.Messaging
     {
         IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors();
         HandlesResult Handles(InboundMessage message);
-        Task HandleAsync(IBotMessageContext context);
+        Task HandleAsync(InboundMessage message);
+
+        IBotProvidedServices BotProvidedServices { get; set; }
     }
 
     public class HandlesResult

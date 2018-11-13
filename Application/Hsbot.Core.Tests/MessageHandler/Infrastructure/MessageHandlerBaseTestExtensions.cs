@@ -7,18 +7,17 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public static class MessageHandlerBaseTestExtensions
     {
-        public static Task<BotMessageContextFake> HandleAsync(this MessageHandlerBase handler, string messageText = "fake message text")
+        public static Task<BotProvidedServicesFake> TestHandleAsync(this MessageHandlerBase handler, string messageText = "fake message text")
         {
             var message = handler.GetTestMessageThatWillBeHandled(messageText);
-            return handler.HandleAsync(message);
+            return handler.TestHandleAsync(message);
         }
 
-        public static async Task<BotMessageContextFake> HandleAsync(this IInboundMessageHandler handler, InboundMessage message)
+        public static async Task<BotProvidedServicesFake> TestHandleAsync(this MessageHandlerBase handler, InboundMessage message)
         {
-            var context = new BotMessageContextFake(message);
-            await handler.HandleAsync(context);
+            await handler.HandleAsync(message);
 
-            return context;
+            return handler.BotProvidedServices as BotProvidedServicesFake;
         }
 
         /// <returns>

@@ -6,7 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
+using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Messaging.Formatting;
 
 namespace Hsbot.Core
 {
@@ -26,18 +28,23 @@ namespace Hsbot.Core
         private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
 
+        private readonly IChatMessageTextFormatter _messageTextFormatter;
+        private readonly ISystemClock _systemClock;
+
         public HsbotBrain Brain { get; private set; }
 
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IBotBrainStorage<HsbotBrain> brainStorage,
-            IHsbotChatConnector connection)
+            IHsbotChatConnector connection,
+            IChatMessageTextFormatter messageTextFormatter,
+            ISystemClock systemClock)
         {
             _log = log;
             _messageHandlers = messageHandlers;
             _brainStorage = brainStorage;
             _connection = connection;
-
+            _messageTextFormatter = messageTextFormatter;
             _messageHandlerDescriptors = _messageHandlers
                 .SelectMany(mh => mh.GetCommandDescriptors())
                 .OrderBy(d => d.Command)
@@ -47,6 +54,8 @@ namespace Hsbot.Core
         public async Task Connect()
         {
             await InitializeBrain();
+
+            ConfigureMessageHandlers();
 
             _log.Info("Connecting to messaging service");
 
@@ -72,6 +81,16 @@ namespace Hsbot.Core
                 .Subscribe();
 
             _log.Info("Connected successfully");
+        }
+
+        private void ConfigureMessageHandlers()
+        {
+            _log.Info("Configuring message handlers with access to brain and log facilities");
+            var botProvidedServices = new BotProvidedServices(Brain, _log, SendMessage, _messageTextFormatter, _systemClock);
+            foreach (var inboundMessageHandler in _messageHandlers)
+            {
+                inboundMessageHandler.BotProvidedServices = botProvidedServices;
+            }
         }
 
         private Task OnDisconnect()
@@ -118,8 +137,6 @@ namespace Hsbot.Core
                 return;
             }
 
-            var messageContext = new BotMessageContext(Brain, _log, message, SendMessage);
-
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
 
             foreach (var inboundMessageHandler in _messageHandlers)
@@ -130,7 +147,7 @@ namespace Hsbot.Core
 
                 if (!handlerResult.HandlesMessage) continue;
 
-                await inboundMessageHandler.HandleAsync(messageContext);
+                await inboundMessageHandler.HandleAsync(message);
             }
         }
 
@@ -145,7 +162,7 @@ namespace Hsbot.Core
                 sb.AppendLine($"{messageHandlerDescriptor.Command} - {messageHandlerDescriptor.Description}");
             }
 
-            return message.ReplyToChannel(sb.ToString());
+            return message.CreateResponse(sb.ToString());
         }
 
         private async Task InitializeBrain()
