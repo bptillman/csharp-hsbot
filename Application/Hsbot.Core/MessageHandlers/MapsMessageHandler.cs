@@ -8,7 +8,7 @@
     using Messaging;
     using Random;
 
-    public class MapsMesssageHandler : MessageHandlerBase
+    public class MapsMessageHandler : MessageHandlerBase
     {
         private const string MapMeCommand = "map me";
         private const string DirectionsFromCommand = "directions from";
@@ -18,7 +18,7 @@
 
         private readonly IMaps _maps;
 
-        public MapsMesssageHandler(IRandomNumberGenerator randomNumberGenerator, IMaps maps) : base(randomNumberGenerator)
+        public MapsMessageHandler(IRandomNumberGenerator randomNumberGenerator, IMaps maps) : base(randomNumberGenerator)
         {
             _maps = maps;
         }
