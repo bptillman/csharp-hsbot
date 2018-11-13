@@ -9,8 +9,8 @@
     {
         private const string ImageResponse = "https://frinkiac.com/img/";
         private const string GifResponse = "https://frinkiac.com/gif/";
-        private const string ImageNotFound = "(doh) no images fit that quote";
-        private const string GifNotFound = "(doh) no gifs fit that quote";
+        private const string ImageNotFound = "\"doh\" no images fit that quote";
+        private const string GifNotFound = "\"doh\" no gifs fit that quote";
 
         protected override string[] MessageTextsThatShouldBeHandled => new[]
         {
@@ -61,55 +61,59 @@
         public async Task ShouldGetImageFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson me steamed hams");
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldStartWith(ImageResponse);
-            response.SentMessages[0].Text.ShouldNotContain("?b64lines=");
+            var response = await messageHandler.TestHandleAsync("simpson me steamed hams");
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[0].IndicateTyping.ShouldBe(true);
+            response.SentMessages[1].Text.ShouldStartWith(ImageResponse);
+            response.SentMessages[1].Text.ShouldNotContain("?b64lines=");
         }
 
         public async Task ShouldNotGetImageFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson me xqmrtvzpq123");
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldBe(ImageNotFound);
+            var response = await messageHandler.TestHandleAsync("simpson me xqmrtvzpq123");
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[0].IndicateTyping.ShouldBe(true);
+            response.SentMessages[1].Text.ShouldBe(ImageNotFound);
         }
 
         public async Task ShouldGetImageWithMemeFromWebsite()
         {
             var meme = "look, a caption!";
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson me steamed hams with meme " + meme);
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldStartWith(ImageResponse);
-            response.SentMessages[0].Text.ShouldEndWith("?b64lines=" + SimpsonMessageHandler.Base64Encode(meme));
+            var response = await messageHandler.TestHandleAsync("simpson me steamed hams with meme " + meme);
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[1].Text.ShouldStartWith(ImageResponse);
+            response.SentMessages[1].Text.ShouldEndWith("?b64lines=" + SimpsonMessageHandler.Base64Encode(meme));
         }
 
         public async Task ShouldGetGifFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson gif me steamed hams");
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldStartWith(GifResponse);
-            response.SentMessages[0].Text.ShouldNotContain("?b64lines=");
+            var response = await messageHandler.TestHandleAsync("simpson gif me steamed hams");
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[0].IndicateTyping.ShouldBe(true);
+            response.SentMessages[1].Text.ShouldStartWith(GifResponse);
+            response.SentMessages[1].Text.ShouldNotContain("?b64lines=");
         }
 
         public async Task ShouldNotGetGifFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson gif me xqmrtvzpq123");
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldBe(GifNotFound);
+            var response = await messageHandler.TestHandleAsync("simpson gif me xqmrtvzpq123");
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[1].Text.ShouldBe(GifNotFound);
         }
 
         public async Task ShouldGetGifWithMemeFromWebsite()
         {
             var meme = "burgers everywhere";
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.HandleAsync("simpson gif me steamed hams with meme " + meme);
-            response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages[0].Text.ShouldStartWith(GifResponse);
-            response.SentMessages[0].Text.ShouldEndWith("?b64lines=" + SimpsonMessageHandler.Base64Encode(meme));
+            var response = await messageHandler.TestHandleAsync("simpson gif me steamed hams with meme " + meme);
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[0].IndicateTyping.ShouldBe(true);
+            response.SentMessages[1].Text.ShouldStartWith(GifResponse);
+            response.SentMessages[1].Text.ShouldEndWith("?b64lines=" + SimpsonMessageHandler.Base64Encode(meme));
         }
     }
 }

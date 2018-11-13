@@ -41,16 +41,18 @@
             return message.IsMatch(SimpsonMeRegex) || message.IsMatch(SimpsonGifMeRegex);
         }
 
-        public override async Task HandleAsync(IBotMessageContext context)
+        public override async Task HandleAsync(InboundMessage message)
         {
-            var command = GetCommand(context);
+            var command = GetCommand(message);
             if (command.CommandType == CommandType.None)
                 return;
+
+            await SendMessage(message.CreateTypingOnChannelResponse());
 
             var quote = HttpUtility.UrlEncode(command.Quote);
             var requestUrl = $"{FrinkiacUrl}{quote}";
 
-            var message = $"(doh) no {command.GetResourceTypeName()} fit that quote";
+            var reply = $"\"doh\" no {command.GetResourceTypeName()} fit that quote";
             try
             {
                 var images = await GetImages(requestUrl);
@@ -59,20 +61,20 @@
                 {
                     var selectedIndex = images.Length > 10 ? 10 : RandomNumberGenerator.Generate(0, images.Length);
                     var selectedImage = images[selectedIndex];
-                    message = await GetCommandResponse(command, selectedImage);
+                    reply = await GetCommandResponse(command, selectedImage);
 
                     if (!string.IsNullOrEmpty(command.Meme))
                     {
-                        message += $"?b64lines={Base64Encode(command.Meme)}";
+                        reply += $"?b64lines={Base64Encode(command.Meme)}";
                     }
                 }
             }
             catch (Exception e)
             {
-                message = e.Message;
+                reply = e.Message;
             }
 
-            await ReplyToChannel(context, message);
+            await SendMessage(message.CreateResponse(reply));
         }
 
         private static async Task<FrinkiacImage[]> GetImages(string url)
@@ -97,31 +99,31 @@
             }
         }
 
-        private static Command GetCommand(IBotMessageContext context)
+        private static Command GetCommand(InboundMessage message)
         {
             Match match;
             var commandType = CommandType.None;
             string quote = null;
             string meme = null;
 
-            if ((match = context.Message.Match(SimpsonMeRegex)).Success)
+            if ((match = message.Match(SimpsonMeRegex)).Success)
             {
                 commandType = CommandType.Image;
                 quote = match.Groups[2].Value;
 
-                if ((match = context.Message.Match(SimpsonMeWithMemeRegex)).Success)
+                if ((match = message.Match(SimpsonMeWithMemeRegex)).Success)
                 {
                     quote = match.Groups[2].Value;
                     meme = match.Groups[3].Value;
                 }
             }
 
-            else if ((match = context.Message.Match(SimpsonGifMeRegex)).Success)
+            else if ((match = message.Match(SimpsonGifMeRegex)).Success)
             {
                 commandType = CommandType.Gif;
                 quote = match.Groups[2].Value;
 
-                if ((match = context.Message.Match(SimpsonGifMeWithMemeRegex)).Success)
+                if ((match = message.Match(SimpsonGifMeWithMemeRegex)).Success)
                 {
                     quote = match.Groups[2].Value;
                     meme = match.Groups[3].Value;
