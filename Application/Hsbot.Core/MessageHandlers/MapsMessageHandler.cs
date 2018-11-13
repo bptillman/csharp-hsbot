@@ -16,9 +16,9 @@
         private static readonly Regex MapMeRegex = new Regex(@"((roadmap|satellite|terrain|hybrid) )?map me (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex DirectionsFromRegex = new Regex(@"((driving|walking|bike|biking|bicycling) )?directions from (.*) to (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private readonly IMaps _maps;
+        private readonly IMapProvider _maps;
 
-        public MapsMessageHandler(IRandomNumberGenerator randomNumberGenerator, IMaps maps) : base(randomNumberGenerator)
+        public MapsMessageHandler(IRandomNumberGenerator randomNumberGenerator, IMapProvider maps) : base(randomNumberGenerator)
         {
             _maps = maps;
         }

@@ -30,7 +30,7 @@ namespace Hsbot.Hosting.Web
             services.AddSingleton<IChatMessageTextFormatter, SlackChatMessageTextFormatter>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IApiClient, ApiClient>();
-            services.AddSingleton<IMaps, GoogleMaps>();
+            services.AddSingleton<IMapProvider, GoogleMaps>();
             services.AddSingleton<Core.Hsbot>();
 
             return services;

@@ -4,7 +4,7 @@
     using System.Threading.Tasks;
     using Core.Maps;
 
-    public class MapsFake : IMaps
+    public class MapsFake : IMapProvider
     {
         public string FakeKey { get; set; }
 

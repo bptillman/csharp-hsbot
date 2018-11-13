@@ -7,7 +7,7 @@
     using Maps;
     using Shouldly;
 
-    public class MapMessageHandlerTests : MessageHandlerTestBase<MapsMesssageHandler>
+    public class MapMessageHandlerTests : MessageHandlerTestBase<MapsMessageHandler>
     {
         protected override string[] MessageTextsThatShouldBeHandled => new[]
         {
@@ -114,16 +114,16 @@
             response.SentMessages[1].Text.ShouldBe("Please enter your Google API key in HsbotConfig google:apiKey.");
         }
 
-        protected override MapsMesssageHandler GetHandlerInstance()
+        protected override MapsMessageHandler GetHandlerInstance()
         {
             var maps = new MapsFake();
             return GetHandlerInstance(maps);
         }
 
-        private static MapsMesssageHandler GetHandlerInstance(IMaps maps)
+        private static MapsMessageHandler GetHandlerInstance(IMapProvider maps)
         {
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
-            var instance = new MapsMesssageHandler(rng, maps);
+            var instance = new MapsMessageHandler(rng, maps);
             instance.BotProvidedServices = new BotProvidedServicesFake();
             return instance;
         }

@@ -88,7 +88,7 @@
             directions.ShouldBe(null);
         }
 
-        private static IMaps GetMapsInstance(string hubotGoogleApiKey)
+        private static IMapProvider GetMapsInstance(string hubotGoogleApiKey)
         {
             return new GoogleMaps
             (
@@ -97,7 +97,7 @@
              );
         }
 
-        private static IMaps GetMapsInstance()
+        private static IMapProvider GetMapsInstance()
         {
             return GetMapsInstance("FakeApiKey");
         }
