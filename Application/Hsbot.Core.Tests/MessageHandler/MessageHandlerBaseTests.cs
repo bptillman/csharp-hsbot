@@ -1,5 +1,4 @@
 ﻿using System;
-using Fixie.Internal.Listeners;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
