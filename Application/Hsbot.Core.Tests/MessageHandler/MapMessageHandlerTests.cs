@@ -45,7 +45,7 @@
             "hicking directions from Austin to Houston",
         };
 
-        public async Task ShouldHandlerObtainQueryParametersFromTextCommand()
+        public async Task HandlerShouldObtainQueryParametersFromTextCommand()
         {
             var expectedResults = new[]
             {
@@ -85,7 +85,7 @@
             }
         }
 
-        public async Task ShouldHandlerWarnWhenDirectionsAreTheSame()
+        public async Task HandlerShouldWarnWhenDirectionsAreTheSame()
         {
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("directions from Monterrey to Monterrey");
@@ -95,7 +95,7 @@
             response.SentMessages[1].Text.ShouldBe("Now you're just being silly.");
         }
 
-        public async Task ShouldHandlerWarnWhenKeyIsEmpty()
+        public async Task HandlerShouldWarnWhenKeyIsEmpty()
         {
             var maps = new MapProviderFake();
             var messageHandler = GetHandlerInstance(maps);
