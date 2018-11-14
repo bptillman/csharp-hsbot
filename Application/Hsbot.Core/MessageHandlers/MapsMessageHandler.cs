@@ -66,7 +66,7 @@
 
                 var map = _maps.GetMap(query, mapType);
 
-                await SendMessage(message.CreateResponse(map.ImageUrl));
+                //await SendMessage(message.CreateResponse(map.ImageUrl)); //Disabled for now: doesn't appear to be a free api call
                 await SendMessage(message.CreateResponse(map.Url));
             }
         }
@@ -95,7 +95,7 @@
                     return;
                 }
 
-                await SendMessage(message.CreateResponse(directions.MapUrl));
+                //await SendMessage(message.CreateResponse(MessageTextFormatter.FormatHyperlink(directions.MapUrl, "Open in Google Maps"))); //Disabled for now: doesn't appear to be a free api call
                 await SendMessage(message.CreateResponse(directions.Instructions));
             }
         }

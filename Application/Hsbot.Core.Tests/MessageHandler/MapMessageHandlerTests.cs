@@ -45,45 +45,46 @@
             "hicking directions from Austin to Houston",
         };
 
-        public async Task HandlerShouldObtainQueryParametersFromTextCommand()
-        {
-            var expectedResults = new[]
-            {
-                "roadmap__Austin",
-                "roadmap__NASA, Houston",
-                "roadmap__Dallas Airport",
-                "roadmap__Headspring, Monterrey",
-                "roadmap__Headspring, Austin",
-                "satellite__Headspring, Austin",
-                "terrain__Headspring, Austin",
-                "hybrid__Headspring, Austin",
-                "driving__Austin__Houston",
-                "driving__Monterrey, Mexico__Dallas, Texas",
-                "driving__Headspring, Austin__nearest Rudy's",
-                "driving__Headspring, Austin__nearest Rudy's",
-                "walking__Monterrey, Mexico__Dallas, Texas",
-                "bicycling__Headspring, Austin__nearest Rudy's",
-                "bike__Austin__Houston",
-                "biking__Austin__Houston"
-            };
+        //This test commented since calls that require a key are not free: Google appears to be charging for this API
+        //public async Task HandlerShouldObtainQueryParametersFromTextCommand()
+        //{
+        //    var expectedResults = new[]
+        //    {
+        //        "roadmap__Austin",
+        //        "roadmap__NASA, Houston",
+        //        "roadmap__Dallas Airport",
+        //        "roadmap__Headspring, Monterrey",
+        //        "roadmap__Headspring, Austin",
+        //        "satellite__Headspring, Austin",
+        //        "terrain__Headspring, Austin",
+        //        "hybrid__Headspring, Austin",
+        //        "driving__Austin__Houston",
+        //        "driving__Monterrey, Mexico__Dallas, Texas",
+        //        "driving__Headspring, Austin__nearest Rudy's",
+        //        "driving__Headspring, Austin__nearest Rudy's",
+        //        "walking__Monterrey, Mexico__Dallas, Texas",
+        //        "bicycling__Headspring, Austin__nearest Rudy's",
+        //        "bike__Austin__Houston",
+        //        "biking__Austin__Houston"
+        //    };
 
-            MessageTextsThatShouldBeHandled.Length.ShouldBe(expectedResults.Length);
+        //    MessageTextsThatShouldBeHandled.Length.ShouldBe(expectedResults.Length);
 
-            var messageHandler = GetHandlerInstance();
+        //    var messageHandler = GetHandlerInstance();
 
-            for (var i = 0; i < MessageTextsThatShouldBeHandled.Length; i++)
-            {
-                var response = await messageHandler.TestHandleAsync(MessageTextsThatShouldBeHandled[i]);
+        //    for (var i = 0; i < MessageTextsThatShouldBeHandled.Length; i++)
+        //    {
+        //        var response = await messageHandler.TestHandleAsync(MessageTextsThatShouldBeHandled[i]);
 
-                response.SentMessages.Count.ShouldBe(MessageTextsThatShouldBeHandled[i]
-                    .Contains("directions from", StringComparison.OrdinalIgnoreCase)
-                    ? 3
-                    : 2);
-                response.SentMessages[1].Text.ShouldBe(expectedResults[i]);
+        //        response.SentMessages.Count.ShouldBe(MessageTextsThatShouldBeHandled[i]
+        //            .Contains("directions from", StringComparison.OrdinalIgnoreCase)
+        //            ? 3
+        //            : 2);
+        //        response.SentMessages[1].Text.ShouldBe(expectedResults[i]);
 
-                response.SentMessages.Clear();
-            }
-        }
+        //        response.SentMessages.Clear();
+        //    }
+        //}
 
         public async Task HandlerShouldWarnWhenDirectionsAreTheSame()
         {
