@@ -97,7 +97,7 @@
 
         public async Task ShouldHandlerWarnWhenKeyIsEmpty()
         {
-            var maps = new MapsFake();
+            var maps = new MapProviderFake();
             var messageHandler = GetHandlerInstance(maps);
 
             maps.FakeKey = null;
@@ -116,7 +116,7 @@
 
         protected override MapsMessageHandler GetHandlerInstance()
         {
-            var maps = new MapsFake();
+            var maps = new MapProviderFake();
             return GetHandlerInstance(maps);
         }
 

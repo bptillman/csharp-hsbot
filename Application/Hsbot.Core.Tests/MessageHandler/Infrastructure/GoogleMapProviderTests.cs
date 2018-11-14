@@ -7,7 +7,7 @@
     using ApiClient;
     using Maps;
 
-    public class GoogleMapsTests
+    public class GoogleMapProviderTests
     {
         private static readonly string[] MapsErrors = new[]
         {
@@ -17,7 +17,7 @@
 
         public void ShouldGetMapResponse()
         {
-            var maps = GetMapsInstance();
+            var maps = GetMapProviderInstance();
             var route = maps.GetMap("Headspring, Austin", MapType.Roadmap);
 
             var location = HttpUtility.UrlEncode("Headspring, Austin");
@@ -31,7 +31,7 @@
 
         public async Task ShouldGetDirectionsThrowErrorOnTesting()
         {
-            var maps = GetMapsInstance();
+            var maps = GetMapProviderInstance();
             MapDirections directions = null;
 
             try
@@ -47,7 +47,7 @@
 
         public async Task ShouldWarnWhenDirectionsAreTheSame()
         {
-            var maps = GetMapsInstance();
+            var maps = GetMapProviderInstance();
             MapDirections directions = null;
 
             try
@@ -90,14 +90,14 @@
 
         private static IMapProvider GetMapsInstance(string hubotGoogleApiKey)
         {
-            return new GoogleMaps
+            return new GoogleMapProvider
             (
                 new HsbotConfig { GoogleApiKey = hubotGoogleApiKey },
                 new ApiClient()
              );
         }
 
-        private static IMapProvider GetMapsInstance()
+        private static IMapProvider GetMapProviderInstance()
         {
             return GetMapsInstance("FakeApiKey");
         }

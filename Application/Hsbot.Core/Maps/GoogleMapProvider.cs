@@ -10,7 +10,7 @@
     using System.Text.RegularExpressions;
     using ApiClient;
 
-    public class GoogleMaps : IMapProvider
+    public class GoogleMapProvider : IMapProvider
     {
         private const string MapUrl = "http://maps.google.com/maps?t=m&z=11&hl=en&sll=37.0625,-95.677068&sspn=73.579623,100.371094&vpsrc=0";
         private const string ImageMapUrl = "http://maps.google.com/maps/api/staticmap?format=png&sensor=false&size=400x400";
@@ -23,7 +23,7 @@
         private readonly string _key;
         private readonly IApiClient _apiClient;
 
-        public GoogleMaps(IHsbotConfig hsbotConfig, IApiClient apiClient)
+        public GoogleMapProvider(IHsbotConfig hsbotConfig, IApiClient apiClient)
         {
             _key = hsbotConfig.GoogleApiKey;
             _apiClient = apiClient;

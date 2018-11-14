@@ -4,11 +4,11 @@
     using System.Threading.Tasks;
     using Core.Maps;
 
-    public class MapsFake : IMapProvider
+    public class MapProviderFake : IMapProvider
     {
         public string FakeKey { get; set; }
 
-        public MapsFake()
+        public MapProviderFake()
         {
             FakeKey = "fakeApiKey";
         }
