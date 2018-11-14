@@ -10,5 +10,6 @@ namespace Hsbot.Core.Messaging.Formatting
         string FormatDate(DateTime date, string format);
         string FormatUserMention(string userId);
         string FormatChannelMention(string channelName);
+        string FormatHyperlink(string url, string displayText);
     }
 }
