@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
@@ -35,14 +36,19 @@ namespace Hsbot.Core.MessageHandlers
             ""
         };
 
-        public override Task HandleAsync(IBotMessageContext context)
+        public Task HandleAsync()
         {
-            if (context.Message.Contains("coffee"))
+            throw new NotImplementedException();
+        }
+
+        public override Task HandleAsync(InboundMessage message)
+        {
+            if (message.Contains("coffee"))
             {
-                return ReplyToChannel(context, "Coffee? How about a beer?");
+                return SendMessage(message.CreateResponse("Coffee? How about a beer?"));
             }
             var random = RandomNumberGenerator.Generate(0, Quips.Length);
-            return ReplyToChannel(context, Quips[random]);
+            return SendMessage(message.CreateResponse(Quips[random]));
         }
 
         protected override bool CanHandle(InboundMessage message)

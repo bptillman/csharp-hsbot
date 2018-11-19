@@ -16,13 +16,13 @@ namespace Hsbot.Core.Tests.MessageHandler
         {
             var rng1 = new RandomNumberGeneratorFake { NextIntValue = 0 };
             var messageHandler1 = GetHandlerInstance(rng1);
-            var response1 = await messageHandler1.HandleAsync();
+            var response1 = await messageHandler1.TestHandleAsync();
             response1.SentMessages.Count.ShouldBe(1);
             response1.SentMessages.First().Text.ShouldBe("In wine there is wisdom, in beer there is freedom, in water there is bacteria");
 
             var rng2 = new RandomNumberGeneratorFake { NextIntValue = 6 };
             var messageHandler2 = GetHandlerInstance(rng2);
-            var response2 = await messageHandler2.HandleAsync();
+            var response2 = await messageHandler2.TestHandleAsync();
             response2.SentMessages.Count.ShouldBe(1);
             response2.SentMessages.First().Text.ShouldBe("24 hours in a day, 24 beers in a case. Coincidence?");
         }
