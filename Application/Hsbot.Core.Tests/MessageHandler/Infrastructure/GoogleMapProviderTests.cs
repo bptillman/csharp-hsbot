@@ -1,20 +1,11 @@
 ﻿namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
-    using System;
-    using System.Threading.Tasks;
     using Shouldly;
     using System.Web;
-    using ApiClient;
     using Maps;
 
     public class GoogleMapProviderTests
     {
-        private static readonly string[] MapsErrors = new[]
-        {
-            "Error: No route found.",
-            "Error: Service is not working."
-        };
-
         public void ShouldGetMapResponse()
         {
             var maps = GetMapProviderInstance();
@@ -29,77 +20,9 @@
             route.ImageUrl.ShouldEndWith(endImageUrl);
         }
 
-        public async Task ShouldGetDirectionsThrowErrorOnTesting()
-        {
-            var maps = GetMapProviderInstance();
-            MapDirections directions = null;
-
-            try
-            {
-                directions = await maps.GetDirections("Houston", "NASA", DirectionsMode.Driving);
-            }
-            catch (Exception e)
-            {
-                e.Message.ShouldBeOneOf(MapsErrors);
-            }
-            directions.ShouldBe(null);
-        }
-
-        public async Task ShouldWarnWhenDirectionsAreTheSame()
-        {
-            var maps = GetMapProviderInstance();
-            MapDirections directions = null;
-
-            try
-            {
-                directions = await maps.GetDirections("Austin", "Austin", DirectionsMode.Walking);
-            }
-            catch (Exception e)
-            {
-                e.Message.ShouldBe("Now you're just being silly.");
-            }
-            directions.ShouldBe(null);
-        }
-
-        public async Task ShouldHandlerWarnWhenKeyIsEmpty()
-        {
-            var maps = GetMapsInstance("");
-            MapDirections directions = null;
-
-            try
-            {
-                directions = await maps.GetDirections("Austin", "Houston", DirectionsMode.Driving);
-            }
-            catch (Exception e)
-            {
-                e.Message.ShouldBe("Please enter your Google API key in HsbotConfig google:apiKey.");
-            }
-            directions.ShouldBe(null);
-
-            maps = GetMapsInstance(null);
-            try
-            {
-                directions = await maps.GetDirections("Austin", "Houston", DirectionsMode.Driving);
-            }
-            catch (Exception e)
-            {
-                e.Message.ShouldBe("Please enter your Google API key in HsbotConfig google:apiKey.");
-            }
-            directions.ShouldBe(null);
-        }
-
-        private static IMapProvider GetMapsInstance(string hubotGoogleApiKey)
-        {
-            return new GoogleMapProvider
-            (
-                new HsbotConfig { GoogleApiKey = hubotGoogleApiKey },
-                new ApiClient()
-             );
-        }
-
         private static IMapProvider GetMapProviderInstance()
         {
-            return GetMapsInstance("FakeApiKey");
+            return new GoogleMapProvider();
         }
     }
 }

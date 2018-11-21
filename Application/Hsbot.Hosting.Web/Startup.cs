@@ -36,8 +36,7 @@ namespace Hsbot.Hosting.Web
                 SlackApiKey = _config["slack:apiKey"],
                 BrainName = _config["brain:name"] ?? "HsbotBrain",
                 BrainStorageConnectionString = _config["brain:connectionString"] ?? "UseDevelopmentStorage=true",
-                BrainStorageKey = _config["brain:storageKey"],
-                GoogleApiKey = _config["google:apiKey"]
+                BrainStorageKey = _config["brain:storageKey"]
             };
         }
 

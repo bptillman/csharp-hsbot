@@ -1,6 +1,5 @@
 ﻿namespace Hsbot.Core.Tests.MessageHandler
 {
-    using System;
     using System.Threading.Tasks;
     using MessageHandlers;
     using Infrastructure;
@@ -18,15 +17,7 @@
             "Roadmap map me Headspring, Austin",
             "Satellite map me Headspring, Austin",
             "Terrain map me Headspring, Austin",
-            "hybrid map me Headspring, Austin",
-            "directions from Austin to Houston",
-            "directions from Monterrey, Mexico to Dallas, Texas",
-            "Directions From Headspring, Austin to nearest Rudy's",
-            "driving directions From Headspring, Austin to nearest Rudy's",
-            "walking directions from Monterrey, Mexico to Dallas, Texas",
-            "BiCycling Directions From Headspring, Austin to nearest Rudy's",
-            "bike directions from Austin to Houston",
-            "Biking directions from Austin to Houston"
+            "hybrid map me Headspring, Austin"
         };
 
         protected override string[] MessageTextsThatShouldNotBeHandled => new[]
@@ -45,85 +36,41 @@
             "hicking directions from Austin to Houston",
         };
 
-        //This test commented since calls that require a key are not free: Google appears to be charging for this API
-        //public async Task HandlerShouldObtainQueryParametersFromTextCommand()
-        //{
-        //    var expectedResults = new[]
-        //    {
-        //        "roadmap__Austin",
-        //        "roadmap__NASA, Houston",
-        //        "roadmap__Dallas Airport",
-        //        "roadmap__Headspring, Monterrey",
-        //        "roadmap__Headspring, Austin",
-        //        "satellite__Headspring, Austin",
-        //        "terrain__Headspring, Austin",
-        //        "hybrid__Headspring, Austin",
-        //        "driving__Austin__Houston",
-        //        "driving__Monterrey, Mexico__Dallas, Texas",
-        //        "driving__Headspring, Austin__nearest Rudy's",
-        //        "driving__Headspring, Austin__nearest Rudy's",
-        //        "walking__Monterrey, Mexico__Dallas, Texas",
-        //        "bicycling__Headspring, Austin__nearest Rudy's",
-        //        "bike__Austin__Houston",
-        //        "biking__Austin__Houston"
-        //    };
-
-        //    MessageTextsThatShouldBeHandled.Length.ShouldBe(expectedResults.Length);
-
-        //    var messageHandler = GetHandlerInstance();
-
-        //    for (var i = 0; i < MessageTextsThatShouldBeHandled.Length; i++)
-        //    {
-        //        var response = await messageHandler.TestHandleAsync(MessageTextsThatShouldBeHandled[i]);
-
-        //        response.SentMessages.Count.ShouldBe(MessageTextsThatShouldBeHandled[i]
-        //            .Contains("directions from", StringComparison.OrdinalIgnoreCase)
-        //            ? 3
-        //            : 2);
-        //        response.SentMessages[1].Text.ShouldBe(expectedResults[i]);
-
-        //        response.SentMessages.Clear();
-        //    }
-        //}
-
-        public async Task HandlerShouldWarnWhenDirectionsAreTheSame()
+        public async Task ShouldGetResponseWithCorrectMapType()
         {
-            var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.TestHandleAsync("directions from Monterrey to Monterrey");
+            var mapTypes = new[]
+            {
+                MapType.Roadmap.ToString(),
+                MapType.Satellite.ToString(),
+                MapType.Terrain.ToString(),
+                MapType.Hybrid.ToString()
+            };
 
-            response.SentMessages.Count.ShouldBe(2);
-            response.SentMessages[0].IndicateTyping.ShouldBe(true);
-            response.SentMessages[1].Text.ShouldBe("Now you're just being silly.");
+            var handler = GetHandlerInstance();
+
+            foreach (var mapType in mapTypes)
+            {
+                var response = await handler.TestHandleAsync($"{mapType} map me Austin, Texas");
+                response.SentMessages.Count.ShouldBe(2);
+                response.SentMessages[0].Text.ShouldBe($"{mapType.ToLower()}__Austin, Texas");
+
+                response.SentMessages.Clear();
+            }
         }
 
-        public async Task HandlerShouldWarnWhenKeyIsEmpty()
+        public async Task ShouldRoadmapBeDefaultWhenMapTypeIsNotSpecified()
         {
-            var maps = new MapProviderFake();
-            var messageHandler = GetHandlerInstance(maps);
+            var handler = GetHandlerInstance();
 
-            maps.FakeKey = null;
-            var response = await messageHandler.TestHandleAsync("directions from NASA to Galveston");
+            var response = await handler.TestHandleAsync("map me Austin, Texas");
             response.SentMessages.Count.ShouldBe(2);
-            response.SentMessages[0].IndicateTyping.ShouldBe(true);
-            response.SentMessages[1].Text.ShouldBe("Please enter your Google API key in HsbotConfig google:apiKey.");
-            response.SentMessages.Clear();
-
-            maps.FakeKey = "";
-            response = await messageHandler.TestHandleAsync("directions from NASA to Galveston");
-            response.SentMessages.Count.ShouldBe(2);
-            response.SentMessages[0].IndicateTyping.ShouldBe(true);
-            response.SentMessages[1].Text.ShouldBe("Please enter your Google API key in HsbotConfig google:apiKey.");
+            response.SentMessages[0].Text.ShouldBe($"{MapType.Roadmap.ToString().ToLower()}__Austin, Texas");
         }
 
         protected override MapsMessageHandler GetHandlerInstance()
         {
-            var maps = new MapProviderFake();
-            return GetHandlerInstance(maps);
-        }
-
-        private static MapsMessageHandler GetHandlerInstance(IMapProvider maps)
-        {
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
+            var maps = new MapProviderFake();
             var instance = new MapsMessageHandler(rng, maps);
             instance.BotProvidedServices = new BotProvidedServicesFake();
             return instance;

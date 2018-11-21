@@ -2,7 +2,6 @@ using System.Linq;
 using System.Reflection;
 using Hsbot.Azure;
 using Hsbot.Core;
-using Hsbot.Core.ApiClient;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
@@ -29,7 +28,6 @@ namespace Hsbot.Hosting.Web
             services.AddSingleton<IHsbotChatConnector, HsbotSlackConnector>();
             services.AddSingleton<IChatMessageTextFormatter, SlackChatMessageTextFormatter>();
             services.AddSingleton<ISystemClock, SystemClock>();
-            services.AddSingleton<IApiClient, ApiClient>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddSingleton<Core.Hsbot>();
 
