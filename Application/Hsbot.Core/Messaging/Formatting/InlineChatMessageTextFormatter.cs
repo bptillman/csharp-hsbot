@@ -25,5 +25,10 @@ namespace Hsbot.Core.Messaging.Formatting
         {
             return channelName;
         }
+
+        public string FormatHyperlink(string url, string displayText)
+        {
+            return $"{displayText} ({url})";
+        }
     }
 }

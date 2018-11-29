@@ -51,7 +51,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             }
         }
 
-        protected T GetHandlerInstance()
+        protected virtual T GetHandlerInstance()
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
@@ -63,7 +63,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             return instance;
         }
 
-        protected T GetHandlerInstance(IRandomNumberGenerator rng)
+        protected virtual T GetHandlerInstance(IRandomNumberGenerator rng)
         {
             var instance = (T) Activator.CreateInstance(typeof(T), rng);
             instance.BotProvidedServices = new BotProvidedServicesFake();

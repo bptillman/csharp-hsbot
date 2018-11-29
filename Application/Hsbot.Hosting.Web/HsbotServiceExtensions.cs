@@ -5,6 +5,7 @@ using Hsbot.Core;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
+using Hsbot.Core.Maps;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
@@ -27,6 +28,7 @@ namespace Hsbot.Hosting.Web
             services.AddSingleton<IHsbotChatConnector, HsbotSlackConnector>();
             services.AddSingleton<IChatMessageTextFormatter, SlackChatMessageTextFormatter>();
             services.AddSingleton<ISystemClock, SystemClock>();
+            services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddSingleton<Core.Hsbot>();
 
             return services;

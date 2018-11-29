@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Hsbot.Core.Messaging.Formatting;
 
 namespace Hsbot.Slack
@@ -28,6 +29,24 @@ namespace Hsbot.Slack
         public string FormatChannelMention(string channelName)
         {
             return $"<#{channelName}>";
+        }
+
+        public string FormatHyperlink(string url, string displayText)
+        {
+            var encodedUrl = url;
+            if (url.Contains("?"))
+            {
+                var queryIndex = url.IndexOf("?", StringComparison.Ordinal);
+                var queryString = queryIndex + 1 < url.Length
+                    ? url.Substring(queryIndex + 1, url.Length - queryIndex - 1)
+                    : "";
+
+                encodedUrl = url.Substring(0, queryIndex) + "?" + WebUtility.UrlEncode(queryString);
+            }
+
+            return string.IsNullOrWhiteSpace(displayText)
+                ? encodedUrl
+                : $"<{encodedUrl}|{displayText}>";
         }
 
         private static long GetUnixEpochTime(DateTime date)
