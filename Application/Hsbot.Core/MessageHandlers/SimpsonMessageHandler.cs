@@ -52,7 +52,7 @@
             var quote = HttpUtility.UrlEncode(command.Quote);
             var requestUrl = $"{FrinkiacUrl}{quote}";
 
-            var reply = $"\"doh\" no {command.GetResourceTypeName()} fit that quote";
+            var reply = $":doh: no {command.GetResourceTypeName()} fit that quote";
             try
             {
                 var images = await GetImages(requestUrl);
@@ -156,7 +156,7 @@
             var requestUrl = $"https://frinkiac.com/api/frames/{selectedImage.Episode}/{selectedImage.TimeStamp}/5000/5000";
             var images = await GetImages(requestUrl);
 
-            if (images.Length <= 0) return $"(doh) no {command.GetResourceTypeName()} fit that quote";
+            if (images.Length <= 0) return $":doh: no {command.GetResourceTypeName()} fit that quote";
 
             var gifImagesLenght = images.Length > 42 ? 42 : images.Length;
             var gifImages = images.OrderBy(x => x.TimeStamp).Skip((images.Length / 2) - (gifImagesLenght / 2)).Take(gifImagesLenght).ToArray();

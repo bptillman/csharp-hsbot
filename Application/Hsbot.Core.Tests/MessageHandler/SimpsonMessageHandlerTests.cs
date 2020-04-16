@@ -9,8 +9,8 @@
     {
         private const string ImageResponse = "https://frinkiac.com/img/";
         private const string GifResponse = "https://frinkiac.com/gif/";
-        private const string ImageNotFound = "\"doh\" no images fit that quote";
-        private const string GifNotFound = "\"doh\" no gifs fit that quote";
+        private const string ImageNotFound = ":doh: no images fit that quote";
+        private const string GifNotFound = ":doh: no gifs fit that quote";
 
         protected override string[] MessageTextsThatShouldBeHandled => new[]
         {
