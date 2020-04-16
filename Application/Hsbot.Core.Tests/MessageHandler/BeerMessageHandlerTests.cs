@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
@@ -14,17 +13,22 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldReturnBeerAnswers()
         {
-            var rng1 = new RandomNumberGeneratorFake { NextIntValue = 0 };
-            var messageHandler1 = GetHandlerInstance(rng1);
-            var response1 = await messageHandler1.TestHandleAsync();
-            response1.SentMessages.Count.ShouldBe(1);
-            response1.SentMessages.First().Text.ShouldBe("In wine there is wisdom, in beer there is freedom, in water there is bacteria");
+            var rng = new RandomNumberGeneratorFake { NextIntValue = 0 };
+            var messageHandler = GetHandlerInstance(rng);
 
-            var rng2 = new RandomNumberGeneratorFake { NextIntValue = 6 };
-            var messageHandler2 = GetHandlerInstance(rng2);
-            var response2 = await messageHandler2.TestHandleAsync();
-            response2.SentMessages.Count.ShouldBe(1);
-            response2.SentMessages.First().Text.ShouldBe("24 hours in a day, 24 beers in a case. Coincidence?");
+            foreach (var cannedResponse in messageHandler.CannedResponses)
+            {
+                var response = await messageHandler.TestHandleAsync();
+                response.SentMessages.Count.ShouldBe(1);
+                response.SentMessages.First().Text.ShouldBe(cannedResponse);
+                response.SentMessages.Clear();
+
+                rng.NextIntValue += 1;
+            }
+
+            var coffeeResponse = await messageHandler.TestHandleAsync("Coffee");
+            coffeeResponse.SentMessages.Count.ShouldBe(1);
+            coffeeResponse.SentMessages.First().Text.ShouldBe("Coffee? How about a beer?");
         }
     }
 }
