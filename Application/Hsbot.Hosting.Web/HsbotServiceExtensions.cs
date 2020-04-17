@@ -45,7 +45,7 @@ namespace Hsbot.Hosting.Web
 
             foreach (var messageHandlerType in messageHandlerTypes)
             {
-                services.Add(new ServiceDescriptor(handlerInterfaceType, messageHandlerType, ServiceLifetime.Transient));
+                services.Add(new ServiceDescriptor(handlerInterfaceType, messageHandlerType, ServiceLifetime.Singleton));
             }
         }
     }
