@@ -8,6 +8,7 @@ using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Infrastructure;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Moq;
 using Shouldly;
 
@@ -21,7 +22,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             brainStorageMock.Verify(x => x.Load(), Times.Once);
@@ -34,7 +35,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -50,7 +51,7 @@ namespace Hsbot.Core.Tests
 
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             hsbot.Brain.SetItem("test", "value");
@@ -88,7 +89,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -130,7 +131,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Never);
@@ -170,7 +171,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -184,7 +185,7 @@ namespace Hsbot.Core.Tests
             var brainStorageMock = MockBrainStorage();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
             await hsbot.Connect();
             
             var outboundResponse = new OutboundResponse();
