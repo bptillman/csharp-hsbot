@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Hsbot.Core.ApiClients;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
@@ -30,6 +31,7 @@ namespace Hsbot.Core
 
         private readonly IChatMessageTextFormatter _messageTextFormatter;
         private readonly ISystemClock _systemClock;
+        private readonly ITumblrApiClient _tumblrApiClient;
 
         public HsbotBrain Brain { get; private set; }
 
@@ -38,13 +40,16 @@ namespace Hsbot.Core
             IBotBrainStorage<HsbotBrain> brainStorage,
             IHsbotChatConnector connection,
             IChatMessageTextFormatter messageTextFormatter,
-            ISystemClock systemClock)
+            ISystemClock systemClock,
+            ITumblrApiClient tumblrApiClient)
         {
             _log = log;
             _messageHandlers = messageHandlers;
             _brainStorage = brainStorage;
             _connection = connection;
             _messageTextFormatter = messageTextFormatter;
+            _systemClock = systemClock;
+            _tumblrApiClient = tumblrApiClient;
             _messageHandlerDescriptors = _messageHandlers
                 .SelectMany(mh => mh.GetCommandDescriptors())
                 .OrderBy(d => d.Command)
@@ -86,7 +91,7 @@ namespace Hsbot.Core
         private void ConfigureMessageHandlers()
         {
             _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(Brain, _log, SendMessage, _messageTextFormatter, _systemClock);
+            var botProvidedServices = new BotProvidedServices(Brain, _log, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;
