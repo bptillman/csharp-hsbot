@@ -51,22 +51,22 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             }
         }
 
-        protected virtual T GetHandlerInstance()
+        protected virtual T GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
             //to be false
             var rng = new RandomNumberGeneratorFake {NextDoubleValue = 0.0};
             var instance = (T) Activator.CreateInstance(typeof(T), rng);
-            instance.BotProvidedServices = new BotProvidedServicesFake();
+            instance.BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake();
 
             return instance;
         }
 
-        protected virtual T GetHandlerInstance(IRandomNumberGenerator rng)
+        protected virtual T GetHandlerInstance(IRandomNumberGenerator rng, BotProvidedServicesFake botProvidedServices = null)
         {
             var instance = (T) Activator.CreateInstance(typeof(T), rng);
-            instance.BotProvidedServices = new BotProvidedServicesFake();
+            instance.BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake();
 
             return instance;
         }

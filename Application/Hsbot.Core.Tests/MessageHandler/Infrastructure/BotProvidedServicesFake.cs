@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Core.ApiClients;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
@@ -12,34 +13,30 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 {
     public class BotProvidedServicesFake : IBotProvidedServices
     {
-        public BotProvidedServicesFake(HsbotBrain brain = null, 
-            Mock<IHsbotLog> logMock = null, 
-            Action<OutboundResponse> sendMessageAction = null, 
-            IChatMessageTextFormatter messageTextFormatter = null,
-            ISystemClock systemClock = null)
+        public BotProvidedServicesFake()
         {
             SendMessage = response =>
             {
                 SentMessages.Add(response);
-                sendMessageAction?.Invoke(response);
-
                 return Task.CompletedTask;
             };
 
-            LogMock = logMock ?? MockLog();
-            Brain = brain ?? new HsbotBrain();
-            MessageTextFormatter = messageTextFormatter ?? new InlineChatMessageTextFormatter();
-            SystemClock = systemClock ?? new TestSystemClock();
+            LogMock = MockLog();
+            Brain = new HsbotBrain();
+            MessageTextFormatter = new InlineChatMessageTextFormatter();
+            SystemClock = new TestSystemClock();
+            TumblrApiClient = new TestTumblrApiClient();
         }
 
-        public Mock<IHsbotLog> LogMock { get; }
+        public Mock<IHsbotLog> LogMock { get; set; }
         public List<OutboundResponse> SentMessages { get; } = new List<OutboundResponse>();
 
-        public IBotBrain Brain { get; }
+        public IBotBrain Brain { get; set; }
         public IHsbotLog Log => LogMock.Object;
         public Func<OutboundResponse, Task> SendMessage { get; }
-        public IChatMessageTextFormatter MessageTextFormatter { get; }
-        public ISystemClock SystemClock { get; }
+        public IChatMessageTextFormatter MessageTextFormatter { get; set; }
+        public ISystemClock SystemClock { get; set; }
+        public ITumblrApiClient TumblrApiClient { get; set; }
 
         private Mock<IHsbotLog> MockLog()
         {

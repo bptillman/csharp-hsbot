@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hsbot.Core.MessageHandlers.Helpers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
 
@@ -29,19 +30,12 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(RollRegex);
         }
 
-        private int? CaptureToInt(Capture capture)
-        {
-            return capture == null || string.IsNullOrEmpty(capture.Value)
-                ? (int?)null
-                : int.Parse(capture.Value);
-        }
-
         public override Task HandleAsync(InboundMessage message)
         {
             var matches = message.Match(RollRegex);
-            var quantity = CaptureToInt(matches.Groups[1]) ?? 1;
-            var die = CaptureToInt(matches.Groups[2]).Value;
-            var mod = CaptureToInt(matches.Groups[4]) ?? 0;
+            var quantity = matches.Groups[1].CaptureToInt() ?? 1;
+            var die = matches.Groups[2].CaptureToInt().Value;
+            var mod = matches.Groups[4].CaptureToInt() ?? 0;
 
             var total = mod;
             var rolls = new int[quantity];

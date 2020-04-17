@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Hsbot.Core.ApiClients;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
@@ -36,6 +37,7 @@ namespace Hsbot.Core.MessageHandlers
         protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
         protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
         protected ISystemClock SystemClock => BotProvidedServices.SystemClock;
+        protected ITumblrApiClient TumblrApiClient => BotProvidedServices.TumblrApiClient;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
