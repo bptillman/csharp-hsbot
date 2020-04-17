@@ -152,7 +152,14 @@ namespace Hsbot.Core
 
                 if (!handlerResult.HandlesMessage) continue;
 
-                await inboundMessageHandler.HandleAsync(message);
+                try
+                {
+                    await inboundMessageHandler.HandleAsync(message);
+                }
+                catch (Exception e)
+                {
+                    _log.Error($"Error handling message: {e}");
+                }
             }
         }
 
