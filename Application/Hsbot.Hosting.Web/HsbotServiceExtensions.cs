@@ -2,6 +2,7 @@ using System.Linq;
 using System.Reflection;
 using Hsbot.Azure;
 using Hsbot.Core;
+using Hsbot.Core.ApiClients;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
@@ -29,6 +30,7 @@ namespace Hsbot.Hosting.Web
             services.AddSingleton<IChatMessageTextFormatter, SlackChatMessageTextFormatter>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
+            services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
             services.AddSingleton<Core.Hsbot>();
 
             return services;
