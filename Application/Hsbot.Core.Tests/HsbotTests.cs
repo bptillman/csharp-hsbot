@@ -179,6 +179,20 @@ namespace Hsbot.Core.Tests
             chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Never);
         }
 
+        public async Task ShouldGetChatUserViaChatConnector()
+        {
+            var logMock = MockLog();
+            var brainStorageMock = MockBrainStorage();
+            var chatConnectorMock = MockChatConnector();
+
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), brainStorageMock.Object, chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            await hsbot.Connect();
+
+            await hsbot.GetChatUserById(string.Empty);
+
+            chatConnectorMock.Verify(x => x.GetChatUserById(string.Empty), Times.Once);
+        }
+
         public async Task ShouldSendMessageResponseViaChatConnector()
         {
             var logMock = MockLog();

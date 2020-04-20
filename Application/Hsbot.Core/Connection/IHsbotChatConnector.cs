@@ -9,6 +9,7 @@ namespace Hsbot.Core.Connection
         Task Connect();
         Task Disconnect();
         Task SendMessage(OutboundResponse response);
+        Task<IChatUser> GetChatUserById(string userId);
 
         IObservable<IHsbotChatConnector> Disconnected { get; }
         IObservable<IHsbotChatConnector> Reconnecting { get; }
