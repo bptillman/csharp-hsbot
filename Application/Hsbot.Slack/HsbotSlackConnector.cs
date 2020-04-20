@@ -144,7 +144,7 @@ namespace Hsbot.Slack
                 Id = user.Id,
                 Email = user.Email,
                 DisplayName = user.Name,
-                FullName = $"{user.FirstName}  {user.LastName}",
+                FullName = $"{user.FirstName} {user.LastName}",
             };
         }
 
