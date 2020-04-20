@@ -6,5 +6,7 @@
         string Email { get; }
         string DisplayName { get; }
         string FullName { get; }
+        bool IsRobot { get; }
+        bool IsGuest { get; }
     }
 }

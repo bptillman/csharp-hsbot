@@ -145,6 +145,8 @@ namespace Hsbot.Slack
                 Email = user.Email,
                 DisplayName = user.Name,
                 FullName = $"{user.FirstName} {user.LastName}",
+                IsRobot = user.IsBot,
+                IsGuest = user.IsGuest,
             };
         }
 
