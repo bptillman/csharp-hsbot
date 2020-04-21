@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Hsbot.Core.ApiClients;
+using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
@@ -17,6 +18,7 @@ namespace Hsbot.Core
     {
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
+        private readonly IEnumerable<IBotService> _botServices;
         private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
         private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
 
@@ -37,6 +39,7 @@ namespace Hsbot.Core
 
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
+            IEnumerable<IBotService> botServices,
             IBotBrainStorage<HsbotBrain> brainStorage,
             IHsbotChatConnector connection,
             IChatMessageTextFormatter messageTextFormatter,
@@ -45,6 +48,7 @@ namespace Hsbot.Core
         {
             _log = log;
             _messageHandlers = messageHandlers;
+            _botServices = botServices;
             _brainStorage = brainStorage;
             _connection = connection;
             _messageTextFormatter = messageTextFormatter;
@@ -86,6 +90,8 @@ namespace Hsbot.Core
                 .Subscribe();
 
             _log.Info("Connected successfully");
+
+            await StartServices();
         }
 
         private void ConfigureMessageHandlers()
@@ -113,12 +119,14 @@ namespace Hsbot.Core
             return Task.CompletedTask;
         }
 
-        public Task Disconnect()
+        public async Task Disconnect()
         {
             _log.Info("Disconnecting");
 
             _disconnecting = true;
-            return _connection.Disconnect();
+            await _connection.Disconnect();
+
+            await ShutdownServices();
         }
 
         private Task OnReconnecting()
@@ -175,6 +183,30 @@ namespace Hsbot.Core
             }
 
             return message.CreateResponse(sb.ToString());
+        }
+
+        private async Task StartServices()
+        {
+            var servicesToStart = _botServices.OrderBy(s => s.StartupOrder);
+            var botServiceContext = new BotServiceContext {Parent = this};
+
+            foreach (var botService in servicesToStart)
+            {
+                _log.Info($"Starting {botService.GetType().Name}");
+                await botService.Start(botServiceContext);
+            }
+        }
+
+        private async Task ShutdownServices()
+        {
+            //shutdown in reverse order of startup
+            var servicesToStop = _botServices.OrderByDescending(s => s.StartupOrder);
+
+            foreach (var botService in servicesToStop)
+            {
+                _log.Info($"Stopping {botService.GetType().Name}");
+                await botService.Stop();
+            }
         }
 
         private async Task InitializeBrain()
