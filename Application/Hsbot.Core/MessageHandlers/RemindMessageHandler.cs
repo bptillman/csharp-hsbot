@@ -39,8 +39,9 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(_remindRegex);
         }
 
-        public override async Task HandleAsync(InboundMessage message)
+        public override async Task HandleAsync(IInboundMessageContext context)
         {
+            var message = context.Message;
             var match = message.Match(_remindRegex);
             var time = match.Groups[1].Value;
             var action = match.Groups[2].Value;
@@ -58,11 +59,11 @@ namespace Hsbot.Core.MessageHandlers
 
             var reminderResult = _reminderService.AddReminder(reminder);
 
-            await SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
+            await context.SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
 
             if (reminderResult == PersistenceState.InMemoryOnly)
             {
-                await SendMessage(message.CreateResponse($"{_messageTextFormatter.Bold("Warning:")} my brain is currently on the fritz, so I won't remember your reminder if I'm rebooted"));
+                await context.SendMessage(message.CreateResponse($"{_messageTextFormatter.Bold("Warning:")} my brain is currently on the fritz, so I won't remember your reminder if I'm rebooted"));
             }
         }
 

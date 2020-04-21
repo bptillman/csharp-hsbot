@@ -50,14 +50,11 @@ namespace Hsbot.Core.Tests.MessageHandler
             response.SentMessages.All(m => m.Text == "Image 0").ShouldBeTrue();
         }
 
-        protected override CatBombHandler GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
+        protected override CatBombHandler GetHandlerInstance()
         {
             var rng = new RandomNumberGeneratorFake();
             var apiClient = new TestTumblrApiClient { Photos = new[] { new TumblrPhoto { Url = "Image 0" } } };
-            var handler = new CatBombHandler(rng, apiClient)
-            {
-                BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake()
-            };
+            var handler = new CatBombHandler(rng, apiClient);
 
             return handler;
         }

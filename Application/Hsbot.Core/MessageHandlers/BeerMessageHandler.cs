@@ -36,11 +36,14 @@ namespace Hsbot.Core.MessageHandlers
             yield break;
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override Task HandleAsync(IInboundMessageContext messageContext)
         {
-            return SendMessage(message.Contains("coffee") 
-                ? message.CreateResponse("Coffee? How about a beer?") 
-                : message.CreateResponse(GetRandomCannedResponse()));
+            var message = messageContext.Message;
+            var response = message.Contains("coffee")
+                ? message.CreateResponse("Coffee? How about a beer?")
+                : message.CreateResponse(GetRandomCannedResponse());
+
+            return messageContext.SendMessage(response);
         }
 
         protected override bool CanHandle(InboundMessage message)

@@ -67,12 +67,11 @@
             response.SentMessages[0].Text.ShouldBe($"{MapType.Roadmap.ToString().ToLower()}__Austin, Texas");
         }
 
-        protected override MapsMessageHandler GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
+        protected override MapsMessageHandler GetHandlerInstance()
         {
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
             var maps = new MapProviderFake();
             var instance = new MapsMessageHandler(rng, maps);
-            instance.BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake();
             return instance;
         }
     }

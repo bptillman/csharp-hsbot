@@ -40,7 +40,7 @@ namespace Hsbot.Core.Tests
             chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
 
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
@@ -48,7 +48,7 @@ namespace Hsbot.Core.Tests
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Once);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Once);
         }
 
         public async Task ShouldNotCallHandlersWhenHelpMessageReceived()
@@ -81,7 +81,7 @@ namespace Hsbot.Core.Tests
                 .Callback<OutboundResponse>(msg => sentMessages.Add(msg));
 
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
@@ -89,7 +89,7 @@ namespace Hsbot.Core.Tests
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Never);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Never);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Never);
             sentMessages.Count.ShouldBe(1);
             sentMessages.First().Text.ShouldStartWith("Available commands:");
         }
@@ -120,7 +120,7 @@ namespace Hsbot.Core.Tests
 
             var outboundResponse = new OutboundResponse();
             var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessage>())).Returns(Task.CompletedTask);
+            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
@@ -128,7 +128,7 @@ namespace Hsbot.Core.Tests
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessage>()), Times.Never);
+            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Never);
             chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Never);
         }
 

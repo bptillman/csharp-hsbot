@@ -4,6 +4,7 @@ using Hsbot.Core.Connection;
 
 namespace Hsbot.Core.Messaging
 {
+    [Obsolete]
     public class BotProvidedServices : IBotProvidedServices
     {
         public BotProvidedServices(Func<string, Task<IChatUser>> getUserByIdFunc, Func<OutboundResponse, Task> sendMessageFunc)

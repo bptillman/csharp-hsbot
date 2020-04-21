@@ -30,9 +30,12 @@ namespace Hsbot.Core.MessageHandlers
             return message.StartsWith(CommandText);
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override Task HandleAsync(IInboundMessageContext context)
         {
-            return SendMessage(message.CreateResponse("Pong!"));
+            var message = context.Message;
+            var response = message.CreateResponse("Pong!");
+
+            return context.SendMessage(response);
         }
     }
 }

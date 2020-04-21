@@ -37,13 +37,9 @@
                    match.Groups[2].Value.Length > 0 && message.StartsWith(match.Groups[2].Value);
         }
 
-        public override async Task HandleAsync(InboundMessage context)
+        public override async Task HandleAsync(IInboundMessageContext context)
         {
-            await HandleMapMeCommand(context);
-        }
-
-        private async Task HandleMapMeCommand(InboundMessage message)
-        {
+            var message = context.Message;
             var match = message.Match(MapMeRegex);
             if (match.Success &&
                 message.StartsWith(MapMeCommand) ||
@@ -54,8 +50,8 @@
 
                 var map = _maps.GetMap(query, mapType);
 
-                await SendMessage(message.CreateResponse(map.ImageUrl));
-                await SendMessage(message.CreateResponse(map.Url));
+                await context.SendMessage(message.CreateResponse(map.ImageUrl));
+                await context.SendMessage(message.CreateResponse(map.Url));
             }
         }
     }

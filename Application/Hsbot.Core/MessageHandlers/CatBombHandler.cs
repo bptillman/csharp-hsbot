@@ -30,9 +30,10 @@ namespace Hsbot.Core.MessageHandlers
             return message.StartsWith("cat me") || message.StartsWith("cat bomb");
         }
 
-        public override async Task HandleAsync(InboundMessage message)
+        public override async Task HandleAsync(IInboundMessageContext context)
         {
             var numberOfCats = 5;
+            var message = context.Message;
             if (message.StartsWith("cat me")) numberOfCats = 1;
             else
             {
@@ -47,7 +48,7 @@ namespace Hsbot.Core.MessageHandlers
             for (var i = 0; i < numberOfCats; i++)
             {
                 var photo = RandomNumberGenerator.GetRandomValue(photos);
-                await SendMessage(message.CreateResponse(photo.Url));
+                await context.SendMessage(message.CreateResponse(photo.Url));
             }
         }
     }

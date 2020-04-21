@@ -4,6 +4,7 @@ using Hsbot.Core.Connection;
 
 namespace Hsbot.Core.Messaging
 {
+    [Obsolete]
     public interface IBotProvidedServices
     {
         Func<string, Task<IChatUser>> GetChatUserById { get; }
