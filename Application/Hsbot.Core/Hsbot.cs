@@ -91,7 +91,7 @@ namespace Hsbot.Core
         private void ConfigureMessageHandlers()
         {
             _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(Brain, _log, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
+            var botProvidedServices = new BotProvidedServices(Brain, _log, GetChatUserById, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;
@@ -228,6 +228,11 @@ namespace Hsbot.Core
             {
                 await SendMessage(outboundResponse);
             }
+        }
+
+        public async Task<IChatUser> GetChatUserById(string userId)
+        {
+            return await _connection.GetChatUserById(userId);
         }
 
         public Task SendMessage(OutboundResponse response)

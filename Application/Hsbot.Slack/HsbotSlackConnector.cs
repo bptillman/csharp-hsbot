@@ -9,6 +9,7 @@ using Hsbot.Core.Messaging;
 using SlackConnector;
 using SlackConnector.EventHandlers;
 using SlackConnector.Models;
+using SocketLite.Services;
 
 namespace Hsbot.Slack
 {
@@ -128,6 +129,24 @@ namespace Hsbot.Slack
                     await _connection.Say(botMessage);
                 }
             }
+        }
+
+        public async Task<IChatUser> GetChatUserById(string userId)
+        {
+            if (!_connection.UserCache.TryGetValue(userId, out var user))
+            {
+                var users = await _connection.GetUsers();
+                user = users.Single(x => x.Id == userId);
+            }
+
+            return new SlackUser
+            {
+                Id = user.Id,
+                Email = user.Email,
+                DisplayName = user.Name,
+                FullName = $"{user.FirstName} {user.LastName}",
+                IsEmployee = !user.IsBot && !user.IsGuest,
+            };
         }
 
         private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
