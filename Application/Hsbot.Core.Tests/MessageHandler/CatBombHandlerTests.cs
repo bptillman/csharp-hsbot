@@ -14,11 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldReturnOneImageForCatMe()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
-            var tumblrApiClient = new TestTumblrApiClient {Photos = new[] {new TumblrPhoto {Url = "Image 0"}}};
-            botProvidedServices.TumblrApiClient = tumblrApiClient;
-
-            var messageHandler = GetHandlerInstance(botProvidedServices);
+            var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("cat me");
             response.SentMessages.Count.ShouldBe(1);
             response.SentMessages.First().Text.ShouldBe("Image 0");
@@ -26,11 +22,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldReturnFiveImagesForCatBomb()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
-            var tumblrApiClient = new TestTumblrApiClient {Photos = new[] {new TumblrPhoto {Url = "Image 0"}}};
-            botProvidedServices.TumblrApiClient = tumblrApiClient;
-
-            var messageHandler = GetHandlerInstance(botProvidedServices);
+            var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("cat bomb");
             response.SentMessages.Count.ShouldBe(5);
             response.SentMessages.All(m => m.Text == "Image 0").ShouldBeTrue();
@@ -38,11 +30,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldReturnFiveImagesForCatBombWithInvalidNumber()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
-            var tumblrApiClient = new TestTumblrApiClient { Photos = new[] { new TumblrPhoto { Url = "Image 0" } } };
-            botProvidedServices.TumblrApiClient = tumblrApiClient;
-
-            var messageHandler = GetHandlerInstance(botProvidedServices);
+            var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("cat bomb NotANumber");
             response.SentMessages.Count.ShouldBe(5);
             response.SentMessages.All(m => m.Text == "Image 0").ShouldBeTrue();
@@ -50,14 +38,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldReturnNImagesForCatBombN()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
-            var tumblrApiClient = new TestTumblrApiClient
-            {
-                Photos = new[] { new TumblrPhoto { Url = "Image 0" } }
-            };
-            botProvidedServices.TumblrApiClient = tumblrApiClient;
-
-            var messageHandler = GetHandlerInstance(botProvidedServices);
+            var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("cat bomb 3");
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages.All(m => m.Text == "Image 0").ShouldBeTrue();
@@ -67,6 +48,18 @@ namespace Hsbot.Core.Tests.MessageHandler
             response = await messageHandler.TestHandleAsync("cat bomb 10");
             response.SentMessages.Count.ShouldBe(10);
             response.SentMessages.All(m => m.Text == "Image 0").ShouldBeTrue();
+        }
+
+        protected override CatBombHandler GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
+        {
+            var rng = new RandomNumberGeneratorFake();
+            var apiClient = new TestTumblrApiClient { Photos = new[] { new TumblrPhoto { Url = "Image 0" } } };
+            var handler = new CatBombHandler(rng, apiClient)
+            {
+                BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake()
+            };
+
+            return handler;
         }
     }
 }

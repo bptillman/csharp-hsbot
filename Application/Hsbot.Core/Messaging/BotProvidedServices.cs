@@ -13,15 +13,13 @@ namespace Hsbot.Core.Messaging
             Func<string, Task<IChatUser>> getUserByIdFunc,
             Func<OutboundResponse, Task> sendMessageFunc,
             IChatMessageTextFormatter chatMessageTextFormatter,
-            ISystemClock systemClock,
-            ITumblrApiClient tumblrApiClient)
+            ISystemClock systemClock)
         {
             Log = log;
             GetChatUserById = getUserByIdFunc;
             SendMessage = sendMessageFunc;
             MessageTextFormatter = chatMessageTextFormatter;
             SystemClock = systemClock;
-            TumblrApiClient = tumblrApiClient;
         }
 
         public IHsbotLog Log { get; }
@@ -29,6 +27,5 @@ namespace Hsbot.Core.Messaging
         public Func<OutboundResponse, Task> SendMessage { get; }
         public IChatMessageTextFormatter MessageTextFormatter { get; }
         public ISystemClock SystemClock { get; }
-        public ITumblrApiClient TumblrApiClient { get; }
     }
 }

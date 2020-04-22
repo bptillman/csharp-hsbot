@@ -36,7 +36,6 @@ namespace Hsbot.Core.MessageHandlers
         protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
         protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
         protected ISystemClock SystemClock => BotProvidedServices.SystemClock;
-        protected ITumblrApiClient TumblrApiClient => BotProvidedServices.TumblrApiClient;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
