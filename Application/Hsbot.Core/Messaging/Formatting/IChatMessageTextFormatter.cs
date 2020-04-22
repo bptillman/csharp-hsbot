@@ -36,5 +36,26 @@ namespace Hsbot.Core.Messaging.Formatting
         /// <param name="displayText">Display text to be rendered in place of the url (if supported)</param>
         /// <returns>String representing a hyperlink formatted for rendering by the chat client.</returns>
         string FormatHyperlink(string url, string displayText);
+
+        /// <summary>
+        /// Formats text in bold face at the client.
+        /// </summary>
+        /// <param name="text">Text to bold</param>
+        /// <returns>String representing bolded text for rendering by the chat client</returns>
+        string Bold(string text);
+
+        /// <summary>
+        /// Formats text in italic face at the client.
+        /// </summary>
+        /// <param name="text">Text to italicize</param>
+        /// <returns>String representing italicized text for rendering by the chat client</returns>
+        string Italic(string text);
+
+        /// <summary>
+        /// Strikes through text at the client.
+        /// </summary>
+        /// <param name="text">Text to strike</param>
+        /// <returns>String representing strikethrough text for rendering by the chat client</returns>
+        string Strikethough(string text);
     }
 }
