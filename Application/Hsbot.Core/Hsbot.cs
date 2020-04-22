@@ -4,23 +4,19 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hsbot.Core.ApiClients;
-using Hsbot.Core.Brain;
+using Hsbot.Core.BotServices;
 using Hsbot.Core.Connection;
-using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
-using Hsbot.Core.Messaging.Formatting;
 
 namespace Hsbot.Core
 {
-    public class Hsbot : IDisposable
+    public sealed class Hsbot : IDisposable
     {
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
+        private readonly IEnumerable<IBotService> _botServices;
         private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
-        private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
-
-        private IDisposable _brainChangedSubscription;
+        
         private IDisposable _onDisconnectSubscription;
         private IDisposable _onReconnectingSubscription;
         private IDisposable _onReconnectedSubscription;
@@ -29,27 +25,15 @@ namespace Hsbot.Core
         private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
 
-        private readonly IChatMessageTextFormatter _messageTextFormatter;
-        private readonly ISystemClock _systemClock;
-        private readonly ITumblrApiClient _tumblrApiClient;
-
-        public HsbotBrain Brain { get; private set; }
-
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
-            IBotBrainStorage<HsbotBrain> brainStorage,
-            IHsbotChatConnector connection,
-            IChatMessageTextFormatter messageTextFormatter,
-            ISystemClock systemClock,
-            ITumblrApiClient tumblrApiClient)
+            IEnumerable<IBotService> botServices,
+            IHsbotChatConnector connection)
         {
             _log = log;
             _messageHandlers = messageHandlers;
-            _brainStorage = brainStorage;
+            _botServices = botServices;
             _connection = connection;
-            _messageTextFormatter = messageTextFormatter;
-            _systemClock = systemClock;
-            _tumblrApiClient = tumblrApiClient;
             _messageHandlerDescriptors = _messageHandlers
                 .SelectMany(mh => mh.GetCommandDescriptors())
                 .OrderBy(d => d.Command)
@@ -58,8 +42,6 @@ namespace Hsbot.Core
 
         public async Task Connect()
         {
-            await InitializeBrain();
-
             ConfigureMessageHandlers();
 
             _log.Info("Connecting to messaging service");
@@ -86,12 +68,15 @@ namespace Hsbot.Core
                 .Subscribe();
 
             _log.Info("Connected successfully");
+
+            await StartServices();
         }
 
         private void ConfigureMessageHandlers()
         {
-            _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(Brain, _log, GetChatUserById, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
+            //since the Hsbot class owns the connection to the chat service, we need
+            //to pass access to this functionality down to the message handlers
+            var botProvidedServices = new BotProvidedServices(GetChatUserById, SendMessage);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;
@@ -113,12 +98,14 @@ namespace Hsbot.Core
             return Task.CompletedTask;
         }
 
-        public Task Disconnect()
+        public async Task Disconnect()
         {
             _log.Info("Disconnecting");
 
             _disconnecting = true;
-            return _connection.Disconnect();
+            await _connection.Disconnect();
+
+            await ShutdownServices();
         }
 
         private Task OnReconnecting()
@@ -177,48 +164,27 @@ namespace Hsbot.Core
             return message.CreateResponse(sb.ToString());
         }
 
-        private async Task InitializeBrain()
+        private async Task StartServices()
         {
-            _log.Info("Initializing brain");
-            if (Brain != null)
+            var servicesToStart = _botServices.OrderBy(s => s.StartupOrder);
+            var botServiceContext = new BotServiceContext {Parent = this};
+
+            foreach (var botService in servicesToStart)
             {
-                _log.Info("Brain already initialized, skipping");
-                return;
-            }
-
-            try
-            {
-                Brain = await _brainStorage.Load();
-                _brainChangedSubscription = Brain.BrainChanged
-                    .Select(SaveBrain)
-                    .Window(1) //ensure we only run 1 call to the save brain method at a given time
-                    .Concat()
-                    .Subscribe();
-
-                _log.Info("Brain loaded from storage successfully");
-            }
-
-            catch (Exception e)
-            {
-                _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
-                _log.Error("Brain load exception: {0}", e);
-
-                Brain = new HsbotBrain();
+                _log.Info($"Starting {botService.GetType().Name}");
+                await botService.Start(botServiceContext);
             }
         }
 
-        private async Task SaveBrain(HsbotBrain brain)
+        private async Task ShutdownServices()
         {
-            _log.Debug("Received brain change event - saving to storage");
-            try
-            {
-                await _brainStorage.Save(brain);
-                _log.Debug("Received brain change event - brain saved successfully");
-            }
+            //shutdown in reverse order of startup
+            var servicesToStop = _botServices.OrderByDescending(s => s.StartupOrder);
 
-            catch (Exception e)
+            foreach (var botService in servicesToStop)
             {
-                _log.Error("Failed to save brain to storage: {0}", e);
+                _log.Info($"Stopping {botService.GetType().Name}");
+                await botService.Stop();
             }
         }
 
@@ -242,7 +208,6 @@ namespace Hsbot.Core
 
         public void Dispose()
         {
-            _brainChangedSubscription?.Dispose();
             _onDisconnectSubscription?.Dispose();
             _onReconnectedSubscription?.Dispose();
             _onReconnectingSubscription?.Dispose();

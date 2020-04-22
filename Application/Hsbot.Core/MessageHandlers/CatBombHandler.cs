@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hsbot.Core.ApiClients;
 using Hsbot.Core.MessageHandlers.Helpers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
@@ -9,8 +10,11 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class CatBombHandler : MessageHandlerBase
     {
-        public CatBombHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
+        private readonly ITumblrApiClient _tumblrApiClient;
+
+        public CatBombHandler(IRandomNumberGenerator randomNumberGenerator, ITumblrApiClient tumblrApiClient) : base(randomNumberGenerator)
         {
+            _tumblrApiClient = tumblrApiClient;
         }
 
         public static Regex CatBombRegex = new Regex(@"cat bomb (\d+)", RegexOptions.Compiled);
@@ -39,7 +43,7 @@ namespace Hsbot.Core.MessageHandlers
                 }
             }
 
-            var photos = await TumblrApiClient.GetPhotos("tongueoutcats.tumblr.com");
+            var photos = await _tumblrApiClient.GetPhotos("tongueoutcats.tumblr.com");
             for (var i = 0; i < numberOfCats; i++)
             {
                 var photo = RandomNumberGenerator.GetRandomValue(photos);

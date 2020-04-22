@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Core.ApiClients;
-using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
-using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
-using Hsbot.Core.Messaging.Formatting;
-using Hsbot.Core.Tests.Infrastructure;
 using Moq;
 
 namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
@@ -23,25 +18,13 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
                 SentMessages.Add(response);
                 return Task.CompletedTask;
             };
-
-            LogMock = MockLog();
-            Brain = new HsbotBrain();
-            MessageTextFormatter = new InlineChatMessageTextFormatter();
-            SystemClock = new TestSystemClock();
-            TumblrApiClient = new TestTumblrApiClient();
         }
 
-        public Mock<IHsbotLog> LogMock { get; set; }
         public IChatUser UserToReturn { get; set; } = new TestChatUser();
         public List<OutboundResponse> SentMessages { get; } = new List<OutboundResponse>();
 
-        public IBotBrain Brain { get; set; }
-        public IHsbotLog Log => LogMock.Object;
         public Func<string, Task<IChatUser>> GetChatUserById { get; }
         public Func<OutboundResponse, Task> SendMessage { get; }
-        public IChatMessageTextFormatter MessageTextFormatter { get; set; }
-        public ISystemClock SystemClock { get; set; }
-        public ITumblrApiClient TumblrApiClient { get; set; }
 
         private Mock<IHsbotLog> MockLog()
         {
