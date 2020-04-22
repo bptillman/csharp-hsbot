@@ -18,15 +18,11 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
                 SentMessages.Add(response);
                 return Task.CompletedTask;
             };
-
-            LogMock = MockLog();
         }
 
-        public Mock<IHsbotLog> LogMock { get; set; }
         public IChatUser UserToReturn { get; set; } = new TestChatUser();
         public List<OutboundResponse> SentMessages { get; } = new List<OutboundResponse>();
 
-        public IHsbotLog Log => LogMock.Object;
         public Func<string, Task<IChatUser>> GetChatUserById { get; }
         public Func<OutboundResponse, Task> SendMessage { get; }
 
