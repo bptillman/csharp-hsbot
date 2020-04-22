@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Core.Brain;
+using Hsbot.Core.BotServices;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
@@ -15,29 +15,20 @@ namespace Hsbot.Core.Tests.MessageHandler
         protected override string[] MessageTextsThatShouldBeHandled => new[] {"remind me in 1 week to test", "remind me in 1 day to test", "remind me in 1 hour to test", "remind me in 1 minute to test"};
         protected override string[] MessageTextsThatShouldNotBeHandled => new[] {"remind me", "remind me to test", "remind me in 1 foo to test", "remind me in 1 hour"};
 
-        public async Task ShouldWriteReminderToBrain()
+        public async Task ShouldWriteReminderToReminderService()
         {
-            var brainMock = GetBrainMock();
-            var botProvidedServices = new BotProvidedServicesFake
-            {
-                Brain = brainMock.Object
-            };
-
-            var handler = GetHandlerInstance(new RandomNumberGeneratorFake(), botProvidedServices);
+            var reminderService = new FakeReminderService();
+            var handler = GetHandlerInstance(reminderService);
             await handler.TestHandleAsync("remind me in 1 hour to test");
 
-            brainMock.Verify(m => m.SetItem(RemindMessageHandler.BrainStorageKey, It.IsAny<List<RemindMessageHandler.Reminder>>()), Times.Once);
+            reminderService.Reminders.Count.ShouldBe(1);
         }
 
         public async Task ShouldRespondWithConfirmation()
         {
-            var brainMock = GetBrainMock();
-            var botProvidedServices = new BotProvidedServicesFake
-            {
-                Brain = brainMock.Object
-            };
-
-            var handler = GetHandlerInstance(new RandomNumberGeneratorFake(), botProvidedServices);
+            var botProvidedServices = new BotProvidedServicesFake();
+            var reminderService = new FakeReminderService();
+            var handler = GetHandlerInstance(reminderService, botProvidedServices);
             await handler.TestHandleAsync("remind me in 1 hour to test");
 
             botProvidedServices.SentMessages.Count.ShouldBe(1);
@@ -94,37 +85,56 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         private async Task AssertReminderSet(string messageText, DateTime now, DateTime expectedReminderTime)
         {
-            var reminderList = new List<RemindMessageHandler.Reminder>();
-            var brainMock = GetBrainMock(reminderList);
-
             var systemClockMock = new Mock<ISystemClock>();
             systemClockMock.Setup(m => m.UtcNow).Returns(now);
 
             var botProvidedServices = new BotProvidedServicesFake
             {
-                Brain = brainMock.Object,
                 SystemClock = systemClockMock.Object
             };
 
-            var handler = GetHandlerInstance(new RandomNumberGeneratorFake(), botProvidedServices);
+            var reminderService = new FakeReminderService();
+            var handler = GetHandlerInstance(reminderService, botProvidedServices);
             await handler.TestHandleAsync(messageText);
 
-            reminderList.Count.ShouldBe(1);
-            reminderList[0].ReminderDateInUtc.ShouldBe(expectedReminderTime);
+            reminderService.Reminders.Count.ShouldBe(1);
+            reminderService.Reminders[0].ReminderDateInUtc.ShouldBe(expectedReminderTime);
 
             botProvidedServices.SentMessages.Count.ShouldBe(1);
         }
 
-        private Mock<IBotBrain> GetBrainMock(List<RemindMessageHandler.Reminder> reminderList = null)
+        protected override RemindMessageHandler GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
         {
-            reminderList = reminderList ?? new List<RemindMessageHandler.Reminder>();
-            var mock = new Mock<IBotBrain>();
-            mock.Setup(b => b.Keys).Returns(new List<string>());
-            mock.Setup(b =>
-                b.SetItem(RemindMessageHandler.BrainStorageKey, It.IsAny<List<RemindMessageHandler.Reminder>>()));
-            mock.Setup(b => b.GetItem<List<RemindMessageHandler.Reminder>>(RemindMessageHandler.BrainStorageKey)).Returns(reminderList);
+            return GetHandlerInstance(new FakeReminderService(), botProvidedServices);
+        }
 
-            return mock;
+        private RemindMessageHandler GetHandlerInstance(FakeReminderService reminderService, BotProvidedServicesFake botProvidedServices = null)
+        {
+            //Since this RNG will always return 0, the check on the random roll in the handler will
+            //always succeed, meaning the random roll will not cause the result of ShouldHandle
+            //to be false
+            var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
+            var handler = new RemindMessageHandler(rng, reminderService)
+            {
+                BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake()
+            };
+
+            return handler;
+        }
+
+        private class FakeReminderService : IReminderService
+        {
+            public readonly List<Reminder> Reminders = new List<Reminder>();
+
+            public void AddReminder(Reminder reminder)
+            {
+                Reminders.Add(reminder);
+            }
+
+            public Task ProcessReminders()
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

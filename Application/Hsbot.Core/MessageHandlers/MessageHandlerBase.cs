@@ -24,7 +24,7 @@ namespace Hsbot.Core.MessageHandlers
             get => _botProvidedServices;
             set 
             {
-                if (value == null || value.Brain == null || value.Log == null || value.SendMessage == null)
+                if (value == null ||  value.Log == null || value.SendMessage == null)
                     throw new ArgumentException("All bot-provided services must be non-null");
 
                 _botProvidedServices = value;
@@ -33,7 +33,6 @@ namespace Hsbot.Core.MessageHandlers
             }
         }
         protected IHsbotLog Log => BotProvidedServices.Log;
-        protected IBotBrain Brain => BotProvidedServices.Brain;
         protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
         protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
         protected ISystemClock SystemClock => BotProvidedServices.SystemClock;

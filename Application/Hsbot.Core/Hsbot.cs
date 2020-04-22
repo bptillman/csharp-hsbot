@@ -33,8 +33,6 @@ namespace Hsbot.Core
         private readonly ISystemClock _systemClock;
         private readonly ITumblrApiClient _tumblrApiClient;
 
-        public HsbotBrain Brain { get; private set; }
-
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IEnumerable<IBotService> botServices,
@@ -91,7 +89,7 @@ namespace Hsbot.Core
         private void ConfigureMessageHandlers()
         {
             _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(Brain, _log, GetChatUserById, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
+            var botProvidedServices = new BotProvidedServices(_log, GetChatUserById, SendMessage, _messageTextFormatter, _systemClock, _tumblrApiClient);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;

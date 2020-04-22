@@ -20,6 +20,7 @@ namespace Hsbot.Core.BotServices
     public interface IReminderService
     {
         void AddReminder(Reminder reminder);
+        Task ProcessReminders();
     }
 
     public sealed class ReminderService : IReminderService, IBotService, IDisposable
@@ -45,7 +46,7 @@ namespace Hsbot.Core.BotServices
             _reminders = new List<Reminder>();
         }
 
-        private async Task ReminderTimerElapsed()
+        public async Task ProcessReminders()
         {
             var remindersToSend = new List<Reminder>();
             lock (_remindersLock)
@@ -78,6 +79,11 @@ namespace Hsbot.Core.BotServices
 
                 await _botServiceContext.Parent.SendMessage(outboundResponse);
             }
+        }
+
+        private async Task ReminderTimerElapsed()
+        {
+            await ProcessReminders();
         }
 
         public Task Start(BotServiceContext context)
@@ -113,6 +119,7 @@ namespace Hsbot.Core.BotServices
                 //always sort after adding a new entry so we can be sure that the
                 //front of the list is next to expire
                 _reminders.Sort((lhs, rhs) => DateTime.Compare(lhs.ReminderDateInUtc, rhs.ReminderDateInUtc));
+                _brain.SetItem(BrainStorageKey, _reminders);
             }
         }
     }

@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hsbot.Core.BotServices;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
 
 namespace Hsbot.Core.MessageHandlers
 {
-    public class RemindMessageHandler : MessageHandlerBase, IDisposable
+    public class RemindMessageHandler : MessageHandlerBase
     {
+        private readonly IReminderService _reminderService;
         private readonly Regex _remindRegex = new Regex(@"remind me in ((?:(?:\d+) (?:weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[ ,]*(?:and)? +)+)to (.*)", RegexOptions.Compiled);
 
-        private readonly object _remindersLock = new Object();
-        private List<Reminder> _reminders;
-
-        private IDisposable _reminderTimerHandle;
-
-        public const string BrainStorageKey = "Reminders";
-
-        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
+        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator, IReminderService reminderService) : base(randomNumberGenerator)
         {
+            _reminderService = reminderService;
         }
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
@@ -32,61 +26,6 @@ namespace Hsbot.Core.MessageHandlers
                 Command = "remind me in <time> to <action>",
                 Description = "Set a reminder in <time> to do an <action> <time> is in the format 1 day, 2 hours, 5 minutes etc. Time segments are optional, as are commas"
             };
-        }
-
-        protected override void OnBotProvidedServicesConfigured()
-        {
-            lock (_remindersLock)
-            {
-                _reminders = Brain.GetItem<List<Reminder>>(BrainStorageKey) ?? new List<Reminder>();
-                SortRemindersByDate();
-            }
-
-            _reminderTimerHandle = Observable.Interval(new TimeSpan(0, 0, 0, 1))
-                .Select(t => Observable.FromAsync(ct => ReminderTimerElapsed()))
-                .Concat()
-                .Window(1)
-                .Subscribe();
-        }
-
-        private void SortRemindersByDate()
-        {
-            _reminders.Sort((lhs,rhs) => DateTime.Compare(lhs.ReminderDateInUtc, rhs.ReminderDateInUtc));
-        }
-
-        private async Task ReminderTimerElapsed()
-        {
-            var remindersToSend = new List<Reminder>();
-            lock (_remindersLock)
-            {
-                //since the list is always sorted, we can be sure that we only need to look
-                //at the front of the list to find expired items
-                while (_reminders.Count > 0 && _reminders[0].ReminderDateInUtc <= SystemClock.UtcNow)
-                {
-                    remindersToSend.Add(_reminders[0]);
-                    _reminders.RemoveAt(0);
-                }
-
-                if (remindersToSend.Count > 0)
-                {
-                    Brain.SetItem(BrainStorageKey, _reminders);
-                }
-            }
-
-            foreach (var reminder in remindersToSend)
-            {
-                var messageText = $"{MessageTextFormatter.FormatUserMention(reminder.UserId)} you asked me to remind you to {reminder.Message}";
-
-                var outboundResponse = new OutboundResponse
-                {
-                    Channel = reminder.ChannelId,
-                    MessageRecipientType = MessageRecipientType.Channel,
-                    Text = messageText,
-                    UserId = reminder.UserId
-                };
-
-                await SendMessage(outboundResponse);
-            }
         }
 
         protected override bool CanHandle(InboundMessage message)
@@ -111,15 +50,7 @@ namespace Hsbot.Core.MessageHandlers
                 ChannelId = message.Channel,
             };
 
-            lock (_remindersLock)
-            {
-                _reminders.Add(reminder);
-
-                //always sort after adding a new entry so we can be sure that the
-                //front of the list is next to expire
-                SortRemindersByDate(); 
-                Brain.SetItem(BrainStorageKey, _reminders);
-            }
+            _reminderService.AddReminder(reminder);
 
             return SendMessage(message.CreateResponse($"Ok, {MessageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {MessageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {MessageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
         }
@@ -131,20 +62,7 @@ namespace Hsbot.Core.MessageHandlers
 
             return result;
         }
-
-        public void Dispose()
-        {
-            _reminderTimerHandle?.Dispose();
-        }
-
-        public class Reminder
-        {
-            public string UserId { get; set; }
-            public string ChannelId { get; set; }
-            public DateTime ReminderDateInUtc { get; set; }
-            public string Message { get; set; }
-        }
-
+        
         internal class TimePeriod
         {
             public TimePeriod(string matchString, long unitLengthInSeconds)
