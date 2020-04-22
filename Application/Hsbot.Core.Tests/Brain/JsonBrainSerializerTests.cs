@@ -22,7 +22,7 @@ namespace Hsbot.Core.Tests.Brain
 
         public void ShouldSerializeSimpleObject()
         {
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
             var simpleObject = new SimpleObject
             {
                 Text = "Foo",
@@ -47,7 +47,7 @@ namespace Hsbot.Core.Tests.Brain
 
         public void ShouldSerializeComplexObject()
         {
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
 
             var simpleObject = new SimpleObject
             {

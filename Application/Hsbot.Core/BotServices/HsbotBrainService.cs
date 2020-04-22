@@ -8,16 +8,16 @@ namespace Hsbot.Core.BotServices
 {
     public sealed class HsbotBrainService : IBotBrain, IBotService, IDisposable
     {
-        private readonly IBotBrainStorage<HsbotBrain> _botBrainStorage;
+        private readonly IBotBrainStorage<InMemoryBrain> _botBrainStorage;
         private readonly IHsbotLog _log;
-        private HsbotBrain _brain;
+        private InMemoryBrain _brain;
         private bool _persistenceEnabled;
 
         private IDisposable _brainChangedEventSubscription;
 
         public int StartupOrder => 0;
 
-        public HsbotBrainService(IBotBrainStorage<HsbotBrain> botBrainStorage, IHsbotLog log)
+        public HsbotBrainService(IBotBrainStorage<InMemoryBrain> botBrainStorage, IHsbotLog log)
         {
             _botBrainStorage = botBrainStorage;
             _log = log;
@@ -51,11 +51,11 @@ namespace Hsbot.Core.BotServices
                 _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
                 _log.Error("Brain load exception: {0}", e);
 
-                _brain = new HsbotBrain();
+                _brain = new InMemoryBrain();
             }
         }
 
-        private async Task SaveBrain(HsbotBrain brain)
+        private async Task SaveBrain(InMemoryBrain brain)
         {
             try
             {

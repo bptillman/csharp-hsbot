@@ -41,7 +41,7 @@ namespace Hsbot.Core
 
         private static void RegisterBrainServices(IServiceCollection services)
         {
-            services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
+            services.AddSingleton<IBotBrainSerializer<InMemoryBrain>, JsonBrainSerializer>();
             services.AddSingleton<HsbotBrainService>();
             services.AddSingleton<IBotBrain, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
             services.AddSingleton<IBotService, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
@@ -88,9 +88,9 @@ namespace Hsbot.Core
         }
 
         public HsbotServiceConfigurator AddBrainStorageProvider<T>()
-            where T : class, IBotBrainStorage<HsbotBrain>
+            where T : class, IBotBrainStorage<InMemoryBrain>
         {
-            _serviceCollection.AddSingleton<IBotBrainStorage<HsbotBrain>, T>();
+            _serviceCollection.AddSingleton<IBotBrainStorage<InMemoryBrain>, T>();
             return this;
         }
 

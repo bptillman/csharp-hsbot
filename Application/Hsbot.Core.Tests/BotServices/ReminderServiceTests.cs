@@ -21,7 +21,7 @@ namespace Hsbot.Core.Tests.BotServices
             var now = DateTime.UtcNow;
             var systemClock = new TestSystemClock {UtcNow = now};
 
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
 
@@ -65,7 +65,7 @@ namespace Hsbot.Core.Tests.BotServices
         {
             var now = DateTime.UtcNow;
             var systemClock = new TestSystemClock { UtcNow = now };
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
 

@@ -18,11 +18,11 @@ namespace Hsbot.Core.Tests.Brain
             {"test", @"{""Text"": ""Foo"", ""TimesRecalled"": 9, ""IsPublic"": true}"}
         };
 
-        private HsbotBrain TestBrain => new HsbotBrain(DefaultTestBrainContents);
+        private InMemoryBrain TestBrain => new InMemoryBrain(DefaultTestBrainContents);
 
         public void ShouldBeEmptyByDefault()
         {
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
             brain.Keys.Count.ShouldBe(0);
         }
 

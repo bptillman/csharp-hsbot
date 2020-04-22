@@ -31,7 +31,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<HsbotBrain>()), Times.Once);
+            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Once);
         }
 
         public async Task ShouldNotSaveBrainIfInitialLoadFailed()
@@ -45,7 +45,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<HsbotBrain>()), Times.Never);
+            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Never);
         }
 
         public async Task SetItemShouldPersistToStorageWhenInitialLoadSucceeds()

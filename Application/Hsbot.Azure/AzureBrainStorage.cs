@@ -7,13 +7,13 @@ using Microsoft.WindowsAzure.Storage.Blob;
 
 namespace Hsbot.Azure
 {
-    public class AzureBrainStorage : IBotBrainStorage<HsbotBrain>
+    public class AzureBrainStorage : IBotBrainStorage<InMemoryBrain>
     {
-        private readonly IBotBrainSerializer<HsbotBrain> _botBrainSerializer;
+        private readonly IBotBrainSerializer<InMemoryBrain> _botBrainSerializer;
         private readonly IHsbotConfig _hsbotConfig;
         private readonly CloudBlobClient _blobClient;
 
-        public AzureBrainStorage(IBotBrainSerializer<HsbotBrain> botBrainSerializer, IHsbotConfig hsbotConfig)
+        public AzureBrainStorage(IBotBrainSerializer<InMemoryBrain> botBrainSerializer, IHsbotConfig hsbotConfig)
         {
             _botBrainSerializer = botBrainSerializer;
             _hsbotConfig = hsbotConfig;
@@ -22,7 +22,7 @@ namespace Hsbot.Azure
             _blobClient = storageAccount.CreateCloudBlobClient();
         }
 
-        public async Task<HsbotBrain> Load()
+        public async Task<InMemoryBrain> Load()
         {
             var blob = GetBrainBlobReference();
 
@@ -35,7 +35,7 @@ namespace Hsbot.Azure
             }
         }
 
-        public Task Save(HsbotBrain brain)
+        public Task Save(InMemoryBrain brain)
         {
             var blobContent = _botBrainSerializer.Serialize(brain);
             var blob = GetBrainBlobReference();

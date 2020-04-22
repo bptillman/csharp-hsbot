@@ -4,9 +4,9 @@ using Newtonsoft.Json.Linq;
 
 namespace Hsbot.Core.Brain
 {
-    public class JsonBrainSerializer : IBotBrainSerializer<HsbotBrain>
+    public class JsonBrainSerializer : IBotBrainSerializer<InMemoryBrain>
     {
-        public HsbotBrain Deserialize(string serializedBrain)
+        public InMemoryBrain Deserialize(string serializedBrain)
         {
             var brainAsDictionary = new Dictionary<string, string>();
             var jObject = JObject.Parse(serializedBrain);
@@ -15,10 +15,10 @@ namespace Hsbot.Core.Brain
                 brainAsDictionary[property.Name] = property.Value.ToString();
             }
 
-            return new HsbotBrain(brainAsDictionary);
+            return new InMemoryBrain(brainAsDictionary);
         }
 
-        public string Serialize(HsbotBrain brain)
+        public string Serialize(InMemoryBrain brain)
         {
             var brainObject = new JObject();
 
