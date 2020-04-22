@@ -44,7 +44,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -85,7 +85,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = true});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Never);
@@ -124,7 +124,7 @@ namespace Hsbot.Core.Tests
             messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
                 .Returns(new HandlesResult {HandlesMessage = false});
 
-            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            var hsbot = new Hsbot(logMock.Object, new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
             await hsbot.Connect();
 
             messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
@@ -137,7 +137,7 @@ namespace Hsbot.Core.Tests
             var logMock = MockLog();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
             await hsbot.Connect();
 
             await hsbot.GetChatUserById(string.Empty);
@@ -150,7 +150,7 @@ namespace Hsbot.Core.Tests
             var logMock = MockLog();
             var chatConnectorMock = MockChatConnector();
 
-            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object, new InlineChatMessageTextFormatter(), new TestSystemClock(), new TestTumblrApiClient());
+            var hsbot = new Hsbot(logMock.Object, Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
             await hsbot.Connect();
             
             var outboundResponse = new OutboundResponse();

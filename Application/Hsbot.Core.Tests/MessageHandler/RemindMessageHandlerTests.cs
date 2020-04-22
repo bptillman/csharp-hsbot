@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.MessageHandlers;
+using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Infrastructure;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
@@ -109,7 +110,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             //to be false
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
             systemClock ??= new TestSystemClock();
-            var handler = new RemindMessageHandler(rng, systemClock, reminderService)
+            var handler = new RemindMessageHandler(rng, systemClock, new InlineChatMessageTextFormatter(), reminderService)
             {
                 BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake()
             };

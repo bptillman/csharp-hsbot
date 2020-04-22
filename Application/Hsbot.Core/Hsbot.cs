@@ -4,13 +4,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Hsbot.Core.ApiClients;
 using Hsbot.Core.BotServices;
-using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
-using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
-using Hsbot.Core.Messaging.Formatting;
 
 namespace Hsbot.Core
 {
@@ -29,25 +25,15 @@ namespace Hsbot.Core
         private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
 
-        private readonly IChatMessageTextFormatter _messageTextFormatter;
-        private readonly ISystemClock _systemClock;
-        private readonly ITumblrApiClient _tumblrApiClient;
-
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IEnumerable<IBotService> botServices,
-            IHsbotChatConnector connection,
-            IChatMessageTextFormatter messageTextFormatter,
-            ISystemClock systemClock,
-            ITumblrApiClient tumblrApiClient)
+            IHsbotChatConnector connection)
         {
             _log = log;
             _messageHandlers = messageHandlers;
             _botServices = botServices;
             _connection = connection;
-            _messageTextFormatter = messageTextFormatter;
-            _systemClock = systemClock;
-            _tumblrApiClient = tumblrApiClient;
             _messageHandlerDescriptors = _messageHandlers
                 .SelectMany(mh => mh.GetCommandDescriptors())
                 .OrderBy(d => d.Command)
@@ -89,7 +75,7 @@ namespace Hsbot.Core
         private void ConfigureMessageHandlers()
         {
             _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(_log, GetChatUserById, SendMessage, _messageTextFormatter);
+            var botProvidedServices = new BotProvidedServices(GetChatUserById, SendMessage);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;

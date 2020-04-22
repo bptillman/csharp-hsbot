@@ -13,12 +13,14 @@ namespace Hsbot.Core.MessageHandlers
     public class RemindMessageHandler : MessageHandlerBase
     {
         private readonly ISystemClock _systemClock;
+        private readonly IChatMessageTextFormatter _messageTextFormatter;
         private readonly IReminderService _reminderService;
         private readonly Regex _remindRegex = new Regex(@"remind me in ((?:(?:\d+) (?:weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[ ,]*(?:and)? +)+)to (.*)", RegexOptions.Compiled);
 
-        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator, ISystemClock systemClock, IReminderService reminderService) : base(randomNumberGenerator)
+        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator, ISystemClock systemClock, IChatMessageTextFormatter messageTextFormatter, IReminderService reminderService) : base(randomNumberGenerator)
         {
             _systemClock = systemClock;
+            _messageTextFormatter = messageTextFormatter;
             _reminderService = reminderService;
         }
 
@@ -55,7 +57,7 @@ namespace Hsbot.Core.MessageHandlers
 
             _reminderService.AddReminder(reminder);
 
-            return SendMessage(message.CreateResponse($"Ok, {MessageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {MessageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {MessageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
+            return SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
         }
 
         private long GetSecondsOffsetFromTimeString(string time)

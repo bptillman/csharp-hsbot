@@ -7,7 +7,6 @@ using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Infrastructure;
-using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using static Hsbot.Core.Tests.ServiceMocks;
 using Moq;
 using Shouldly;
@@ -71,7 +70,7 @@ namespace Hsbot.Core.Tests.BotServices
             reminderList.Count.ShouldBe(2);
 
             var chatConnector = MockChatConnector();
-            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object, new InlineChatMessageTextFormatter(), systemClock, new TestTumblrApiClient());
+            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
             var context = new BotServiceContext {Parent = hsbot};
 
             await reminderService.Start(context);

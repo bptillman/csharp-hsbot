@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Core.ApiClients;
-using Hsbot.Core.Brain;
-using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
-using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
 
 namespace Hsbot.Core.MessageHandlers
@@ -24,17 +20,14 @@ namespace Hsbot.Core.MessageHandlers
             get => _botProvidedServices;
             set 
             {
-                if (value == null ||  value.Log == null || value.SendMessage == null)
+                if (value == null || value.SendMessage == null)
                     throw new ArgumentException("All bot-provided services must be non-null");
 
                 _botProvidedServices = value;
-
-                OnBotProvidedServicesConfigured();
             }
         }
-        protected IHsbotLog Log => BotProvidedServices.Log;
+
         protected Func<OutboundResponse, Task> SendMessage => BotProvidedServices.SendMessage;
-        protected IChatMessageTextFormatter MessageTextFormatter => BotProvidedServices.MessageTextFormatter;
 
         protected MessageHandlerBase(IRandomNumberGenerator randomNumberGenerator)
         {
@@ -113,9 +106,5 @@ namespace Hsbot.Core.MessageHandlers
 
         protected abstract bool CanHandle(InboundMessage message);
         public abstract Task HandleAsync(InboundMessage message);
-
-        protected virtual void OnBotProvidedServicesConfigured()
-        {
-        }
     }
 }
