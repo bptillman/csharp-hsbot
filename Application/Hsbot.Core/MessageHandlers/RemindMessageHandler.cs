@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
@@ -11,11 +12,13 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class RemindMessageHandler : MessageHandlerBase
     {
+        private readonly ISystemClock _systemClock;
         private readonly IReminderService _reminderService;
         private readonly Regex _remindRegex = new Regex(@"remind me in ((?:(?:\d+) (?:weeks?|days?|hours?|hrs?|minutes?|mins?|seconds?|secs?)[ ,]*(?:and)? +)+)to (.*)", RegexOptions.Compiled);
 
-        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator, IReminderService reminderService) : base(randomNumberGenerator)
+        public RemindMessageHandler(IRandomNumberGenerator randomNumberGenerator, ISystemClock systemClock, IReminderService reminderService) : base(randomNumberGenerator)
         {
+            _systemClock = systemClock;
             _reminderService = reminderService;
         }
 
@@ -40,7 +43,7 @@ namespace Hsbot.Core.MessageHandlers
             var action = match.Groups[2].Value;
 
             var secondsOffset = GetSecondsOffsetFromTimeString(time);
-            var reminderDateInUtc = SystemClock.UtcNow.AddSeconds(secondsOffset);
+            var reminderDateInUtc = _systemClock.UtcNow.AddSeconds(secondsOffset);
 
             var reminder = new Reminder
             {

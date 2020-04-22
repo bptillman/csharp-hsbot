@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Connection;
-using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
-using Hsbot.Core.Tests.Infrastructure;
 using Moq;
 
 namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
@@ -24,7 +22,6 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
             LogMock = MockLog();
             MessageTextFormatter = new InlineChatMessageTextFormatter();
-            SystemClock = new TestSystemClock();
         }
 
         public Mock<IHsbotLog> LogMock { get; set; }
@@ -35,7 +32,6 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
         public Func<string, Task<IChatUser>> GetChatUserById { get; }
         public Func<OutboundResponse, Task> SendMessage { get; }
         public IChatMessageTextFormatter MessageTextFormatter { get; set; }
-        public ISystemClock SystemClock { get; set; }
 
         private Mock<IHsbotLog> MockLog()
         {

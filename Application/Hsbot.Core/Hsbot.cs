@@ -89,7 +89,7 @@ namespace Hsbot.Core
         private void ConfigureMessageHandlers()
         {
             _log.Info("Configuring message handlers with access to brain and log facilities");
-            var botProvidedServices = new BotProvidedServices(_log, GetChatUserById, SendMessage, _messageTextFormatter, _systemClock);
+            var botProvidedServices = new BotProvidedServices(_log, GetChatUserById, SendMessage, _messageTextFormatter);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
                 inboundMessageHandler.BotProvidedServices = botProvidedServices;
