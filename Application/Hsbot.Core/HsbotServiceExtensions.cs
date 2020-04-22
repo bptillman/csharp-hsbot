@@ -18,12 +18,12 @@ namespace Hsbot.Core
     {
         public static HsbotServiceConfigurator AddHsbot(this IServiceCollection services, HsbotConfig config)
         {
+            RegisterBrainServices(services);
+            RegisterReminderServices(services);
             RegisterMessageHandlers(services);
-            RegisterBotServices(services);
 
             services.AddSingleton<IHsbotConfig>(svc => config);
             services.AddSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
-            services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
@@ -32,14 +32,24 @@ namespace Hsbot.Core
             return new HsbotServiceConfigurator(services);
         }
 
+        private static void RegisterReminderServices(IServiceCollection services)
+        {
+            services.AddSingleton<ReminderService>();
+            services.AddSingleton<IReminderService, ReminderService>(x => x.GetRequiredService<ReminderService>());
+            services.AddSingleton<IBotService, ReminderService>(x => x.GetRequiredService<ReminderService>());
+        }
+
+        private static void RegisterBrainServices(IServiceCollection services)
+        {
+            services.AddSingleton<IBotBrainSerializer<HsbotBrain>, JsonBrainSerializer>();
+            services.AddSingleton<HsbotBrainService>();
+            services.AddSingleton<IBotBrain, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
+            services.AddSingleton<IBotService, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
+        }
+
         private static void RegisterMessageHandlers(IServiceCollection services)
         {
             RegisterImplementationsOfInterface<IInboundMessageHandler>(services, ServiceLifetime.Singleton);
-        }
-
-        private static void RegisterBotServices(IServiceCollection services)
-        {
-            RegisterImplementationsOfInterface<IBotService>(services, ServiceLifetime.Singleton);
         }
 
         private static void RegisterImplementationsOfInterface<T>(IServiceCollection services, ServiceLifetime serviceLifetime)
@@ -47,13 +57,13 @@ namespace Hsbot.Core
             var handlerInterfaceType = typeof(T);
             if (!handlerInterfaceType.IsInterface) throw new InvalidOperationException("This method is to be used for interface types only");
 
-            var messageHandlerTypes = Assembly.GetAssembly(typeof(Hsbot))
+            var implementationTypes = Assembly.GetAssembly(typeof(Hsbot))
                 .GetTypes()
                 .Where(t => !t.IsAbstract && !t.IsInterface && handlerInterfaceType.IsAssignableFrom(t));
 
-            foreach (var messageHandlerType in messageHandlerTypes)
+            foreach (var implementationType in implementationTypes)
             {
-                services.Add(new ServiceDescriptor(handlerInterfaceType, messageHandlerType, serviceLifetime));
+                services.Add(new ServiceDescriptor(handlerInterfaceType, implementationType, serviceLifetime));
             }
         }
     }
@@ -88,7 +98,7 @@ namespace Hsbot.Core
             where T : class, IHsbotLog
         {
             _serviceCollection.AddLogging();
-            _serviceCollection.AddScoped<IHsbotLog, T>();
+            _serviceCollection.AddTransient<IHsbotLog, T>();
             return this;
         }
     }
