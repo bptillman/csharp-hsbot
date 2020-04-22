@@ -49,6 +49,21 @@ namespace Hsbot.Slack
                 : $"<{encodedUrl}|{displayText}>";
         }
 
+        public string Bold(string text)
+        {
+            return $"*{text}*";
+        }
+
+        public string Italic(string text)
+        {
+            return $"_{text}_";
+        }
+
+        public string Strikethough(string text)
+        {
+            return $"~{text}~";
+        }
+
         private static long GetUnixEpochTime(DateTime date)
         {
             return new DateTimeOffset(date).ToUnixTimeSeconds();

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.Brain;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Infrastructure;
@@ -33,6 +34,18 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             botProvidedServices.SentMessages.Count.ShouldBe(1);
             botProvidedServices.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
+        }
+
+        public async Task ShouldRespondWithWarningIfReminderNotPersisted()
+        {
+            var botProvidedServices = new BotProvidedServicesFake();
+            var reminderService = new FakeReminderService {PersistenceState = PersistenceState.InMemoryOnly};
+            var handler = GetHandlerInstance(reminderService, new TestSystemClock(), botProvidedServices);
+            await handler.TestHandleAsync("remind me in 1 hour to test");
+
+            botProvidedServices.SentMessages.Count.ShouldBe(2);
+            botProvidedServices.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
+            botProvidedServices.SentMessages[1].Text.ShouldContain("Warning:");
         }
 
         public Task ShouldSetReminderInOneSecond()
@@ -121,10 +134,12 @@ namespace Hsbot.Core.Tests.MessageHandler
         private class FakeReminderService : IReminderService
         {
             public readonly List<Reminder> Reminders = new List<Reminder>();
+            public PersistenceState PersistenceState { get; set; } = PersistenceState.Persisted;
 
-            public void AddReminder(Reminder reminder)
+            public PersistenceState AddReminder(Reminder reminder)
             {
                 Reminders.Add(reminder);
+                return PersistenceState;
             }
 
             public Task ProcessReminders()

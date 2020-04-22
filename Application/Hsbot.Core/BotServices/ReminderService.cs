@@ -19,7 +19,7 @@ namespace Hsbot.Core.BotServices
 
     public interface IReminderService
     {
-        void AddReminder(Reminder reminder);
+        PersistenceState AddReminder(Reminder reminder);
         Task ProcessReminders();
     }
 
@@ -110,7 +110,7 @@ namespace Hsbot.Core.BotServices
             _reminderTimerHandle?.Dispose();
         }
 
-        public void AddReminder(Reminder reminder)
+        public PersistenceState AddReminder(Reminder reminder)
         {
             lock (_remindersLock)
             {
@@ -119,7 +119,7 @@ namespace Hsbot.Core.BotServices
                 //always sort after adding a new entry so we can be sure that the
                 //front of the list is next to expire
                 _reminders.Sort((lhs, rhs) => DateTime.Compare(lhs.ReminderDateInUtc, rhs.ReminderDateInUtc));
-                _brain.SetItem(BrainStorageKey, _reminders);
+                return _brain.SetItem(BrainStorageKey, _reminders);
             }
         }
     }

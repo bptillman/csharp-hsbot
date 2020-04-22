@@ -7,18 +7,18 @@ using Newtonsoft.Json;
 
 namespace Hsbot.Core.Brain
 {
-    public class HsbotBrain : IBotBrain
+    public class InMemoryBrain : IBotBrain
     {
         private readonly ConcurrentDictionary<string, string> _brainContents = new ConcurrentDictionary<string, string>();
         
-        private readonly Subject<HsbotBrain> _brainChanged = new Subject<HsbotBrain>();
-        public IObservable<HsbotBrain> BrainChanged => _brainChanged.AsObservable();
+        private readonly Subject<InMemoryBrain> _brainChanged = new Subject<InMemoryBrain>();
+        public IObservable<InMemoryBrain> BrainChanged => _brainChanged.AsObservable();
 
-        public HsbotBrain()
+        public InMemoryBrain()
         {
         }
 
-        public HsbotBrain(IDictionary<string, string> brainContents)
+        public InMemoryBrain(IDictionary<string, string> brainContents)
         {
             SetContents(brainContents);
         }
@@ -43,11 +43,13 @@ namespace Hsbot.Core.Brain
             return JsonConvert.DeserializeObject<T>(value);
         }
 
-        public void SetItem<T>(string key, T value)
+        public PersistenceState SetItem<T>(string key, T value)
             where T: class
         {
             _brainContents[key] = JsonConvert.SerializeObject(value);
             _brainChanged.OnNext(this);
+
+            return PersistenceState.InMemoryOnly;
         }
     }
 }

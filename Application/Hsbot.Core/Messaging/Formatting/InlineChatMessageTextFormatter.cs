@@ -30,5 +30,20 @@ namespace Hsbot.Core.Messaging.Formatting
         {
             return $"{displayText} ({url})";
         }
+
+        public string Bold(string text)
+        {
+            return $"*{text}*";
+        }
+
+        public string Italic(string text)
+        {
+            return $"_{text}_";
+        }
+
+        public string Strikethough(string text)
+        {
+            return $"~{text}~";
+        }
     }
 }

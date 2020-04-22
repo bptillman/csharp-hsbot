@@ -6,6 +6,7 @@ using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
+using Hsbot.Core.Tests.Brain;
 using Hsbot.Core.Tests.Infrastructure;
 using static Hsbot.Core.Tests.ServiceMocks;
 using Moq;
@@ -20,7 +21,7 @@ namespace Hsbot.Core.Tests.BotServices
             var now = DateTime.UtcNow;
             var systemClock = new TestSystemClock {UtcNow = now};
 
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
 
@@ -39,11 +40,32 @@ namespace Hsbot.Core.Tests.BotServices
             reminderList[0].Message.ShouldBe(reminder.Message);
         }
 
+        public void AddReminderShouldReturnBrainPersistenceState()
+        {
+            var brain = new FakeBrain {PersistenceState = PersistenceState.Persisted};
+            var reminderService = new ReminderService(new TestSystemClock(), new InlineChatMessageTextFormatter(), brain);
+
+            var reminder = new Reminder
+            {
+                ChannelId = "test",
+                Message = "this is a reminder",
+                ReminderDateInUtc = DateTime.UtcNow.AddSeconds(-1),
+                UserId = "test"
+            };
+
+            var result = reminderService.AddReminder(reminder);
+            result.ShouldBe(PersistenceState.Persisted);
+
+            brain.PersistenceState = PersistenceState.InMemoryOnly;
+            result = reminderService.AddReminder(reminder);
+            result.ShouldBe(PersistenceState.InMemoryOnly);
+        }
+
         public async Task ShouldSendRemindersPastDueDate()
         {
             var now = DateTime.UtcNow;
             var systemClock = new TestSystemClock { UtcNow = now };
-            var brain = new HsbotBrain();
+            var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
 

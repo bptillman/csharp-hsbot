@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
-using Hsbot.Core.Messaging;
-using Hsbot.Core.Messaging.Formatting;
-using Hsbot.Core.Tests.Infrastructure;
-using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using static Hsbot.Core.Tests.ServiceMocks;
 using Moq;
+using Shouldly;
 
 namespace Hsbot.Core.Tests.BotServices
 {
     public class HsbotBrainServicesTests
     {
-        public async Task ShouldLoadBrainOnConnect()
+        public async Task ShouldLoadBrainOnStart()
         {
             var logMock = MockLog();
             var brainStorageMock = MockBrainStorage();
@@ -35,7 +31,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<HsbotBrain>()), Times.Once);
+            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Once);
         }
 
         public async Task ShouldNotSaveBrainIfInitialLoadFailed()
@@ -49,7 +45,32 @@ namespace Hsbot.Core.Tests.BotServices
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<HsbotBrain>()), Times.Never);
+            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Never);
+        }
+
+        public async Task SetItemShouldPersistToStorageWhenInitialLoadSucceeds()
+        {
+            var logMock = MockLog();
+            var brainStorageMock = MockBrainStorage();
+
+            var brainService = new HsbotBrainService(brainStorageMock.Object, logMock.Object);
+            await brainService.Start(new BotServiceContext());
+
+            var persistenceState = brainService.SetItem("test", "value");
+            persistenceState.ShouldBe(PersistenceState.Persisted);
+        }
+
+        public async Task SetItemShouldSaveInMemoryWhenInitialLoadFailed()
+        {
+            var logMock = MockLog();
+            var brainStorageMock = MockBrainStorage();
+            brainStorageMock.Setup(x => x.Load()).Throws(new Exception());
+
+            var brainService = new HsbotBrainService(brainStorageMock.Object, logMock.Object);
+            await brainService.Start(new BotServiceContext());
+
+            var persistenceState = brainService.SetItem("test", "value");
+            persistenceState.ShouldBe(PersistenceState.InMemoryOnly);
         }
     }
 }

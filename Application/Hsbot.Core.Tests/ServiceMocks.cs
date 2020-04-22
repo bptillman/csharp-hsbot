@@ -19,11 +19,11 @@ namespace Hsbot.Core.Tests
             return logMock;
         }
 
-        public static Mock<IBotBrainStorage<HsbotBrain>> MockBrainStorage()
+        public static Mock<IBotBrainStorage<InMemoryBrain>> MockBrainStorage()
         {
-            var brainStorageMock = new Mock<IBotBrainStorage<HsbotBrain>>();
-            brainStorageMock.Setup(x => x.Load()).Returns(Task.FromResult(new HsbotBrain()));
-            brainStorageMock.Setup(x => x.Save(It.IsAny<HsbotBrain>())).Returns(Task.CompletedTask);
+            var brainStorageMock = new Mock<IBotBrainStorage<InMemoryBrain>>();
+            brainStorageMock.Setup(x => x.Load()).Returns(Task.FromResult(new InMemoryBrain()));
+            brainStorageMock.Setup(x => x.Save(It.IsAny<InMemoryBrain>())).Returns(Task.CompletedTask);
 
             return brainStorageMock;
         }
