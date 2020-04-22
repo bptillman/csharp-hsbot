@@ -43,11 +43,13 @@ namespace Hsbot.Core.Brain
             return JsonConvert.DeserializeObject<T>(value);
         }
 
-        public void SetItem<T>(string key, T value)
+        public PersistenceState SetItem<T>(string key, T value)
             where T: class
         {
             _brainContents[key] = JsonConvert.SerializeObject(value);
             _brainChanged.OnNext(this);
+
+            return PersistenceState.InMemoryOnly;
         }
     }
 }

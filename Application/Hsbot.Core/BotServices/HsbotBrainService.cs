@@ -85,10 +85,14 @@ namespace Hsbot.Core.BotServices
             return _brain.GetItem<T>(key);
         }
 
-        public void SetItem<T>(string key, T value) where T : class
+        public PersistenceState SetItem<T>(string key, T value) where T : class
         {
             _log.Debug($"Saving new value to brain for Key={key}");
             _brain.SetItem(key, value);
+
+            return _persistenceEnabled
+                ? PersistenceState.Persisted
+                : PersistenceState.InMemoryOnly;
         }
 
         public void Dispose()

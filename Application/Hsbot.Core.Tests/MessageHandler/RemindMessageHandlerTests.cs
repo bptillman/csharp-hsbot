@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.Brain;
 using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Infrastructure;
@@ -122,9 +123,10 @@ namespace Hsbot.Core.Tests.MessageHandler
         {
             public readonly List<Reminder> Reminders = new List<Reminder>();
 
-            public void AddReminder(Reminder reminder)
+            public PersistenceState AddReminder(Reminder reminder)
             {
                 Reminders.Add(reminder);
+                return PersistenceState.Persisted;
             }
 
             public Task ProcessReminders()

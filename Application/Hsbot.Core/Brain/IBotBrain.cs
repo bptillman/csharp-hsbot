@@ -6,6 +6,6 @@ namespace Hsbot.Core.Brain
     {
         ICollection<string> Keys { get; }
         T GetItem<T>(string key) where T: class;
-        void SetItem<T>(string key, T value) where T: class;
+        PersistenceState SetItem<T>(string key, T value) where T: class;
     }
 }

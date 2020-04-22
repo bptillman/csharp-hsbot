@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.Brain;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
@@ -38,7 +39,7 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(_remindRegex);
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override async Task HandleAsync(InboundMessage message)
         {
             var match = message.Match(_remindRegex);
             var time = match.Groups[1].Value;
@@ -55,9 +56,14 @@ namespace Hsbot.Core.MessageHandlers
                 ChannelId = message.Channel,
             };
 
-            _reminderService.AddReminder(reminder);
+            var reminderResult = _reminderService.AddReminder(reminder);
 
-            return SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
+            await SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
+
+            if (reminderResult == PersistenceState.InMemoryOnly)
+            {
+                await SendMessage(message.CreateResponse($"{_messageTextFormatter.Bold("Warning:")} my brain is currently on the fritz, so I won't remember your reminder if I'm rebooted"));
+            }
         }
 
         private long GetSecondsOffsetFromTimeString(string time)
