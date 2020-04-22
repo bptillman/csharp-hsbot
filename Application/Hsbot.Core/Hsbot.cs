@@ -74,7 +74,8 @@ namespace Hsbot.Core
 
         private void ConfigureMessageHandlers()
         {
-            _log.Info("Configuring message handlers with access to brain and log facilities");
+            //since the Hsbot class owns the connection to the chat service, we need
+            //to pass access to this functionality down to the message handlers
             var botProvidedServices = new BotProvidedServices(GetChatUserById, SendMessage);
             foreach (var inboundMessageHandler in _messageHandlers)
             {
