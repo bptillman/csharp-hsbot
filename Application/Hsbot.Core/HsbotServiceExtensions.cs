@@ -83,5 +83,13 @@ namespace Hsbot.Core
             _serviceCollection.AddSingleton<IBotBrainStorage<HsbotBrain>, T>();
             return this;
         }
+
+        public HsbotServiceConfigurator AddLogging<T>()
+            where T : class, IHsbotLog
+        {
+            _serviceCollection.AddLogging();
+            _serviceCollection.AddScoped<IHsbotLog, T>();
+            return this;
+        }
     }
 }
