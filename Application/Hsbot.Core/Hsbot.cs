@@ -14,15 +14,13 @@ using Hsbot.Core.Messaging.Formatting;
 
 namespace Hsbot.Core
 {
-    public class Hsbot : IDisposable
+    public sealed class Hsbot : IDisposable
     {
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
         private readonly IEnumerable<IBotService> _botServices;
         private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
-        private readonly IBotBrainStorage<HsbotBrain> _brainStorage;
-
-        private IDisposable _brainChangedSubscription;
+        
         private IDisposable _onDisconnectSubscription;
         private IDisposable _onReconnectingSubscription;
         private IDisposable _onReconnectedSubscription;
@@ -40,7 +38,6 @@ namespace Hsbot.Core
         public Hsbot(IHsbotLog log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IEnumerable<IBotService> botServices,
-            IBotBrainStorage<HsbotBrain> brainStorage,
             IHsbotChatConnector connection,
             IChatMessageTextFormatter messageTextFormatter,
             ISystemClock systemClock,
@@ -49,7 +46,6 @@ namespace Hsbot.Core
             _log = log;
             _messageHandlers = messageHandlers;
             _botServices = botServices;
-            _brainStorage = brainStorage;
             _connection = connection;
             _messageTextFormatter = messageTextFormatter;
             _systemClock = systemClock;
@@ -62,8 +58,6 @@ namespace Hsbot.Core
 
         public async Task Connect()
         {
-            await InitializeBrain();
-
             ConfigureMessageHandlers();
 
             _log.Info("Connecting to messaging service");
@@ -209,51 +203,6 @@ namespace Hsbot.Core
             }
         }
 
-        private async Task InitializeBrain()
-        {
-            _log.Info("Initializing brain");
-            if (Brain != null)
-            {
-                _log.Info("Brain already initialized, skipping");
-                return;
-            }
-
-            try
-            {
-                Brain = await _brainStorage.Load();
-                _brainChangedSubscription = Brain.BrainChanged
-                    .Select(SaveBrain)
-                    .Window(1) //ensure we only run 1 call to the save brain method at a given time
-                    .Concat()
-                    .Subscribe();
-
-                _log.Info("Brain loaded from storage successfully");
-            }
-
-            catch (Exception e)
-            {
-                _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
-                _log.Error("Brain load exception: {0}", e);
-
-                Brain = new HsbotBrain();
-            }
-        }
-
-        private async Task SaveBrain(HsbotBrain brain)
-        {
-            _log.Debug("Received brain change event - saving to storage");
-            try
-            {
-                await _brainStorage.Save(brain);
-                _log.Debug("Received brain change event - brain saved successfully");
-            }
-
-            catch (Exception e)
-            {
-                _log.Error("Failed to save brain to storage: {0}", e);
-            }
-        }
-
         public async Task SendMessage(IEnumerable<OutboundResponse> responses)
         {
             foreach (var outboundResponse in responses)
@@ -274,7 +223,6 @@ namespace Hsbot.Core
 
         public void Dispose()
         {
-            _brainChangedSubscription?.Dispose();
             _onDisconnectSubscription?.Dispose();
             _onReconnectedSubscription?.Dispose();
             _onReconnectingSubscription?.Dispose();
