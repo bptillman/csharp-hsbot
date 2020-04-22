@@ -38,9 +38,10 @@ namespace Hsbot.Core.MessageHandlers
             return message.StartsWith(MakeGlennDanceCommand) || message.StartsWith(GlennDanceBombCommand);
         }
 
-        public override async Task HandleAsync(InboundMessage message)
+        public override async Task HandleAsync(IInboundMessageContext context)
         {
             var repliesNumber = 0;
+            var message = context.Message;
 
             if (message.StartsWith(MakeGlennDanceCommand))
             {
@@ -60,7 +61,7 @@ namespace Hsbot.Core.MessageHandlers
 
             for (var i = 0; i < repliesNumber; i++)
             {
-                await SendMessage(message.CreateResponse(GetRandomCannedResponse()));
+                await context.SendMessage(message.CreateResponse(GetRandomCannedResponse()));
             }
         }
     }

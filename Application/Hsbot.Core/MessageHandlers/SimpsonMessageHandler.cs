@@ -41,13 +41,14 @@
             return message.IsMatch(SimpsonMeRegex) || message.IsMatch(SimpsonGifMeRegex);
         }
 
-        public override async Task HandleAsync(InboundMessage message)
+        public override async Task HandleAsync(IInboundMessageContext context)
         {
+            var message = context.Message;
             var command = GetCommand(message);
             if (command.CommandType == CommandType.None)
                 return;
 
-            await SendMessage(message.CreateTypingOnChannelResponse());
+            await context.SendMessage(message.CreateTypingOnChannelResponse());
 
             var quote = HttpUtility.UrlEncode(command.Quote);
             var requestUrl = $"{FrinkiacUrl}{quote}";
@@ -74,7 +75,7 @@
                 reply = e.Message;
             }
 
-            await SendMessage(message.CreateResponse(reply));
+            await context.SendMessage(message.CreateResponse(reply));
         }
 
         private static async Task<FrinkiacImage[]> GetImages(string url)

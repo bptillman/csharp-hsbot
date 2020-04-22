@@ -30,8 +30,9 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(RollRegex);
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override Task HandleAsync(IInboundMessageContext context)
         {
+            var message = context.Message;
             var matches = message.Match(RollRegex);
             var quantity = matches.Groups[1].CaptureToInt() ?? 1;
             var die = matches.Groups[2].CaptureToInt().Value;
@@ -46,7 +47,7 @@ namespace Hsbot.Core.MessageHandlers
                 total += rolls[i];
             }
 
-            return SendMessage(message.CreateResponse($"rolled a {total} ({string.Join(", ", rolls)})+{mod}"));
+            return context.SendMessage(message.CreateResponse($"rolled a {total} ({string.Join(", ", rolls)})+{mod}"));
         }
     }
 }

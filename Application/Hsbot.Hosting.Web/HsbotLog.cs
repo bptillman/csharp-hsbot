@@ -1,8 +1,10 @@
+using System;
 using Hsbot.Core;
 using Microsoft.Extensions.Logging;
 
 namespace Hsbot.Hosting.Web
 {
+    [Obsolete]
     public class HsbotLog : IHsbotLog
     {
         private readonly ILogger _logger;

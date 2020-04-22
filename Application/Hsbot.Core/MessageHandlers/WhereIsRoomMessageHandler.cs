@@ -68,31 +68,32 @@ namespace Hsbot.Core.MessageHandlers
             return message.StartsWith(CommandText);
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override Task HandleAsync(IInboundMessageContext context)
         {
+            var message = context.Message;
             var roomSearch = message.TextWithoutBotName.Replace("where is", "").Trim();
 
             if (string.IsNullOrEmpty(roomSearch))
             {
-                return SendMessage(message.CreateResponse("Gimme a room name to look for!"));
+                return context.SendMessage(message.CreateResponse("Gimme a room name to look for!"));
             }
 
             if (!_rooms.ContainsKey(roomSearch))
             {
-                return SendMessage(message.CreateResponse(GetRandomCannedResponse(roomSearch)));
+                return context.SendMessage(message.CreateResponse(GetRandomCannedResponse(roomSearch)));
             }
 
             var room = _rooms[roomSearch];
 
             if (room.StartsWith("http"))
             {
-                return SendMessage(message.CreateResponse(null, new Attachment
+                return context.SendMessage(message.CreateResponse(null, new Attachment
                 {
                     ImageUrl = room
                 }));
             }
 
-            return SendMessage(message.CreateResponse(room));
+            return context.SendMessage(message.CreateResponse(room));
         }
     }
 }

@@ -27,25 +27,23 @@ namespace Hsbot.Core.Tests.MessageHandler
 
         public async Task ShouldRespondWithConfirmation()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
             var reminderService = new FakeReminderService();
-            var handler = GetHandlerInstance(reminderService, new TestSystemClock(), botProvidedServices);
-            await handler.TestHandleAsync("remind me in 1 hour to test");
+            var handler = GetHandlerInstance(reminderService, new TestSystemClock());
+            var context = await handler.TestHandleAsync("remind me in 1 hour to test");
 
-            botProvidedServices.SentMessages.Count.ShouldBe(1);
-            botProvidedServices.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
+            context.SentMessages.Count.ShouldBe(1);
+            context.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
         }
 
         public async Task ShouldRespondWithWarningIfReminderNotPersisted()
         {
-            var botProvidedServices = new BotProvidedServicesFake();
             var reminderService = new FakeReminderService {PersistenceState = PersistenceState.InMemoryOnly};
-            var handler = GetHandlerInstance(reminderService, new TestSystemClock(), botProvidedServices);
-            await handler.TestHandleAsync("remind me in 1 hour to test");
+            var handler = GetHandlerInstance(reminderService, new TestSystemClock());
+            var context = await handler.TestHandleAsync("remind me in 1 hour to test");
 
-            botProvidedServices.SentMessages.Count.ShouldBe(2);
-            botProvidedServices.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
-            botProvidedServices.SentMessages[1].Text.ShouldContain("Warning:");
+            context.SentMessages.Count.ShouldBe(2);
+            context.SentMessages[0].Text.ShouldMatch("Ok, (.+), I'll remind you");
+            context.SentMessages[1].Text.ShouldContain("Warning:");
         }
 
         public Task ShouldSetReminderInOneSecond()
@@ -99,34 +97,30 @@ namespace Hsbot.Core.Tests.MessageHandler
         private async Task AssertReminderSet(string messageText, DateTime now, DateTime expectedReminderTime)
         {
             var systemClock = new TestSystemClock { UtcNow = now };
-            var botProvidedServices = new BotProvidedServicesFake();
 
             var reminderService = new FakeReminderService();
-            var handler = GetHandlerInstance(reminderService, systemClock, botProvidedServices);
-            await handler.TestHandleAsync(messageText);
+            var handler = GetHandlerInstance(reminderService, systemClock);
+            var context = await handler.TestHandleAsync(messageText);
 
             reminderService.Reminders.Count.ShouldBe(1);
             reminderService.Reminders[0].ReminderDateInUtc.ShouldBe(expectedReminderTime);
 
-            botProvidedServices.SentMessages.Count.ShouldBe(1);
+            context.SentMessages.Count.ShouldBe(1);
         }
 
-        protected override RemindMessageHandler GetHandlerInstance(BotProvidedServicesFake botProvidedServices = null)
+        protected override RemindMessageHandler GetHandlerInstance()
         {
-            return GetHandlerInstance(new FakeReminderService(), new TestSystemClock(), botProvidedServices);
+            return GetHandlerInstance(new FakeReminderService(), new TestSystemClock());
         }
 
-        private RemindMessageHandler GetHandlerInstance(FakeReminderService reminderService, TestSystemClock systemClock = null, BotProvidedServicesFake botProvidedServices = null)
+        private RemindMessageHandler GetHandlerInstance(FakeReminderService reminderService, TestSystemClock systemClock = null)
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
             //to be false
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
             systemClock ??= new TestSystemClock();
-            var handler = new RemindMessageHandler(rng, systemClock, new InlineChatMessageTextFormatter(), reminderService)
-            {
-                BotProvidedServices = botProvidedServices ?? new BotProvidedServicesFake()
-            };
+            var handler = new RemindMessageHandler(rng, systemClock, new InlineChatMessageTextFormatter(), reminderService);
 
             return handler;
         }

@@ -43,8 +43,9 @@ namespace Hsbot.Core.MessageHandlers
             return message.IsMatch(FlipRegex) || message.IsMatch(MegaflipRegex);
         }
 
-        public override Task HandleAsync(InboundMessage message)
+        public override Task HandleAsync(IInboundMessageContext context)
         {
+            var message = context.Message;
             var match = message.Match(FlipRegex);
             var responseText = FlipResponse;
 
@@ -55,7 +56,7 @@ namespace Hsbot.Core.MessageHandlers
             }
 
             var flippedText = FlipText(match.Groups[1].Value);
-            return SendMessage(message.CreateResponse(string.Format(responseText, flippedText)));
+            return context.SendMessage(message.CreateResponse(string.Format(responseText, flippedText)));
         }
 
         private string FlipText(string text)

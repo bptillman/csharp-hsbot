@@ -42,8 +42,6 @@ namespace Hsbot.Core
 
         public async Task Connect()
         {
-            ConfigureMessageHandlers();
-
             _log.Info("Connecting to messaging service");
 
             await _connection.Connect();
@@ -70,17 +68,6 @@ namespace Hsbot.Core
             _log.Info("Connected successfully");
 
             await StartServices();
-        }
-
-        private void ConfigureMessageHandlers()
-        {
-            //since the Hsbot class owns the connection to the chat service, we need
-            //to pass access to this functionality down to the message handlers
-            var botProvidedServices = new BotProvidedServices(GetChatUserById, SendMessage);
-            foreach (var inboundMessageHandler in _messageHandlers)
-            {
-                inboundMessageHandler.BotProvidedServices = botProvidedServices;
-            }
         }
 
         private Task OnDisconnect()
@@ -130,6 +117,7 @@ namespace Hsbot.Core
             }
 
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
+            var messageContext = new InboundMessageContext(message, SendMessage, GetChatUserById);
 
             foreach (var inboundMessageHandler in _messageHandlers)
             {
@@ -141,7 +129,7 @@ namespace Hsbot.Core
 
                 try
                 {
-                    await inboundMessageHandler.HandleAsync(message);
+                    await inboundMessageHandler.HandleAsync(messageContext);
                 }
                 catch (Exception e)
                 {
