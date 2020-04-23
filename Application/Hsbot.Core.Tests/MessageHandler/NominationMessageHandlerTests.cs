@@ -11,7 +11,8 @@ namespace Hsbot.Core.Tests.MessageHandler
     public class NominationMessageHandlerTests : MessageHandlerTestBase<NominationMessageHandler>
     {
         private readonly string _bragRoom = "CE9K4LTFD";
-        private readonly string _hvaSuccessMessage = "Success";
+        private readonly HvaResponse _hvaSuccessResponse = new HvaResponse {HvaKey = "theKey", Message = "Success"};
+        private readonly HvaResponse _hvaFailureResponse = new HvaResponse {Failed = true};
         private readonly string _jiraErrorMessage = "I failed...";
 
         protected override string[] MessageTextsThatShouldBeHandled => new []
@@ -75,7 +76,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages
-                .SingleOrDefault(x => x.Channel == message.Channel && x.Text == _hvaSuccessMessage)
+                .SingleOrDefault(x => x.Channel == message.Channel && x.Text == _hvaSuccessResponse.Message)
                 .ShouldNotBeNull();
             context.SentMessages
                 .SingleOrDefault(x => x.Channel == _bragRoom && x.Text == "bob exhibits *_dfe_*\nthis bot is great\nnominated by: _nobody_\ntheKey")
@@ -92,21 +93,24 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(_hvaSuccessMessage);
+            context.SentMessages.First().Text.ShouldBe(_hvaSuccessResponse.Message);
+        }
+
+        public async Task ShouldReturnCannedResponse()
+        {
+            var messageHandler = GetHandlerInstance(_hvaFailureResponse);
+            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this bot is great");
+            var context = GetMessageContext(message);
+
+            await messageHandler.HandleAsync(context);
+
+            context.SentMessages.Count.ShouldBe(1);
+            context.SentMessages.First().Text.ShouldBe("My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:");
         }
 
         protected override NominationMessageHandler GetHandlerInstance()
         {
-            return GetHandlerInstance(new TestJiraApiClient
-            {
-                ErrorMessage = _jiraErrorMessage,
-                HvaSuccessMessage = _hvaSuccessMessage,
-                Users = new[]
-                {
-                    new TestJiraUser {DisplayName = "bobby", Email = "bob@bob.com"},
-                    new TestJiraUser {DisplayName = "nobody", Email = "nobody@nobody.com"},
-                }
-            });
+            return GetHandlerInstance(_hvaSuccessResponse);
         }
 
         protected TestInboundMessageContext GetMessageContext(InboundMessage inboundMessage)
@@ -144,12 +148,24 @@ namespace Hsbot.Core.Tests.MessageHandler
             return inboundMessage;
         }
 
-        private NominationMessageHandler GetHandlerInstance(IJiraApiClient jiraApiClient)
+        private NominationMessageHandler GetHandlerInstance(HvaResponse hvaResponse)
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
             //to be false
             var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
+
+            var jiraApiClient = new TestJiraApiClient
+            {
+                ErrorMessage = _jiraErrorMessage,
+                HvaResponse = hvaResponse,
+                Users = new[]
+                {
+                    new TestJiraUser {DisplayName = "bobby", Email = "bob@bob.com"},
+                    new TestJiraUser {DisplayName = "nobody", Email = "nobody@nobody.com"},
+                }
+            };
+
             var handler = new NominationMessageHandler(jiraApiClient, rng);
 
             return handler;

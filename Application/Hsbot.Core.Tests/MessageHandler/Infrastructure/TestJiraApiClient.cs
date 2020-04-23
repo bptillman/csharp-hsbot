@@ -13,18 +13,13 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
     public class TestJiraApiClient : IJiraApiClient
     {
-        public string HvaSuccessMessage { get; set; }
+        public HvaResponse HvaResponse { get; set; }
         public string ErrorMessage { get; set; }
         public IEnumerable<TestJiraUser> Users { get; set; }
 
         Task<HvaResponse> IJiraApiClient.SubmitHva(JiraUser nominator, JiraUser nominee, string description, string awardType)
         {
-            return Task.FromResult(new HvaResponse
-            {
-                Message = HvaSuccessMessage,
-                Failed = false,
-                HvaKey = "theKey",
-            });
+            return Task.FromResult(HvaResponse);
         }
 
         public Task<JiraUser> GetUser(string search)
