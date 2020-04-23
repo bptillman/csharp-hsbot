@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Hsbot.Core.Brain;
 using Newtonsoft.Json;
 
@@ -6,7 +7,7 @@ namespace Hsbot.Core.Tests.Brain
 {
     public class FakeBrain : IBotBrain
     {
-        public Dictionary<string, string> BrainContents = new Dictionary<string, string>();
+        public Dictionary<string, string> BrainContents = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         public PersistenceState PersistenceState { get; set; } = PersistenceState.Persisted;
 
         public ICollection<string> Keys => BrainContents.Keys;

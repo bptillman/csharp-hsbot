@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
@@ -12,17 +12,14 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class RememberMessageHandler : MessageHandlerBase
     {
-        private readonly IBotBrain _brain;
+        private readonly IMemoryService _memoryService;
         private readonly IChatMessageTextFormatter _chatMessageTextFormatter;
 
-        public RememberMessageHandler(IRandomNumberGenerator randomNumberGenerator, IBotBrain brain, IChatMessageTextFormatter chatMessageTextFormatter) : base(randomNumberGenerator)
+        public RememberMessageHandler(IRandomNumberGenerator randomNumberGenerator, IMemoryService memoryService, IChatMessageTextFormatter chatMessageTextFormatter) : base(randomNumberGenerator)
         {
-            _brain = brain;
+            _memoryService = memoryService;
             _chatMessageTextFormatter = chatMessageTextFormatter;
         }
-
-        public const string MemoriesBrainStorageKey = "remember";
-        public const string MemoryCountBrainStorageKey = "memoriesByRecollection";
 
         private readonly Regex _memoryRegex = new Regex(@"(?:what is|rem(?:ember)?)\s+(.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly Regex _newMemoryRegex = new Regex(@"(.*?)(\s+is\s+([\s\S]*))$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
@@ -54,9 +51,6 @@ namespace Hsbot.Core.MessageHandlers
 
         public override async Task HandleAsync(IInboundMessageContext context)
         {
-            var memories = LoadMemories();
-            var memoryCounts = LoadMemoryCounts();
-
             var message = context.Message;
 
             var forgetMatch = message.Match(_forgetRegex);
@@ -64,18 +58,10 @@ namespace Hsbot.Core.MessageHandlers
             {
                 var memoryToForget = forgetMatch.Groups[1].Value;
 
-                if (memoryCounts.Remove(memoryToForget))
+                if (_memoryService.Forget(memoryToForget, out var memory))
                 {
-                    SaveMemoryCounts(memoryCounts);
-                }
-
-                if (memories.Remove(memoryToForget, out var value))
-                {
-                    var responseText = $"Ok, I'll forget that {memoryToForget} is {value}";
-                    memories.Remove(memoryToForget);
-
+                    var responseText = $"Ok, I'll forget that {memoryToForget} is {memory.Value}";
                     await context.SendResponse(responseText);
-                    SaveMemories(memories);
                 }
 
                 else
@@ -96,18 +82,20 @@ namespace Hsbot.Core.MessageHandlers
                     var key = newMemoryMatch.Groups[1].Value;
                     var value = newMemoryMatch.Groups[3].Value;
 
-                    if (memories.TryGetValue(key, out var oldValue))
+                    PersistenceState persistenceState;
+                    if (_memoryService.HasMemory(key, out var oldMemory))
                     {
-                        await context.SendResponse($"Ok, {key} is updated from {oldValue} to {value}");
+                        persistenceState = _memoryService.Remember(key, value);
+                        await context.SendResponse($"Ok, {key} is updated from {oldMemory.Value} to {value}");
                     }
 
                     else
                     {
+                        persistenceState = _memoryService.Remember(key, value);
                         await context.SendResponse($"Ok, I'll remember {key} is {value}");
                     }
 
-                    memories[key] = value;
-                    if (SaveMemories(memories) == PersistenceState.InMemoryOnly)
+                    if (persistenceState == PersistenceState.InMemoryOnly)
                     {
                         await context.SendResponse($"{_chatMessageTextFormatter.Bold("Warning:")} my brain is on the fritz, so I won't remember this after a reboot.");
                     }
@@ -119,18 +107,9 @@ namespace Hsbot.Core.MessageHandlers
                 if (searchKeyMatch.Success)
                 {
                     var key = searchKeyMatch.Groups[1].Value;
-                    if (memories.TryGetValue(key, out var value))
+                    if (_memoryService.GetMemory(key, out var memory))
                     {
-                        var counter = 1;
-                        if (memoryCounts.ContainsKey(key))
-                        {
-                            counter = memoryCounts[key] + 1;
-                        }
-
-                        memoryCounts[key] = counter;
-                        SaveMemoryCounts(memoryCounts);
-
-                        await context.SendResponse(value);
+                        await context.SendResponse(memory.Value);
                     }
 
                     else
@@ -142,7 +121,7 @@ namespace Hsbot.Core.MessageHandlers
                 return;
             }
 
-            if (memories.Count == 0)
+            if (_memoryService.Count == 0)
             {
                 await context.SendResponse("I don't remember anything :shrug:");
                 return;
@@ -150,14 +129,15 @@ namespace Hsbot.Core.MessageHandlers
 
             if (message.StartsWith(WhatDoYouRemember))
             {
-                await context.SendResponse($"I remember:\r\n{string.Join("\r\n", memories.Keys)}");
+                await context.SendResponse($"I remember:\r\n{string.Join("\r\n", _memoryService.GetAllMemories().OrderBy(m => m.Key).Select(m => m.Key))}");
             }
 
             else if (message.StartsWith(WhatAreYourFavoriteMemories))
             {
-                var topMemoryKeys = memories.Keys
-                    .OrderByDescending(k => memoryCounts.ContainsKey(k) ? memoryCounts[k] : 0)
-                    .Take(5);
+                var topMemoryKeys = _memoryService.GetAllMemories()
+                    .OrderByDescending(m => m.RememberCount)
+                    .Take(5)
+                    .Select(m => m.Key);
 
                 var responseText = $"My favorite memories are:\r\n{string.Join("\r\n", topMemoryKeys)}";
                 await context.SendResponse(responseText);
@@ -165,29 +145,9 @@ namespace Hsbot.Core.MessageHandlers
 
             else if (message.StartsWith(RandomMemory))
             {
-                var memory = RandomNumberGenerator.GetRandomValue(memories);
+                var memory = RandomNumberGenerator.GetRandomValue(_memoryService.GetAllMemories().OrderBy(m => m.Key).ToArray());
                 await context.SendResponse($"{memory.Key}\r\n{memory.Value}");
             }
-        }
-
-        private Dictionary<string, int> LoadMemoryCounts()
-        {
-            return _brain.GetItem<Dictionary<string, int>>(MemoryCountBrainStorageKey).ToCaseInsensitiveDictionary();
-        }
-
-        private Dictionary<string, string> LoadMemories()
-        {
-            return _brain.GetItem<Dictionary<string, string>>(MemoriesBrainStorageKey).ToCaseInsensitiveDictionary();
-        }
-
-        private void SaveMemoryCounts(Dictionary<string, int> memoryCounts)
-        {
-            _brain.SetItem(MemoryCountBrainStorageKey, memoryCounts);
-        }
-
-        private PersistenceState SaveMemories(Dictionary<string, string> memories)
-        {
-            return _brain.SetItem(MemoriesBrainStorageKey, memories);
         }
     }
 }
