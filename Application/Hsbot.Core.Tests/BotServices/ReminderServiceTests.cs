@@ -98,7 +98,7 @@ namespace Hsbot.Core.Tests.BotServices
             await reminderService.Start(context);
             await reminderService.ProcessReminders();
 
-            chatConnector.Verify(x => x.SendMessage(It.IsAny<OutboundResponse>()), Times.Once);
+            chatConnector.Verify(x => x.SendMessage(It.IsAny<OutboundResponse>()), Times.Exactly(2));
 
             reminderList = brain.GetItem<List<Reminder>>(ReminderService.BrainStorageKey);
             reminderList.Count.ShouldBe(1);
