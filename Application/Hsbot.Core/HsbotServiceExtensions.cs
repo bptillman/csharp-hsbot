@@ -27,6 +27,7 @@ namespace Hsbot.Core
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
+            services.AddHttpClient<IJiraApiClient, JiraApiClient>();
             services.AddSingleton<Hsbot>();
 
             return new HsbotServiceConfigurator(services);

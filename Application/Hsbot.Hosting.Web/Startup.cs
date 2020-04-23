@@ -41,7 +41,8 @@ namespace Hsbot.Hosting.Web
                 BrainName = _config["brain:name"] ?? "HsbotBrain",
                 BrainStorageConnectionString = _config["brain:connectionString"] ?? "UseDevelopmentStorage=true",
                 BrainStorageKey = _config["brain:storageKey"],
-                TumblrApiKey = _config["tumblr:apiKey"]
+                TumblrApiKey = _config["tumblr:apiKey"],
+                JiraApiKey = _config["jira:apiKey"],
             };
         }
 
