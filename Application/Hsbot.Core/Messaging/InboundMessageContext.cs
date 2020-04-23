@@ -32,7 +32,7 @@ namespace Hsbot.Core.Messaging
             return context.SendMessage(context.Message.CreateResponse(text));
         }
 
-        public static Task SendTypingOnChannelResponse(this IInboundMessageContext context, string text)
+        public static Task SendTypingOnChannelResponse(this IInboundMessageContext context)
         {
             return context.SendMessage(context.Message.CreateTypingOnChannelResponse());
         }
