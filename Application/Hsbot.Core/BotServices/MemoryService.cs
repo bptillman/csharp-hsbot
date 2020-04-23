@@ -57,10 +57,12 @@ namespace Hsbot.Core.BotServices
             _botServiceContext = context;
 
             var existingMemories = _brain.GetItem<Dictionary<string, Memory>>(MemoriesBrainStorageKey);
-
-            foreach (var existingMemory in existingMemories)
+            if (existingMemories != null)
             {
-                _memories.TryAdd(existingMemory.Key, existingMemory.Value);
+                foreach (var existingMemory in existingMemories)
+                {
+                    _memories.TryAdd(existingMemory.Key, existingMemory.Value);
+                }
             }
 
             return Task.CompletedTask;
