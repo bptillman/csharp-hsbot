@@ -13,6 +13,13 @@ namespace Hsbot.Core.MessageHandlers
         private readonly Regex _nominationRegex = new Regex(@"hva *(to *|for *)?<@([a-zA-Z0-9.-]+)> *for *(DFE|PAV|COM|PLG|OWN|GRIT|HUMILITY|CANDOR|CURIOSITY|AGENCY) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly IJiraApiClient _jiraApiClient;
 
+        private readonly object[] _errorBarks = {
+            "My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:",
+            ":shrug: What you requested should have worked, BUT it didn't",
+            "Bad news: it didn't work :kaboom:; good news: I'm alive! I'm alive! :awesome: Wait, no...that is Johnny # 5, there is no good news :evil_burns:",
+            "https://media.giphy.com/media/owRSsSHHoVYFa/giphy.gif"
+        };
+
         public NominationMessageHandler(IJiraApiClient jiraApiClient, IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
         {
             _jiraApiClient = jiraApiClient;
@@ -81,9 +88,16 @@ namespace Hsbot.Core.MessageHandlers
             }
 
             var response = await _jiraApiClient.SubmitHva(nominatorJiraUser, nomineeJiraUser, reason, awardType);
+
+            if (response.Failed)
+            {
+                await context.SendMessage(message.CreateResponse(GetRandomCannedResponse(_errorBarks)));
+                return;
+            }
+
             await context.SendMessage(message.CreateResponse(response.Message));
 
-            if (response.Success && message.Channel != _bragAndAwardChannel)
+            if (message.Channel != _bragAndAwardChannel)
             {
                 var hvaSuccessMessage = new OutboundResponse
                 {

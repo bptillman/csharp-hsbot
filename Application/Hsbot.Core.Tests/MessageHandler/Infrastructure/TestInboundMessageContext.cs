@@ -14,7 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
         public InboundMessage Message { get; set; }
         public Func<OutboundResponse, Task> SendMessage { get; }
-        public Func<string, Task<IChatUser>> GetChatUserById { get; set; }
+        public Func<string, Task<IChatUser>> GetChatUserById { get; }
 
         public TestInboundMessageContext(InboundMessage message)
         {

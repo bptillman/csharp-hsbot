@@ -22,7 +22,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
             return Task.FromResult(new HvaResponse
             {
                 Message = HvaSuccessMessage,
-                Success = true,
+                Failed = false,
                 HvaKey = "theKey",
             });
         }

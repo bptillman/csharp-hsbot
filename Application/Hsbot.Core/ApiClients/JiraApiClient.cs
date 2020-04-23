@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Flurl.Http.Content;
 using Hsbot.Core.Infrastructure;
-using Hsbot.Core.Random;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -33,7 +32,7 @@ namespace Hsbot.Core.ApiClients
     {
         public string Message { get; set; }
         public string HvaKey { get; set; }
-        public bool Success { get; set; }
+        public bool Failed { get; set; }
     }
 
     public class JiraApiClient : IJiraApiClient
@@ -43,23 +42,14 @@ namespace Hsbot.Core.ApiClients
         private readonly string _hvaId = "11303";
         private readonly string _baseUrl = "https://headspring.atlassian.net/rest/api/2/";
 
-        private readonly string[] _errorBarks = {
-            "My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:",
-            ":shrug: What you requested should have worked, BUT it didn't",
-            "Bad news: it didn't work :kaboom:; good news: I'm alive! I'm alive! :awesome: Wait, no...that is Johnny # 5, there is no good news :evil_burns:",
-            "https://media.giphy.com/media/owRSsSHHoVYFa/giphy.gif"
-        };
-
         private readonly HttpClient _httpClient;
         private readonly IHsbotConfig _hsbotConfig;
-        private readonly IRandomNumberGenerator _randomNumberGenerator;
         private readonly ISystemClock _systemClock;
 
-        public JiraApiClient(HttpClient httpClient, IHsbotConfig hsbotConfig, IRandomNumberGenerator randomNumberGenerator, ISystemClock systemClock)
+        public JiraApiClient(HttpClient httpClient, IHsbotConfig hsbotConfig, ISystemClock systemClock)
         {
             _httpClient = httpClient;
             _hsbotConfig = hsbotConfig;
-            _randomNumberGenerator = randomNumberGenerator;
             _systemClock = systemClock;
         }
 
@@ -87,7 +77,7 @@ namespace Hsbot.Core.ApiClients
 
             if (!response.IsSuccessStatusCode)
             {
-                return new HvaResponse {Message = _errorBarks[_randomNumberGenerator.Generate(0, 3)]};
+                return new HvaResponse {Failed = true};
             }
 
             dynamic content = JObject.Parse(await response.Content.ReadAsStringAsync());
@@ -95,8 +85,7 @@ namespace Hsbot.Core.ApiClients
 
             return new HvaResponse
             {
-                Message = $"Your nomination of {nominee.DisplayName} for {awardType} was successfully retrieved and processed! [{issueKey}]",
-                Success = true,
+                Message = $"Your nomination of {nominee.DisplayName} for {awardType} was successfully retrieved and processed! [{issueKey}]"
             };
         }
 
