@@ -90,6 +90,16 @@ namespace Hsbot.Core.BotServices
         {
             if (_botServiceContext != null) throw new InvalidOperationException("Service is already started");
 
+            lock (_remindersLock)
+            {
+                var persistedReminders = _brain.GetItem<List<Reminder>>(BrainStorageKey);
+                _reminders.AddRange(persistedReminders);
+
+                //always sort after adding a new entry so we can be sure that the
+                //front of the list is next to expire
+                _reminders.Sort((lhs, rhs) => DateTime.Compare(lhs.ReminderDateInUtc, rhs.ReminderDateInUtc));
+            }
+
             _botServiceContext = context;
             _reminderTimerHandle = Observable.Interval(new TimeSpan(0, 0, 0, 1))
                 .Select(t => Observable.FromAsync(ct => ReminderTimerElapsed()))
