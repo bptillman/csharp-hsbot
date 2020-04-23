@@ -68,6 +68,11 @@ namespace Hsbot.Core.Tests.BotServices
             var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
+            var chatConnector = MockChatConnector();
+            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
+            var context = new BotServiceContext { Parent = hsbot };
+
+            await reminderService.Start(context);
 
             var pastDueReminder = new Reminder
             {
@@ -91,14 +96,9 @@ namespace Hsbot.Core.Tests.BotServices
             var reminderList = brain.GetItem<List<Reminder>>(ReminderService.BrainStorageKey);
             reminderList.Count.ShouldBe(2);
 
-            var chatConnector = MockChatConnector();
-            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
-            var context = new BotServiceContext {Parent = hsbot};
-
-            await reminderService.Start(context);
             await reminderService.ProcessReminders();
 
-            chatConnector.Verify(x => x.SendMessage(It.IsAny<OutboundResponse>()), Times.Exactly(2));
+            chatConnector.Verify(x => x.SendMessage(It.IsAny<OutboundResponse>()), Times.Once);
 
             reminderList = brain.GetItem<List<Reminder>>(ReminderService.BrainStorageKey);
             reminderList.Count.ShouldBe(1);
