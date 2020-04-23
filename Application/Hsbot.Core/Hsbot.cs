@@ -154,7 +154,7 @@ namespace Hsbot.Core
 
         private async Task StartServices()
         {
-            var servicesToStart = _botServices.OrderBy(s => s.StartupOrder);
+            var servicesToStart = _botServices.OrderBy(s => s.GetStartupOrder());
             var botServiceContext = new BotServiceContext {Parent = this};
 
             foreach (var botService in servicesToStart)
@@ -167,7 +167,7 @@ namespace Hsbot.Core
         private async Task ShutdownServices()
         {
             //shutdown in reverse order of startup
-            var servicesToStop = _botServices.OrderByDescending(s => s.StartupOrder);
+            var servicesToStop = _botServices.OrderByDescending(s => s.GetStartupOrder());
 
             foreach (var botService in servicesToStop)
             {

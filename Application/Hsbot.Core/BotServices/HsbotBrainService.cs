@@ -15,12 +15,17 @@ namespace Hsbot.Core.BotServices
 
         private IDisposable _brainChangedEventSubscription;
 
-        public int StartupOrder => 0;
-
         public HsbotBrainService(IBotBrainStorage<InMemoryBrain> botBrainStorage, IHsbotLog log)
         {
             _botBrainStorage = botBrainStorage;
             _log = log;
+        }
+
+        public static readonly int StartupOrder = BotStartupOrder.First;
+
+        public int GetStartupOrder()
+        {
+            return StartupOrder;
         }
 
         public async Task Start(BotServiceContext context)
