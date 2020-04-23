@@ -7,6 +7,7 @@ namespace Hsbot.Core
         string BrainStorageKey { get; }
         string BrainName { get; }
         string TumblrApiKey { get; }
+        string JiraApiKey { get; set; }
     }
 
     public class HsbotConfig : IHsbotConfig
@@ -16,5 +17,6 @@ namespace Hsbot.Core
       public string BrainStorageKey { get; set; }
       public string BrainName { get; set; }
       public string TumblrApiKey { get; set; }
+      public string JiraApiKey { get; set; }
     }
 }
