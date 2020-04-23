@@ -93,7 +93,10 @@ namespace Hsbot.Core.BotServices
             lock (_remindersLock)
             {
                 var persistedReminders = _brain.GetItem<List<Reminder>>(BrainStorageKey);
-                _reminders.AddRange(persistedReminders);
+                if (persistedReminders != null)
+                {
+                    _reminders.AddRange(persistedReminders);
+                }
 
                 //always sort after adding a new entry so we can be sure that the
                 //front of the list is next to expire
