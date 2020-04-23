@@ -35,7 +35,12 @@ namespace Hsbot.Core.BotServices
 
         public const string BrainStorageKey = "reminders";
 
-        public int StartupOrder => 1; //needs to start after brain
+        public static readonly int StartupOrder = BotStartupOrder.After(HsbotBrainService.StartupOrder);
+
+        public int GetStartupOrder()
+        {
+            return StartupOrder;
+        }
 
         public ReminderService(ISystemClock systemClock, IChatMessageTextFormatter chatMessageTextFormatter, IBotBrain brain)
         {

@@ -105,5 +105,13 @@ namespace Hsbot.Core.Tests.BotServices
             reminderList[0].Message.ShouldBe(futureReminder.Message);
             reminderList[0].ReminderDateInUtc.ShouldBe(futureReminder.ReminderDateInUtc);
         }
+
+        public void ShouldStartupAfterBrainService()
+        {
+            var reminderService = new ReminderService(new TestSystemClock(), new InlineChatMessageTextFormatter(), new FakeBrain());
+            var brainService = new HsbotBrainService(MockBrainStorage().Object, MockLog().Object);
+
+            reminderService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
+        }
     }
 }

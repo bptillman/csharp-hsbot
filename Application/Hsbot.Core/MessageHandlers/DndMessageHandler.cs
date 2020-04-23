@@ -47,7 +47,7 @@ namespace Hsbot.Core.MessageHandlers
                 total += rolls[i];
             }
 
-            return context.SendMessage(message.CreateResponse($"rolled a {total} ({string.Join(", ", rolls)})+{mod}"));
+            return context.SendResponse($"rolled a {total} ({string.Join(", ", rolls)})+{mod}");
         }
     }
 }

@@ -50,8 +50,8 @@
 
                 var map = _maps.GetMap(query, mapType);
 
-                await context.SendMessage(message.CreateResponse(map.ImageUrl));
-                await context.SendMessage(message.CreateResponse(map.Url));
+                await context.SendResponse(map.ImageUrl);
+                await context.SendResponse(map.Url);
             }
         }
     }

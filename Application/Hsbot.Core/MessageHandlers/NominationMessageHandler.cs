@@ -53,13 +53,13 @@ namespace Hsbot.Core.MessageHandlers
 
             if (!nominee.IsEmployee)
             {
-                await context.SendMessage(message.CreateResponse(":blush: Sorry, only employees can be nominated."));
+                await context.SendResponse(":blush: Sorry, only employees can be nominated.");
                 return;
             }
 
             if(nominee.Id == nominator.Id)
             {
-                await context.SendMessage(message.CreateResponse(":disapproval: nominating yourself is not allowed!"));
+                await context.SendResponse(":disapproval: nominating yourself is not allowed!");
                 return;
             }
 
@@ -71,7 +71,7 @@ namespace Hsbot.Core.MessageHandlers
 
             if (nomineeJiraUser.HasError)
             {
-                await context.SendMessage(message.CreateResponse($":doh: {nomineeJiraUser.Error}"));
+                await context.SendResponse($":doh: {nomineeJiraUser.Error}");
                 return;
             }
 
@@ -83,7 +83,7 @@ namespace Hsbot.Core.MessageHandlers
 
             if (nominatorJiraUser.HasError)
             {
-                await context.SendMessage(message.CreateResponse($":doh: {nominatorJiraUser.Error}"));
+                await context.SendResponse($":doh: {nominatorJiraUser.Error}");
                 return;
             }
 
@@ -91,11 +91,11 @@ namespace Hsbot.Core.MessageHandlers
 
             if (response.Failed)
             {
-                await context.SendMessage(message.CreateResponse(RandomNumberGenerator.GetRandomValue(_errorBarks)));
+                await context.SendResponse(RandomNumberGenerator.GetRandomValue(_errorBarks));
                 return;
             }
 
-            await context.SendMessage(message.CreateResponse(response.Message));
+            await context.SendResponse(response.Message);
 
             if (message.Channel != _bragAndAwardChannel)
             {

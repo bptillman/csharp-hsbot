@@ -61,7 +61,7 @@ namespace Hsbot.Core.MessageHandlers
 
             for (var i = 0; i < repliesNumber; i++)
             {
-                await context.SendMessage(message.CreateResponse(GetRandomCannedResponse()));
+                await context.SendResponse(GetRandomCannedResponse());
             }
         }
     }

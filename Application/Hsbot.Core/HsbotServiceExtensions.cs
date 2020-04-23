@@ -20,6 +20,7 @@ namespace Hsbot.Core
         {
             RegisterBrainServices(services);
             RegisterReminderServices(services);
+            RegisterMemoryServices(services);
             RegisterMessageHandlers(services);
 
             services.AddSingleton<IHsbotConfig>(svc => config);
@@ -46,6 +47,13 @@ namespace Hsbot.Core
             services.AddSingleton<HsbotBrainService>();
             services.AddSingleton<IBotBrain, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
             services.AddSingleton<IBotService, HsbotBrainService>(x => x.GetRequiredService<HsbotBrainService>());
+        }
+
+        private static void RegisterMemoryServices(IServiceCollection services)
+        {
+            services.AddSingleton<MemoryService>();
+            services.AddSingleton<IMemoryService, MemoryService>(x => x.GetRequiredService<MemoryService>());
+            services.AddSingleton<IBotService, MemoryService>(x => x.GetRequiredService<MemoryService>());
         }
 
         private static void RegisterMessageHandlers(IServiceCollection services)

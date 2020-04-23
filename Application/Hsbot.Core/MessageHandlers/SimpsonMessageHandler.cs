@@ -75,7 +75,7 @@
                 reply = e.Message;
             }
 
-            await context.SendMessage(message.CreateResponse(reply));
+            await context.SendResponse(reply);
         }
 
         private static async Task<FrinkiacImage[]> GetImages(string url)
