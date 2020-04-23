@@ -59,11 +59,13 @@ namespace Hsbot.Core.MessageHandlers
 
             var reminderResult = _reminderService.AddReminder(reminder);
 
-            await context.SendMessage(message.CreateResponse($"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}"));
+            var responseText = $"Ok, {_messageTextFormatter.FormatUserMention(reminder.UserId)}, I'll remind you to {action} on {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.DateNumeric)} at {_messageTextFormatter.FormatDate(reminderDateInUtc, DateFormat.TimeLong)}";
+            await context.SendResponse(responseText);
 
             if (reminderResult == PersistenceState.InMemoryOnly)
             {
-                await context.SendMessage(message.CreateResponse($"{_messageTextFormatter.Bold("Warning:")} my brain is currently on the fritz, so I won't remember your reminder if I'm rebooted"));
+                responseText = $"{_messageTextFormatter.Bold("Warning:")} my brain is currently on the fritz, so I won't remember your reminder if I'm rebooted";
+                await context.SendResponse(responseText);
             }
         }
 

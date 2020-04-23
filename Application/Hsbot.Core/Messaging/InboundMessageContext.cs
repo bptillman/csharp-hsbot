@@ -24,4 +24,17 @@ namespace Hsbot.Core.Messaging
         public Func<OutboundResponse, Task> SendMessage { get; }
         public Func<string, Task<IChatUser>> GetChatUserById { get; }
     }
+
+    public static class InboundMessageContextExtensions
+    {
+        public static Task SendResponse(this IInboundMessageContext context, string text)
+        {
+            return context.SendMessage(context.Message.CreateResponse(text));
+        }
+
+        public static Task SendTypingOnChannelResponse(this IInboundMessageContext context, string text)
+        {
+            return context.SendMessage(context.Message.CreateTypingOnChannelResponse());
+        }
+    }
 }

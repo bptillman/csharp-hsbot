@@ -75,12 +75,12 @@ namespace Hsbot.Core.MessageHandlers
 
             if (string.IsNullOrEmpty(roomSearch))
             {
-                return context.SendMessage(message.CreateResponse("Gimme a room name to look for!"));
+                return context.SendResponse("Gimme a room name to look for!");
             }
 
             if (!_rooms.ContainsKey(roomSearch))
             {
-                return context.SendMessage(message.CreateResponse(GetRandomCannedResponse(roomSearch)));
+                return context.SendResponse(GetRandomCannedResponse(roomSearch));
             }
 
             var room = _rooms[roomSearch];
@@ -93,7 +93,7 @@ namespace Hsbot.Core.MessageHandlers
                 }));
             }
 
-            return context.SendMessage(message.CreateResponse(room));
+            return context.SendResponse(room);
         }
     }
 }

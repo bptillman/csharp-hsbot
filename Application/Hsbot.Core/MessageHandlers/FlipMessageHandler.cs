@@ -56,7 +56,7 @@ namespace Hsbot.Core.MessageHandlers
             }
 
             var flippedText = FlipText(match.Groups[1].Value);
-            return context.SendMessage(message.CreateResponse(string.Format(responseText, flippedText)));
+            return context.SendResponse(string.Format(responseText, flippedText));
         }
 
         private string FlipText(string text)

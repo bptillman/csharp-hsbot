@@ -48,7 +48,7 @@ namespace Hsbot.Core.MessageHandlers
             for (var i = 0; i < numberOfCats; i++)
             {
                 var photo = RandomNumberGenerator.GetRandomValue(photos);
-                await context.SendMessage(message.CreateResponse(photo.Url));
+                await context.SendResponse(photo.Url);
             }
         }
     }
