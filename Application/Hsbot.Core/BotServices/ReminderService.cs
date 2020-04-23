@@ -94,6 +94,10 @@ namespace Hsbot.Core.BotServices
             {
                 var persistedReminders = _brain.GetItem<List<Reminder>>(BrainStorageKey);
                 _reminders.AddRange(persistedReminders);
+
+                //always sort after adding a new entry so we can be sure that the
+                //front of the list is next to expire
+                _reminders.Sort((lhs, rhs) => DateTime.Compare(lhs.ReminderDateInUtc, rhs.ReminderDateInUtc));
             }
 
             _botServiceContext = context;
