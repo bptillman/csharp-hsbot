@@ -11,28 +11,23 @@ namespace Hsbot.Core.ApiClients
 {
     public interface IJiraApiClient
     {
-        Task<HvaResponse> SubmitHva(
-            JiraUser nominator,
-            JiraUser nominee,
+        Task<SubmissionResponse> SubmitHva(
+            IUser nominator,
+            IUser nominee,
             string description,
             string awardType);
 
-        Task<JiraUser> GetUser(string search);
+        Task<SubmissionResponse> SubmitBrag(
+            IUser nominator,
+            IUser nominee,
+            string description);
     }
 
-    public class JiraUser
+    public class SubmissionResponse
     {
-        public string AccountId { get; set; }
-        public string DisplayName { get; set; }
-        public string Error { get; set; }
-        public bool HasError => !string.IsNullOrEmpty(Error);
-    }
-
-    public class HvaResponse
-    {
-        public string Message { get; set; }
-        public string HvaKey { get; set; }
+        public string Key { get; set; }
         public bool Failed { get; set; }
+        public string FailureResponse { get; set; }
     }
 
     public class JiraApiClient : IJiraApiClient
@@ -40,6 +35,7 @@ namespace Hsbot.Core.ApiClients
         private readonly string _projectKey = "NOM";
         private readonly string _projectId = "14701";
         private readonly string _hvaId = "11303";
+        private readonly string _bragId = "11304";
         private readonly string _baseUrl = "https://headspring.atlassian.net/rest/api/2/";
 
         private readonly HttpClient _httpClient;
@@ -53,23 +49,69 @@ namespace Hsbot.Core.ApiClients
             _systemClock = systemClock;
         }
 
-        public async Task<HvaResponse> SubmitHva(JiraUser nominator, JiraUser nominee, string description, string awardType)
+        public async Task<SubmissionResponse> SubmitHva(IUser nominator, IUser nominee, string description, string awardType)
         {
-            var awardText = GetHvaJiraAwardText(awardType);
+            var nominatorJiraUser = await GetJiraUser(nominator);
+            if (nominatorJiraUser.HasError)
+            {
+                return new SubmissionResponse { Failed = true, FailureResponse = nominatorJiraUser.Error };
+            }
+
+            var nomineeJiraUser = await GetJiraUser(nominee);
+            if (nomineeJiraUser.HasError)
+            {
+                return new SubmissionResponse { Failed = true, FailureResponse = nomineeJiraUser.Error };
+            }
+
             var body = new
             {
                 fields = new
                 {
                     project = new {key = _projectKey, id = _projectId},
                     issuetype = new {id = _hvaId},
-                    customfield_12100 = new {id = nominee.AccountId},
-                    customfield_12101 = new {value = awardText},
+                    customfield_12100 = new {id = nomineeJiraUser.AccountId},
+                    customfield_12101 = new {value = GetHvaJiraAwardText(awardType)},
                     description = description,
-                    summary = $"{nominator.DisplayName} nominates {nominee.DisplayName} on {_systemClock.UtcNow:MMM dd, yyyy}",
-                    reporter = new {id = nominator.AccountId}
+                    summary = $"{nominatorJiraUser.DisplayName} nominates {nomineeJiraUser.DisplayName} on {_systemClock.UtcNow:MMM dd, yyyy}",
+                    reporter = new {id = nominatorJiraUser.AccountId}
                 }
             };
 
+            return await SendSubmissionToJira(body);
+        }
+
+        public async Task<SubmissionResponse> SubmitBrag(IUser nominator, IUser nominee, string description)
+        {
+            var nominatorJiraUser = await GetJiraUser(nominator);
+            if (nominatorJiraUser.HasError)
+            {
+                return new SubmissionResponse {Failed = true, FailureResponse = nominatorJiraUser.Error};
+            }
+
+            var nomineeJiraUser = await GetJiraUser(nominee);
+            if (nomineeJiraUser.HasError)
+            {
+                return new SubmissionResponse {Failed = true, FailureResponse = nomineeJiraUser.Error};
+            }
+
+            var body = new
+            {
+                fields = new
+                {
+                    project = new {key = _projectKey, id = _projectId},
+                    issuetype = new {id = _bragId},
+                    customfield_12100 = new {id = nomineeJiraUser.AccountId},
+                    description = description,
+                    summary = $"{nominatorJiraUser.DisplayName} brags about {nomineeJiraUser.DisplayName} on {_systemClock.UtcNow:MMM dd, yyyy}",
+                    reporter = new {id = nominatorJiraUser.AccountId}
+                }
+            };
+
+            return await SendSubmissionToJira(body);
+        }
+
+        private async Task<SubmissionResponse> SendSubmissionToJira(object body)
+        {
             var request = new HttpRequestMessage(HttpMethod.Post, $"{_baseUrl}/issue");
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", _hsbotConfig.JiraApiKey);
             request.Content = new CapturedJsonContent(JsonConvert.SerializeObject(body));
@@ -77,15 +119,15 @@ namespace Hsbot.Core.ApiClients
 
             if (!response.IsSuccessStatusCode)
             {
-                return new HvaResponse {Failed = true};
+                return new SubmissionResponse { Failed = true };
             }
 
             dynamic content = JObject.Parse(await response.Content.ReadAsStringAsync());
             var issueKey = content.key;
 
-            return new HvaResponse
+            return new SubmissionResponse
             {
-                Message = $"Your nomination of {nominee.DisplayName} for {awardType} was successfully retrieved and processed! [{issueKey}]"
+                Key = issueKey,
             };
         }
 
@@ -113,7 +155,18 @@ namespace Hsbot.Core.ApiClients
             }
         }
 
-        public async Task<JiraUser> GetUser(string search)
+        private async Task<JiraUser> GetJiraUser(IUser user)
+        {
+            var nomineeJiraUser = await GetUser(user.Email);
+            if (nomineeJiraUser.HasError)
+            {
+                nomineeJiraUser = await GetUser(user.FullName);
+            }
+
+            return nomineeJiraUser;
+        }
+
+        private async Task<JiraUser> GetUser(string search)
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{_baseUrl}/user/picker?query={search}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", _hsbotConfig.JiraApiKey);// Convert.ToBase64String(Encoding.UTF8.GetBytes(_hsbotConfig.JiraApiToken)));
@@ -153,6 +206,14 @@ namespace Hsbot.Core.ApiClients
             {
                 Error = "Something went wrong...Jira user search failed."
             };
+        }
+
+        private class JiraUser
+        {
+            public string AccountId { get; set; }
+            public string DisplayName { get; set; }
+            public string Error { get; set; }
+            public bool HasError => !string.IsNullOrEmpty(Error);
         }
     }
 }

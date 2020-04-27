@@ -1,10 +1,9 @@
-﻿namespace Hsbot.Core.Connection
+﻿namespace Hsbot.Core
 {
-    public interface IChatUser
+    public interface IUser
     {
         string Id { get; }
         string Email { get; }
-        string DisplayName { get; }
         string FullName { get; }
         bool IsEmployee { get; }
     }

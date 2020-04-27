@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Hsbot.Core.ApiClients;
 using Hsbot.Core.MessageHandlers;
+using Hsbot.Core.MessageHandlers.Celebrations;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
@@ -11,8 +12,8 @@ namespace Hsbot.Core.Tests.MessageHandler
     public class NominationMessageHandlerTests : MessageHandlerTestBase<NominationMessageHandler>
     {
         private readonly string _bragRoom = "CE9K4LTFD";
-        private readonly HvaResponse _hvaSuccessResponse = new HvaResponse {HvaKey = "theKey", Message = "Success"};
-        private readonly HvaResponse _hvaFailureResponse = new HvaResponse {Failed = true};
+        private readonly SubmissionResponse _successResponse = new SubmissionResponse {Key = "theKey"};
+        private readonly SubmissionResponse _failureResponse = new SubmissionResponse {Failed = true};
         private readonly string _jiraErrorMessage = "I failed...";
 
         protected override string[] MessageTextsThatShouldBeHandled => new []
@@ -21,13 +22,22 @@ namespace Hsbot.Core.Tests.MessageHandler
             "hva for <@bob> for dfe because",
             "hva to <@bob> for dfe this is a long time coming",
             "hva <@bob> for dfe this is a long time coming",
+            "brag for <@bob> for this is a long time coming",
+            "brag for <@bob> for because",
+            "brag to <@bob> for this is a long time coming",
+            "brag <@bob> for this is a long time coming",
+            "brag <@bob>,<@doug> for this is a long time coming",
+            "brag <@bob> & <@doug> for this is a long time coming",
+            "brag <@bob> <@doug> for this is a long time coming",
         };
         protected override string[] MessageTextsThatShouldNotBeHandled => new[]
         {
             "hva for bob for dfe this is a long time coming",
             "hva for <@bob> for dfe",
             "hva for <@bob> for something i don't know the names of the awards",
-            "hva for <@bob> dfe something to test"
+            "hva for <@bob> dfe something to test",
+            "brag for bob for this is a long time coming",
+            "brag for <@bob>",
         };
 
         public async Task ShouldSayCannotGiveHvaForNonEmployee()
@@ -39,78 +49,67 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(":blush: Sorry, only employees can be nominated.");
+            context.SentMessages.First().Text.ShouldBe(":blush: Sorry, only employees can be celebrated.");
         }
 
         public async Task ShouldNotAllowSelfNominations()
         {
             var messageHandler = GetHandlerInstance();
-            var message = GetMessage(messageHandler, "hva to <@nobody> for dfe this bot is great");
+            var message = GetMessage(messageHandler, "hva to <@nobody> for dfe this person is great");
             var context = GetMessageContext(message);
 
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(":disapproval: nominating yourself is not allowed!");
-        }
-
-        public async Task ShouldReturnMessageIfUserNotFoundInJira()
-        {
-            var messageHandler = GetHandlerInstance();
-            var message = GetMessage(messageHandler, "hva to <@notInJira> for dfe this bot is great");
-            var context = GetMessageContext(message);
-
-            await messageHandler.HandleAsync(context);
-
-            context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe($":doh: {_jiraErrorMessage}");
+            context.SentMessages.First().Text.ShouldBe(":disapproval: celebrating yourself is not allowed!");
         }
 
         public async Task ShouldMessageToBragRoomWhenNotInBragRoom()
         {
             var messageHandler = GetHandlerInstance();
-            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this bot is great");
+            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this person is great");
             message.Channel = "randomRoom";
             var context = GetMessageContext(message);
 
             await messageHandler.HandleAsync(context);
 
-            context.SentMessages
-                .SingleOrDefault(x => x.Channel == message.Channel && x.Text == _hvaSuccessResponse.Message)
-                .ShouldNotBeNull();
-            context.SentMessages
-                .SingleOrDefault(x => x.Channel == _bragRoom && x.Text == "bob exhibits *_dfe_*\nthis bot is great\nnominated by: _nobody_\ntheKey")
-                .ShouldNotBeNull();
+            var firstMessage = context.SentMessages[0]; 
+            firstMessage.Channel.ShouldBe(message.Channel);
+            firstMessage.Text.ShouldBe("Your celebration for bob [theKey] was successfully retrieved and processed!");
+
+            var secondMessage = context.SentMessages[1];
+            secondMessage.Channel.ShouldBe(_bragRoom);
+            secondMessage.Text.ShouldBe("bob exhibits *_dfe_*\nthis person is great\nnominated by: _nobody_\ntheKey");
         }
 
         public async Task ShouldNotMessageToBragRoomWhenInBragRoom()
         {
             var messageHandler = GetHandlerInstance();
-            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this bot is great");
+            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this person is great");
             message.Channel = _bragRoom;
             var context = GetMessageContext(message);
 
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(_hvaSuccessResponse.Message);
+            context.SentMessages.First().Text.ShouldBe("Your celebration for bob [theKey] was successfully retrieved and processed!");
         }
 
         public async Task ShouldReturnCannedResponse()
         {
-            var messageHandler = GetHandlerInstance(_hvaFailureResponse);
-            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this bot is great");
+            var messageHandler = GetHandlerInstance(_failureResponse);
+            var message = GetMessage(messageHandler, "hva to <@bob> for dfe this person is great");
             var context = GetMessageContext(message);
 
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe("My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:");
+            context.SentMessages.First().Text.ShouldBe(":doh: My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:");
         }
 
         protected override NominationMessageHandler GetHandlerInstance()
         {
-            return GetHandlerInstance(_hvaSuccessResponse);
+            return GetHandlerInstance(_successResponse);
         }
 
         protected TestInboundMessageContext GetMessageContext(InboundMessage inboundMessage)
@@ -119,10 +118,10 @@ namespace Hsbot.Core.Tests.MessageHandler
             {
                 ChatUsers =
                 {
-                    {"bob", new TestChatUser {Id = "bob", IsEmployee = true, Email = "bob@bob.com", FullName="bob"}},
+                    {"bob", new TestChatUser {Id = "bob", IsEmployee = true, Email = "bob@bob.com", FullName = "bob"}},
                     {"bot", new TestChatUser {IsEmployee = false}},
-                    {"nobody", new TestChatUser {Id = "nobody", IsEmployee = true, FullName="nobody"}},
-                    {"notInJira", new TestChatUser {Id = "notInJira", IsEmployee = true}},
+                    {"notInJira", new TestChatUser {IsEmployee = true}},
+                    {"nobody", new TestChatUser {Id = "nobody", IsEmployee = true, FullName = "nobody"}},
                 }
             };
         }
@@ -148,7 +147,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             return inboundMessage;
         }
 
-        private NominationMessageHandler GetHandlerInstance(HvaResponse hvaResponse)
+        private NominationMessageHandler GetHandlerInstance(SubmissionResponse hvaResponse)
         {
             //Since this RNG will always return 0, the check on the random roll in the handler will
             //always succeed, meaning the random roll will not cause the result of ShouldHandle
@@ -158,15 +157,13 @@ namespace Hsbot.Core.Tests.MessageHandler
             var jiraApiClient = new TestJiraApiClient
             {
                 ErrorMessage = _jiraErrorMessage,
-                HvaResponse = hvaResponse,
-                Users = new[]
-                {
-                    new TestJiraUser {DisplayName = "bobby", Email = "bob@bob.com"},
-                    new TestJiraUser {DisplayName = "nobody", Email = "nobody@nobody.com"},
-                }
+                SubmissionResponse = hvaResponse,
             };
 
-            var handler = new NominationMessageHandler(jiraApiClient, rng);
+            ICelebration nominationCelebration = new BragCelebration(jiraApiClient);
+            ICelebration bragCelebration = new NominationCelebration(jiraApiClient, rng);
+
+            var handler = new NominationMessageHandler(new[] {bragCelebration, nominationCelebration}, rng);
 
             return handler;
         }

@@ -14,7 +14,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
 
         public InboundMessage Message { get; set; }
         public Func<OutboundResponse, Task> SendMessage { get; }
-        public Func<string, Task<IChatUser>> GetChatUserById { get; }
+        public Func<string, Task<IUser>> GetChatUserById { get; }
 
         public TestInboundMessageContext(InboundMessage message)
         {
@@ -24,7 +24,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
                 SentMessages.Add(r);
                 return Task.CompletedTask;
             };
-            GetChatUserById = id => Task.FromResult((IChatUser) ChatUsers[id]);
+            GetChatUserById = id => Task.FromResult((IUser) ChatUsers[id]);
         }
     }
 }

@@ -8,6 +8,9 @@ namespace Hsbot.Core.Tests
         {
             Methods
                 .Where(x => x.Name != "SetUp");
+
+            Parameters
+                .Add<TestCaseSourceAttributeParameterSource>();
         }
 
         public void Execute(TestClass testClass)
