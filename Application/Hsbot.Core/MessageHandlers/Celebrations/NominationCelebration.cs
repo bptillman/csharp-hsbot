@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Hsbot.Core.ApiClients;
+using Hsbot.Core.MessageHandlers.Helpers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
 
@@ -53,7 +54,7 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
         {
             var (awardType, reason) = GetAwardTypeAndReason(match);
             var (fullName, key) = successes.First();
-            return $"{fullName} exhibits *_{awardType}_*\n{reason}\nnominated by: _{nominatorName}_\n{key}";
+            return $"{fullName} exhibits *_{awardType.ToJiraAwardText()}_* {reason} nominated by: _{nominatorName}_ [{key}]";
         }
 
         private static (string awardType, string reason) GetAwardTypeAndReason(Match match)

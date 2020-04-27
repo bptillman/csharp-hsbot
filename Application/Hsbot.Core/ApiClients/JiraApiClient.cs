@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Flurl.Http.Content;
 using Hsbot.Core.Infrastructure;
+using Hsbot.Core.MessageHandlers.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -70,7 +71,7 @@ namespace Hsbot.Core.ApiClients
                     project = new {key = _projectKey, id = _projectId},
                     issuetype = new {id = _hvaId},
                     customfield_12100 = new {id = nomineeJiraUser.AccountId},
-                    customfield_12101 = new {value = GetHvaJiraAwardText(awardType)},
+                    customfield_12101 = new {value = awardType.ToJiraAwardText()},
                     description = description,
                     summary = $"{nominatorJiraUser.DisplayName} nominates {nomineeJiraUser.DisplayName} on {_systemClock.UtcNow:MMM dd, yyyy}",
                     reporter = new {id = nominatorJiraUser.AccountId}
@@ -129,30 +130,6 @@ namespace Hsbot.Core.ApiClients
             {
                 Key = issueKey,
             };
-        }
-
-        private string GetHvaJiraAwardText(string awardType)
-        {
-            switch (awardType.ToLower())
-            {
-                case "dfe":
-                case "grit":
-                    return "Drive for Excellence";
-                case "pav":
-                case "humility":
-                    return "People are Valued";
-                case "com":
-                case "candor":
-                    return "Honest Communication";
-                case "plg":
-                case "curiosity":
-                    return "Passion for Learning and Growth";
-                case "own":
-                case "agency":
-                    return "Own Your Experience";
-                default:
-                    return null;
-            }
         }
 
         private async Task<JiraUser> GetJiraUser(IUser user)

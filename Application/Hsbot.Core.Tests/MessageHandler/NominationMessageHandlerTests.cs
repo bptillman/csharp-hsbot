@@ -22,9 +22,9 @@ namespace Hsbot.Core.Tests.MessageHandler
             "hva for <@bob> for dfe because",
             "hva to <@bob> for dfe this is a long time coming",
             "hva <@bob> for dfe this is a long time coming",
-            "brag for <@bob> for this is a long time coming",
-            "brag for <@bob> for because",
-            "brag to <@bob> for this is a long time coming",
+            "brag on <@bob> for this is a long time coming",
+            "brag about <@bob> for because",
+            "brag on <@bob> for this is a long time coming",
             "brag <@bob> for this is a long time coming",
             "brag <@bob>,<@doug> for this is a long time coming",
             "brag <@bob> & <@doug> for this is a long time coming",
@@ -36,8 +36,8 @@ namespace Hsbot.Core.Tests.MessageHandler
             "hva for <@bob> for dfe",
             "hva for <@bob> for something i don't know the names of the awards",
             "hva for <@bob> dfe something to test",
-            "brag for bob for this is a long time coming",
-            "brag for <@bob>",
+            "brag on bob for this is a long time coming",
+            "brag about <@bob>",
         };
 
         public async Task ShouldSayCannotGiveHvaForNonEmployee()
@@ -79,7 +79,6 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             var secondMessage = context.SentMessages[1];
             secondMessage.Channel.ShouldBe(_bragRoom);
-            secondMessage.Text.ShouldBe("bob exhibits *_dfe_*\nthis person is great\nnominated by: _nobody_\ntheKey");
         }
 
         public async Task ShouldNotMessageToBragRoomWhenInBragRoom()

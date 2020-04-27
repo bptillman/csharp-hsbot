@@ -34,7 +34,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Celebrations
         {
             var celebration = new BragCelebration(new TestJiraApiClient());
 
-            var match = celebration.GetMatch(new InboundMessage { TextWithoutBotName = "brag for <@bob> for this is a long time coming" });
+            var match = celebration.GetMatch(new InboundMessage { TextWithoutBotName = "brag on <@bob> for this is a long time coming" });
 
             var message = celebration.GetAwardRoomMessage(new[] {("bob", "123")}, "doug", match);
             message.ShouldBe("Kudos to *bob* for this is a long time coming bragged by: _doug_ [123]");
@@ -42,17 +42,16 @@ namespace Hsbot.Core.Tests.MessageHandler.Celebrations
 
         private static IEnumerable<object[]> GetMessagesToTestMatching() => new List<object[]>
         {
-            new object[] {"brag for <@bob> for this is a long time coming", true},
-            new object[] {"brag for <@bob> for because", true},
-            new object[] {"brag to <@bob> for this is a long time coming", true},
+            new object[] {"brag about <@bob> for this is a long time coming", true},
+            new object[] {"brag on <@bob> for this is a long time coming", true},
             new object[] {"brag <@bob> for this is a long time coming", true},
             new object[] {"brag <@bob>,<@doug> for this is a long time coming", true},
             new object[] {"brag <@bob> & <@doug> for this is a long time coming", true},
             new object[] {"brag <@bob> <@doug> for this is a long time coming", true},
             new object[] {"brag <@bob> <@doug> this is a long time coming", true},
 
-            new object[] {"brag for bob for this is a long time coming", false},
-            new object[] {"brag for <@bob>", false},
+            new object[] {"brag on bob for this is a long time coming", false},
+            new object[] {"brag about <@bob>", false},
         };
 
         private static IEnumerable<object[]> GetMessagesToTestUserParsing => new List<object[]>
@@ -61,6 +60,14 @@ namespace Hsbot.Core.Tests.MessageHandler.Celebrations
             new object[] {"brag <@bob>,<@doug> for this is a long time coming", new[] {"bob", "doug"}},
             new object[] {"brag <@bob> & <@doug> for this is a long time coming", new[] {"bob", "doug"}},
             new object[] {"brag <@bob> <@doug> for this is a long time coming", new[] {"bob", "doug"}},
+            new object[] {"brag <@bob> and <@doug> for this is a long time coming", new[] {"bob", "doug"}},
+            new object[] {"brag <@bob>, <@carl> and <@doug> for this is a long time coming", new[] {"bob", "carl", "doug"}},
+            new object[] {"brag <@bob> <@carl> <@doug> for this is a long time coming", new[] {"bob", "carl", "doug"}},
+            new object[] {"brag <@bob>,<@carl>,<@doug> for this is a long time coming", new[] {"bob", "carl", "doug"}},
+            new object[] {"brag <@bob>,<@carl>&<@doug> for this is a long time coming", new[] {"bob", "carl", "doug"}},
+            new object[] {"brag <@bob>,<@sandy>,<@carl>&<@doug> for this is a long time coming", new[] {"bob", "sandy", "carl", "doug"}},
+            new object[] {"brag <@bob><@sandy><@carl><@doug> for this is a long time coming", new[] {"bob", "sandy", "carl", "doug"}},
+            new object[] {"brag <@bob>&<@sandy>&<@carl>&<@doug> for this is a long time coming", new[] {"bob", "sandy", "carl", "doug"}},
         };
     }
 }

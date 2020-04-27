@@ -9,7 +9,8 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
 {
     public class BragCelebration : ICelebration
     {
-        private readonly Regex _bragRegex = new Regex(@"brag *(to *|for *|on *)? *((<@([a-zA-Z0-9.-]+)>( *, * and *| *, *& *| *, *| *and*| *& *| *| * and *)?)+) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _bragRegex = new Regex(@"brag* (on|about)? *((<@([a-zA-Z0-9.-]+)>( *, * and *| *, *& *| *, *| *and *| *& *| *)?)+) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         private readonly IJiraApiClient _jiraApiClient;
 
         public BragCelebration(IJiraApiClient jiraApiClient)

@@ -36,7 +36,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Celebrations
             var match = celebration.GetMatch(new InboundMessage { TextWithoutBotName = "hva for <@bob> for dfe this is a long time coming" });
 
             var message = celebration.GetAwardRoomMessage(new[] {("bob", "123")}, "doug", match);
-            message.ShouldBe("bob exhibits *_dfe_*\nthis is a long time coming\nnominated by: _doug_\n123");
+            message.ShouldBe("bob exhibits *_Drive for Excellence_* this is a long time coming nominated by: _doug_ [123]");
         }
 
         private static IEnumerable<object[]> GetMessagesToTestMatching() => new List<object[]>
