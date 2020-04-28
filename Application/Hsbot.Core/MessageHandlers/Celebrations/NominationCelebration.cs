@@ -31,8 +31,8 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
 
         public MessageHandlerDescriptor CommandDescriptor => new MessageHandlerDescriptor
         {
-            Command = "hsbot hva [to|for] @coworker for awardAcronym nominationText",
-            Description = "Coworker and nominationText are required, awardAcronym must be one of:\n\tDFE or GRIT (Drive for Excellence)\n\tPAV or HUMILITY (People are Valued)\n\tCOM or CANDOR (Honest Communication)\n\tPLG or CURIOSITY (Passion for Learning and Growth)\n\tOWN or AGENCY (Own Your Experience)"
+            Command = "hsbot hva to | for <<@coworker>> for >awardAcronym> <nominationText>",
+            Description = "<<@coworker>>, <awardAcronym> and <nominationText> are required, <awardAcronym> must be one of:\n\tDFE or GRIT (Drive for Excellence)\n\tPAV or HUMILITY (People are Valued)\n\tCOM or CANDOR (Honest Communication)\n\tPLG or CURIOSITY (Passion for Learning and Growth)\n\tOWN or AGENCY (Own Your Experience)"
         };
 
         public Match GetMatch(InboundMessage message) => message.Match(_nominationRegex);

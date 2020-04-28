@@ -20,8 +20,8 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
 
         public MessageHandlerDescriptor CommandDescriptor => new MessageHandlerDescriptor
         {
-            Command = "hsbot brag [on|about] @coworker bragText",
-            Description = "bragText and at least one @coworker are required\n\tmultiple @coworker's can be bragged simultaneously when separated by spaces, and, &, or commas (Oxford or otherwise)"
+            Command = "hsbot brag on | about <<@coworker>> <bragText>",
+            Description = "<bragText> and at least one <<@coworker>> are required\n\tmultiple <<@coworker>>'s can be bragged simultaneously when separated by spaces, and, &, or commas (Oxford or otherwise)"
         };
 
         public Match GetMatch(InboundMessage message) => message.Match(_bragRegex);
