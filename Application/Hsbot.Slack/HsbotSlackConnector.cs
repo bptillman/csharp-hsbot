@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -142,21 +141,21 @@ namespace Hsbot.Slack
             }
         }
 
-        public async Task<IUser> GetChatUserById(string userId)
+        public Task<IUser> GetChatUserById(string userId)
         {
-            if (!_connection.UserCache.TryGetValue(userId, out var user))
+            if (_connection.UserCache.TryGetValue(userId, out var user))
             {
-                var users = await _connection.GetUsers();
-                user = users.Single(x => x.Id == userId);
+                return Task.FromResult((IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                });
             }
 
-            return new SlackUser
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = $"{user.FirstName} {user.LastName}",
-                IsEmployee = !user.IsBot && !user.IsGuest,
-            };
+            return null;
+        }
         }
 
         private async Task<SlackChatHub> GetChatHub(ResponseBase response)
