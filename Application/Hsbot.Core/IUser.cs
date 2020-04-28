@@ -1,4 +1,6 @@
-﻿namespace Hsbot.Core
+﻿using System;
+
+namespace Hsbot.Core
 {
     public interface IUser
     {
@@ -6,5 +8,6 @@
         string Email { get; }
         string FullName { get; }
         bool IsEmployee { get; }
+        TimeSpan TimeZoneOffset { get; }
     }
 }

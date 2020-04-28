@@ -1,4 +1,5 @@
-﻿using Hsbot.Core;
+﻿using System;
+using Hsbot.Core;
 
 namespace Hsbot.Slack
 {
@@ -8,5 +9,6 @@ namespace Hsbot.Slack
         public string Email { get; set; }
         public string FullName { get; set; }
         public bool IsEmployee { get; set; }
+        public TimeSpan TimeZoneOffset { get; set; }
     }
 }
