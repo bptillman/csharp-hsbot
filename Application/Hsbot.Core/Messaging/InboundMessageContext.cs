@@ -8,12 +8,12 @@ namespace Hsbot.Core.Messaging
     {
         InboundMessage Message { get; }
         Func<OutboundResponse, Task> SendMessage { get; }
-        Func<string, Task<IChatUser>> GetChatUserById { get; }
+        Func<string, Task<IUser>> GetChatUserById { get; }
     }
 
     public class InboundMessageContext : IInboundMessageContext
     {
-        public InboundMessageContext(InboundMessage message, Func<OutboundResponse, Task> sendMessageFunc, Func<string, Task<IChatUser>> getChatUserByIdFunc)
+        public InboundMessageContext(InboundMessage message, Func<OutboundResponse, Task> sendMessageFunc, Func<string, Task<IUser>> getChatUserByIdFunc)
         {
             Message = message;
             SendMessage = sendMessageFunc;
@@ -22,7 +22,7 @@ namespace Hsbot.Core.Messaging
         
         public InboundMessage Message { get; }
         public Func<OutboundResponse, Task> SendMessage { get; }
-        public Func<string, Task<IChatUser>> GetChatUserById { get; }
+        public Func<string, Task<IUser>> GetChatUserById { get; }
     }
 
     public static class InboundMessageContextExtensions

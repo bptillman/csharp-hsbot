@@ -9,7 +9,6 @@ using Hsbot.Core.Messaging;
 using SlackConnector;
 using SlackConnector.EventHandlers;
 using SlackConnector.Models;
-using SocketLite.Services;
 
 namespace Hsbot.Slack
 {
@@ -131,7 +130,7 @@ namespace Hsbot.Slack
             }
         }
 
-        public async Task<IChatUser> GetChatUserById(string userId)
+        public async Task<IUser> GetChatUserById(string userId)
         {
             if (!_connection.UserCache.TryGetValue(userId, out var user))
             {
@@ -143,7 +142,6 @@ namespace Hsbot.Slack
             {
                 Id = user.Id,
                 Email = user.Email,
-                DisplayName = user.Name,
                 FullName = $"{user.FirstName} {user.LastName}",
                 IsEmployee = !user.IsBot && !user.IsGuest,
             };

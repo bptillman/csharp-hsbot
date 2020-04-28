@@ -7,6 +7,7 @@ using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Maps;
+using Hsbot.Core.MessageHandlers.Celebrations;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Random;
@@ -21,6 +22,7 @@ namespace Hsbot.Core
             RegisterBrainServices(services);
             RegisterReminderServices(services);
             RegisterMemoryServices(services);
+            RegisterCelebrations(services);
             RegisterMessageHandlers(services);
 
             services.AddSingleton<IHsbotConfig>(svc => config);
@@ -59,6 +61,11 @@ namespace Hsbot.Core
         private static void RegisterMessageHandlers(IServiceCollection services)
         {
             RegisterImplementationsOfInterface<IInboundMessageHandler>(services, ServiceLifetime.Singleton);
+        }
+
+        private static void RegisterCelebrations(IServiceCollection services)
+        {
+            RegisterImplementationsOfInterface<ICelebration>(services, ServiceLifetime.Singleton);
         }
 
         private static void RegisterImplementationsOfInterface<T>(IServiceCollection services, ServiceLifetime serviceLifetime)
