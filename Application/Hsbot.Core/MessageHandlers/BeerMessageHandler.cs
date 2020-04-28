@@ -43,7 +43,7 @@ namespace Hsbot.Core.MessageHandlers
                 ? message.CreateResponse("Coffee? How about a beer?")
                 : message.CreateResponse(GetRandomCannedResponse());
 
-            return messageContext.SendMessage(response);
+            return messageContext.SendResponse(response);
         }
 
         protected override bool CanHandle(InboundMessage message)

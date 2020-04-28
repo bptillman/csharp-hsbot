@@ -48,7 +48,7 @@
             if (command.CommandType == CommandType.None)
                 return;
 
-            await context.SendMessage(message.CreateTypingOnChannelResponse());
+            await context.SendTypingOnChannelResponse();
 
             var quote = HttpUtility.UrlEncode(command.Quote);
             var requestUrl = $"{FrinkiacUrl}{quote}";

@@ -24,8 +24,7 @@ namespace Hsbot.Core.MessageHandlers
         public override async Task HandleAsync(IInboundMessageContext context)
         {
             var message = context.Message;
-            await context.SendMessage(message.CreateResponse(
-                $"Channel: {message.Channel}\nChannel name: {message.ChannelName}"));
+            await context.SendResponse($"Channel: {message.Channel}\nChannel name: {message.ChannelName}");
         }
     }
 }

@@ -87,10 +87,10 @@ namespace Hsbot.Core.MessageHandlers
 
             if (room.StartsWith("http"))
             {
-                return context.SendMessage(message.CreateResponse(null, new Attachment
+                return context.SendResponse(null, new Attachment
                 {
                     ImageUrl = room
-                }));
+                });
             }
 
             return context.SendResponse(room);

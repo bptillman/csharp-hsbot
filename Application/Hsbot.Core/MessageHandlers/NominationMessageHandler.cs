@@ -82,7 +82,7 @@ namespace Hsbot.Core.MessageHandlers
                         UserId = message.BotId,
                     };
 
-                    await context.SendMessage(hvaSuccessMessage);
+                    await context.SendResponse(hvaSuccessMessage);
                 }
             }
         }

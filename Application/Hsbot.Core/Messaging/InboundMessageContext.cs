@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Hsbot.Core.Messaging
@@ -28,7 +29,7 @@ namespace Hsbot.Core.Messaging
             return context.Bot.GetChatUserById(userId);
         }
 
-        public static Task SendMessage(this IInboundMessageContext context, OutboundResponse response)
+        public static Task SendResponse(this IInboundMessageContext context, OutboundResponse response)
         {
             return context.Bot.SendMessage(response);
         }
@@ -36,6 +37,11 @@ namespace Hsbot.Core.Messaging
         public static Task SendResponse(this IInboundMessageContext context, string text)
         {
             return context.Bot.SendMessage(context.Message.CreateResponse(text));
+        }
+
+        public static Task SendResponse(this IInboundMessageContext context, string text, Attachment attachment)
+        {
+            return context.Bot.SendMessage(context.Message.CreateResponse(text, attachment));
         }
 
         public static Task SendTypingOnChannelResponse(this IInboundMessageContext context)
