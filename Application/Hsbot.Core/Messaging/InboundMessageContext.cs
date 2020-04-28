@@ -1,40 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hsbot.Core.Connection;
 
 namespace Hsbot.Core.Messaging
 {
     public interface IInboundMessageContext
     {
         InboundMessage Message { get; }
-        Func<OutboundResponse, Task> SendMessage { get; }
-        Func<string, Task<IUser>> GetChatUserById { get; }
+        IBotMessagingServices Bot { get; }
     }
 
     public class InboundMessageContext : IInboundMessageContext
     {
-        public InboundMessageContext(InboundMessage message, Func<OutboundResponse, Task> sendMessageFunc, Func<string, Task<IUser>> getChatUserByIdFunc)
+        public InboundMessageContext(InboundMessage message, IBotMessagingServices botMessagingServices)
         {
             Message = message;
-            SendMessage = sendMessageFunc;
-            GetChatUserById = getChatUserByIdFunc;
+            Bot = botMessagingServices;
         }
-        
+
         public InboundMessage Message { get; }
-        public Func<OutboundResponse, Task> SendMessage { get; }
-        public Func<string, Task<IUser>> GetChatUserById { get; }
+        public IBotMessagingServices Bot { get; }
     }
 
     public static class InboundMessageContextExtensions
     {
+        public static Task<IUser> GetChatUserById(this IInboundMessageContext context, string userId)
+        {
+            return context.Bot.GetChatUserById(userId);
+        }
+
+        public static Task SendResponse(this IInboundMessageContext context, OutboundResponse response)
+        {
+            return context.Bot.SendMessage(response);
+        }
+
         public static Task SendResponse(this IInboundMessageContext context, string text)
         {
-            return context.SendMessage(context.Message.CreateResponse(text));
+            return context.Bot.SendMessage(context.Message.CreateResponse(text));
+        }
+
+        public static Task SendResponse(this IInboundMessageContext context, string text, Attachment attachment)
+        {
+            return context.Bot.SendMessage(context.Message.CreateResponse(text, attachment));
         }
 
         public static Task SendTypingOnChannelResponse(this IInboundMessageContext context)
         {
-            return context.SendMessage(context.Message.CreateTypingOnChannelResponse());
+            return context.Bot.SendMessage(context.Message.CreateTypingOnChannelResponse());
         }
     }
 }

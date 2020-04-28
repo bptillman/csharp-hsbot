@@ -2,6 +2,6 @@
 {
     public class BotServiceContext
     {
-        public Hsbot Parent { get; set; }
+        public IBotMessagingServices Parent { get; set; }
     }
 }
