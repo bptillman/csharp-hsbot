@@ -10,7 +10,7 @@ using Hsbot.Core.Messaging;
 
 namespace Hsbot.Core
 {
-    public sealed class Hsbot : IDisposable
+    public sealed class Hsbot : IBotMessagingServices, IDisposable
     {
         private readonly IHsbotLog _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
@@ -117,7 +117,7 @@ namespace Hsbot.Core
             }
 
             var messageSnippet = $"{message.Username}: {message.TextWithoutBotName.Substring(0, Math.Min(message.TextWithoutBotName.Length, 25))}...";
-            var messageContext = new InboundMessageContext(message, SendMessage, GetChatUserById);
+            var messageContext = new InboundMessageContext(message, this);
 
             foreach (var inboundMessageHandler in _messageHandlers)
             {
