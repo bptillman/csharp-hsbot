@@ -29,6 +29,9 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
             _randomNumberGenerator = randomNumberGenerator;
         }
 
+        public string EmployeesOnlyMessage => ":blush: Sorry, only employees can be nominated.";
+        public string SelfAggrandizingMessage => ":disapproval: nominating yourself is not allowed!";
+
         public MessageHandlerDescriptor CommandDescriptor => new MessageHandlerDescriptor
         {
             Command = "hsbot hva to | for <<@coworker>> for >awardAcronym> <nominationText>",
@@ -38,6 +41,12 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
         public Match GetMatch(InboundMessage message) => message.Match(_nominationRegex);
 
         public IEnumerable<string> GetNomineeUserIds(Match match) => new[] {match.Groups[2].Value.Trim()};
+
+        public string GetRoomMessage(IEnumerable<(string FullName, string Key)> successes)
+        {
+            var successfulNominees = string.Join(", ", successes.Select(x => $"{x.FullName} [{x.Key}]"));
+            return $"Your nomination for {successfulNominees} was successfully retrieved and processed!";
+        }
 
         public async Task<(string ErrorMessage, string Key)> Submit(IUser nominator, IUser nominee, Match match)
         {

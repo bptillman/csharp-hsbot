@@ -18,6 +18,9 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
             _jiraApiClient = jiraApiClient;
         }
 
+        public string EmployeesOnlyMessage => ":blush: Sorry, only employees can get brags.";
+        public string SelfAggrandizingMessage => ":disapproval: bragging on yourself is not allowed!";
+
         public MessageHandlerDescriptor CommandDescriptor => new MessageHandlerDescriptor
         {
             Command = "hsbot brag on | about <<@coworker>> <bragText>",
@@ -27,6 +30,12 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
         public Match GetMatch(InboundMessage message) => message.Match(_bragRegex);
 
         public IEnumerable<string> GetNomineeUserIds(Match match) => ParseUsers(match.Groups[2].Value.Trim());
+
+        public string GetRoomMessage(IEnumerable<(string FullName, string Key)> successes)
+        {
+            var successfulNominees = string.Join(", ", successes.Select(x => $"{x.FullName} [{x.Key}]"));
+            return $"Your brag about {successfulNominees} was successfully retrieved and processed!";
+        }
 
         public async Task<(string ErrorMessage, string Key)> Submit(IUser nominator, IUser nominee, Match match)
         {

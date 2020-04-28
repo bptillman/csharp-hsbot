@@ -11,7 +11,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 {
     public class NominationMessageHandlerTests : MessageHandlerTestBase<NominationMessageHandler>
     {
-        private readonly string _bragRoom = "CE9K4LTFD";
+        private readonly string _bragRoom = "#brags-and-awards";
         private readonly SubmissionResponse _successResponse = new SubmissionResponse {Key = "theKey"};
         private readonly SubmissionResponse _failureResponse = new SubmissionResponse {Failed = true};
         private readonly string _jiraErrorMessage = "I failed...";
@@ -49,7 +49,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(":blush: Sorry, only employees can be celebrated.");
+            context.SentMessages.First().Text.ShouldBe(":blush: Sorry, only employees can be nominated.");
         }
 
         public async Task ShouldNotAllowSelfNominations()
@@ -61,7 +61,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe(":disapproval: celebrating yourself is not allowed!");
+            context.SentMessages.First().Text.ShouldBe(":disapproval: nominating yourself is not allowed!");
         }
 
         public async Task ShouldMessageToBragRoomWhenNotInBragRoom()
@@ -77,7 +77,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             var firstMessage = context.SentMessages[0]; 
             firstMessage.Channel.ShouldBe(message.Channel);
-            firstMessage.Text.ShouldBe("Your celebration for bob [theKey] was successfully retrieved and processed!");
+            firstMessage.Text.ShouldBe("Your nomination for bob [theKey] was successfully retrieved and processed!");
 
             var secondMessage = context.SentMessages[1];
             secondMessage.Channel.ShouldBe(_bragRoom);
@@ -93,7 +93,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             await messageHandler.HandleAsync(context);
 
             context.SentMessages.Count.ShouldBe(1);
-            context.SentMessages.First().Text.ShouldBe("Your celebration for bob [theKey] was successfully retrieved and processed!");
+            context.SentMessages.First().Text.ShouldBe("Your nomination for bob [theKey] was successfully retrieved and processed!");
         }
 
         public async Task ShouldReturnCannedResponse()

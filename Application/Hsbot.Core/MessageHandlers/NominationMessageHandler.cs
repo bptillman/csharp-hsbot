@@ -48,13 +48,13 @@ namespace Hsbot.Core.MessageHandlers
                     var nominee = await context.GetChatUserById(nomineeUserId);
                     if (!nominee.IsEmployee)
                     {
-                        await context.SendResponse(":blush: Sorry, only employees can be celebrated.");
+                        await context.SendResponse(celebration.EmployeesOnlyMessage);
                         continue;
                     }
 
                     if (nominee.Id == nominator.Id)
                     {
-                        await context.SendResponse(":disapproval: celebrating yourself is not allowed!");
+                        await context.SendResponse(celebration.SelfAggrandizingMessage);
                         continue;
                     }
 
@@ -70,10 +70,7 @@ namespace Hsbot.Core.MessageHandlers
 
                 if (successes.Any())
                 {
-                    var successfulNominees = string.Join(", ", successes.Select(x => $"{x.FullName} [{x.Key}]"));
-                    var successMessage = $"Your celebration for {successfulNominees} was successfully retrieved and processed!";
-
-                    await context.SendResponse(successMessage);
+                    await context.SendResponse(celebration.GetRoomMessage(successes));
                 }
 
                 if (message.Channel != _bragAndAwardChannel && successes.Any())
