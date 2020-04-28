@@ -156,6 +156,18 @@ namespace Hsbot.Slack
 
             return null;
         }
+
+        public Task<IUser[]> GetAllUsers()
+        {
+            return Task.FromResult(_connection.UserCache.Values.Select(user =>
+                (IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                })
+                .ToArray());
         }
 
         private async Task<SlackChatHub> GetChatHub(ResponseBase response)

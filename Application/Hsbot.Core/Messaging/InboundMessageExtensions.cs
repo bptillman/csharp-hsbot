@@ -36,6 +36,15 @@ namespace Hsbot.Core.Messaging
         }
 
         /// <summary>
+        /// Determines if message.TargetedText equals the supplied string (case insensitive)
+        /// </summary>
+        /// <returns>True if message.TargetedText equals the supplied string, false otherwise</returns>
+        public static bool Is(this InboundMessage message, string text, StringComparison compareType = StringComparison.OrdinalIgnoreCase)
+        {
+            return message.TextWithoutBotName.Equals(text, compareType);
+        }
+
+        /// <summary>
         /// Applies regular expression to message.TargetedText to determine if message matches
         /// </summary>
         /// <returns>True if message.TargetedText is matched by regex, false otherwise</returns>

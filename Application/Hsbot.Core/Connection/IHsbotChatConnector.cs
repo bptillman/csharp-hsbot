@@ -11,6 +11,7 @@ namespace Hsbot.Core.Connection
         Task SendMessage(OutboundResponse response);
         Task UploadFile(FileUploadResponse response);
         Task<IUser> GetChatUserById(string userId);
+        Task<IUser[]> GetAllUsers();
 
         IObservable<IHsbotChatConnector> Disconnected { get; }
         IObservable<IHsbotChatConnector> Reconnecting { get; }

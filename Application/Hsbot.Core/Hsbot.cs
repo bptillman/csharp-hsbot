@@ -217,9 +217,14 @@ namespace Hsbot.Core
             }
         }
 
-        public async Task<IUser> GetChatUserById(string userId)
+        public Task<IUser[]> GetAllUsers()
         {
-            return await _connection.GetChatUserById(userId);
+            return _connection.GetAllUsers();
+        }
+
+        public Task<IUser> GetChatUserById(string userId)
+        {
+            return _connection.GetChatUserById(userId);
         }
 
         public Task SendMessage(OutboundResponse response)
