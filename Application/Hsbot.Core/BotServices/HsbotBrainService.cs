@@ -101,6 +101,11 @@ namespace Hsbot.Core.BotServices
                 : PersistenceState.InMemoryOnly;
         }
 
+        public string BrainDump()
+        {
+            return _brain.BrainDump();
+        }
+
         public void Dispose()
         {
             _brainChangedEventSubscription?.Dispose();

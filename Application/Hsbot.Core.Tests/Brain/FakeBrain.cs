@@ -26,5 +26,10 @@ namespace Hsbot.Core.Tests.Brain
             BrainContents[key] = JsonConvert.SerializeObject(value);
             return PersistenceState;
         }
+
+        public string BrainDump()
+        {
+            return JsonConvert.SerializeObject(BrainContents);
+        }
     }
 }
