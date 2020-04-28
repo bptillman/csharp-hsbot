@@ -9,7 +9,7 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class NominationMessageHandler : MessageHandlerBase
     {
-        private readonly string _bragAndAwardChannel = "CE9K4LTFD"; //Test room: GCT9TL8KA Brag room: CE9K4LTFD
+        private readonly string _bragAndAwardChannel = "#brags-and-awards";
         private readonly IEnumerable<ICelebration> _celebrations;
 
         public NominationMessageHandler(IEnumerable<ICelebration> celebrations, IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
