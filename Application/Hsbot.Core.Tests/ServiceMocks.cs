@@ -9,16 +9,6 @@ namespace Hsbot.Core.Tests
 {
     public static class ServiceMocks
     {
-        public static Mock<IHsbotLog> MockLog()
-        {
-            var logMock = new Mock<IHsbotLog>();
-            logMock.Setup(x => x.Info(It.IsAny<string>(), It.IsAny<object[]>()));
-            logMock.Setup(x => x.Warn(It.IsAny<string>(), It.IsAny<object[]>()));
-            logMock.Setup(x => x.Debug(It.IsAny<string>(), It.IsAny<object[]>()));
-
-            return logMock;
-        }
-
         public static Mock<IBotBrainStorage<InMemoryBrain>> MockBrainStorage()
         {
             var brainStorageMock = new Mock<IBotBrainStorage<InMemoryBrain>>();

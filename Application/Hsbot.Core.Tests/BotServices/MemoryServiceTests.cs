@@ -98,7 +98,7 @@ namespace Hsbot.Core.Tests.BotServices
         public void ShouldStartupAfterBrainService()
         {
             var memoryService = new MemoryService(new FakeBrain());
-            var brainService = new HsbotBrainService(MockBrainStorage().Object, MockLog().Object);
+            var brainService = new HsbotBrainService(MockBrainStorage().Object, new FakeLogger<HsbotBrainService>());
 
             memoryService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
         }
