@@ -73,6 +73,8 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             await messageHandler.HandleAsync(context);
 
+            context.SentMessages.Count.ShouldBe(2);
+
             var firstMessage = context.SentMessages[0]; 
             firstMessage.Channel.ShouldBe(message.Channel);
             firstMessage.Text.ShouldBe("Your celebration for bob [theKey] was successfully retrieved and processed!");
