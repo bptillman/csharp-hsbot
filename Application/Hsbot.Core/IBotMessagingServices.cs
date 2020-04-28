@@ -7,5 +7,6 @@ namespace Hsbot.Core
     {
         Task<IUser> GetChatUserById(string userId);
         Task SendMessage(OutboundResponse response);
+        Task UploadFile(FileUploadResponse response);
     }
 }

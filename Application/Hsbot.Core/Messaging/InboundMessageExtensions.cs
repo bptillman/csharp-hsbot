@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -104,6 +105,20 @@ namespace Hsbot.Core.Messaging
                 MessageRecipientType = MessageRecipientType.Channel,
                 Text = "",
                 IndicateTyping = true
+            };
+        }
+
+        /// <summary>
+        /// Will upload a file and push a response to the channel with a link to the file
+        /// </summary>
+        public static FileUploadResponse CreateFileUploadResponse(this InboundMessage message, Stream fileStream, string fileName)
+        {
+            return new FileUploadResponse
+            {
+                Channel = message.Channel,
+                FileName = fileName,
+                FileStream = fileStream,
+                MessageRecipientType = MessageRecipientType.Channel
             };
         }
     }

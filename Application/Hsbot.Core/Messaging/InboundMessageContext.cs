@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
 using System.Threading.Tasks;
 
 namespace Hsbot.Core.Messaging
@@ -47,6 +46,11 @@ namespace Hsbot.Core.Messaging
         public static Task SendTypingOnChannelResponse(this IInboundMessageContext context)
         {
             return context.Bot.SendMessage(context.Message.CreateTypingOnChannelResponse());
+        }
+
+        public static Task UploadFile(this IInboundMessageContext context, Stream fileStream, string fileName)
+        {
+            return context.Bot.UploadFile(context.Message.CreateFileUploadResponse(fileStream, fileName));
         }
     }
 }

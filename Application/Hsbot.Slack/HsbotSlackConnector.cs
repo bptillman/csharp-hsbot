@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -131,6 +132,16 @@ namespace Hsbot.Slack
             }
         }
 
+        public async Task UploadFile(FileUploadResponse response)
+        {
+            var chatHub = await GetChatHub(response);
+
+            if (chatHub != null)
+            {
+                await _connection.Upload(chatHub, response.FileStream, response.FileName);
+            }
+        }
+
         public async Task<IUser> GetChatUserById(string userId)
         {
             if (!_connection.UserCache.TryGetValue(userId, out var user))
@@ -148,7 +159,7 @@ namespace Hsbot.Slack
             };
         }
 
-        private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
+        private async Task<SlackChatHub> GetChatHub(ResponseBase response)
         {
             switch (response.MessageRecipientType)
             {

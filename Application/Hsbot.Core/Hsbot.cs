@@ -195,6 +195,11 @@ namespace Hsbot.Core
             return _connection.SendMessage(response);
         }
 
+        public Task UploadFile(FileUploadResponse response)
+        {
+            return _connection.UploadFile(response);
+        }
+
         public void Dispose()
         {
             _onDisconnectSubscription?.Dispose();
