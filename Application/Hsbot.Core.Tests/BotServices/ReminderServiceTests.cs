@@ -8,6 +8,7 @@ using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Brain;
 using Hsbot.Core.Tests.Infrastructure;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using static Hsbot.Core.Tests.ServiceMocks;
 using Moq;
 using Shouldly;
@@ -69,7 +70,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
             var chatConnector = MockChatConnector();
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector.Object);
             var context = new BotServiceContext { Parent = hsbot };
 
             await reminderService.Start(context);
