@@ -15,7 +15,8 @@ namespace Hsbot.Core.MessageHandlers
         private const string CommandText = "xkcd";
         private const string BaseUrl = "https://xkcd.com/";
         private const string JsonTag = "info.0.json";
-        private static readonly Regex XkcdNumberRegex = new Regex("^(xkcd )(\\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex XkcdLatestRegex = new Regex("^(xkcd)( latest)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex XkcdNumberRegex = new Regex("^(xkcd )(\\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex XkcdRandomRegex = new Regex("^(xkcd random)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public XkcdMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
@@ -42,9 +43,19 @@ namespace Hsbot.Core.MessageHandlers
             await context.SendTypingOnChannelResponse();
 
             var command = await GetCommand(message);
-            var comic = string.IsNullOrEmpty(command.Id) ? await GetInfo() : await GetInfo(command.Id);
 
-            await context.SendResponse($"{comic.Title}\n{comic.Img}\n{comic.Alt}");
+            if (command.CommandType == CommandType.None)
+            {
+                await context.SendResponse("Sorry, I don't know that one.");
+            }
+
+            else
+            {
+                var comic = string.IsNullOrEmpty(command.Id) ? await GetInfo() : await GetInfo(command.Id);
+
+                await context.SendResponse($"{comic.Title}\n{comic.Img}");
+                await context.SendResponse($"{comic.Alt}");
+            }
         }
 
         private static async Task<XkcdInfo> GetInfo(string id = null)
@@ -74,27 +85,45 @@ namespace Hsbot.Core.MessageHandlers
         {
             Match match;
             string id = null;
+            var commandType = CommandType.None;
 
             if (message.Match(XkcdRandomRegex).Success)
             {
                 var currentInfo = await GetInfo();
                 id = RandomNumberGenerator.Generate(1, Int32.Parse(currentInfo.Num)).ToString();
+                commandType = CommandType.Random;
             }
 
             else if ((match = message.Match(XkcdNumberRegex)).Success)
             {
                 id = match.Groups[2].Value;
+                commandType = CommandType.Number;
+            }
+
+            else if (message.Match(XkcdLatestRegex).Success)
+            {
+                commandType = CommandType.Latest;
             }
 
             return new Command
             {
-                Id = id
+                Id = id,
+                CommandType = commandType
             };
         }
 
         public class Command
         {
+            public CommandType CommandType { get; set; }
             public string Id { get; set; }
+        }
+
+        public enum CommandType
+        {
+            None,
+            Latest,
+            Random,
+            Number
         }
 
         public class XkcdInfo

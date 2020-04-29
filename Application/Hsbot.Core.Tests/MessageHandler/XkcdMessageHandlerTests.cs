@@ -8,6 +8,7 @@
     public class XkcdMessageHandlerTests : MessageHandlerTestBase<XkcdMessageHandler>
     {
         private const string ResponseString = "xkcd.com";
+        private const string NoResponseString = "Sorry";
 
         protected override string[] MessageTextsThatShouldBeHandled => new[]
         {
@@ -28,7 +29,7 @@
         {
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("xkcd");
-            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
         }
@@ -37,7 +38,7 @@
         {
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("xkcd latest");
-            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
         }
@@ -46,7 +47,7 @@
         {
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("xkcd random");
-            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
         }
@@ -55,9 +56,18 @@
         {
             var messageHandler = GetHandlerInstance();
             var response = await messageHandler.TestHandleAsync("xkcd 15");
-            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain($"{ResponseString}");
+        }
+
+        public async Task ShouldGetNoResponseString()
+        {
+            var messageHandler = GetHandlerInstance();
+            var response = await messageHandler.TestHandleAsync("xkcd this is wrong");
+            response.SentMessages.Count.ShouldBe(2);
+            response.SentMessages[0].IndicateTyping.ShouldBe(true);
+            response.SentMessages[1].Text.ShouldContain($"{NoResponseString}");
         }
 
         protected override XkcdMessageHandler GetHandlerInstance()
