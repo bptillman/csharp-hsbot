@@ -1,27 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Hsbot.Core.Messaging;
+using Hsbot.Core.Random;
+using Hsbot.Core.ApiClients;
+
 namespace Hsbot.Core.MessageHandlers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Net.Http;
-    using System.Text.RegularExpressions;
-    using System.Threading.Tasks;
-    using Messaging;
-    using Newtonsoft.Json;
-    using Random;
-
     public class XkcdMessageHandler : MessageHandlerBase
     {
         private const string CommandText = "xkcd";
-        private const string BaseUrl = "https://xkcd.com/";
-        private const string JsonTag = "info.0.json";
         private static readonly Regex XkcdLatestRegex = new Regex("^(xkcd)( latest)?$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex XkcdNumberRegex = new Regex("^(xkcd )(\\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex XkcdRandomRegex = new Regex("^(xkcd random)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        public XkcdMessageHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
-        {
+        private readonly IXkcdApiClient _xkcdApiClient;
 
+        public XkcdMessageHandler(IRandomNumberGenerator randomNumberGenerator, IXkcdApiClient xkcdApiClient) : base(randomNumberGenerator)
+        {
+            _xkcdApiClient = xkcdApiClient;
         }
 
         public override IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
@@ -51,33 +49,12 @@ namespace Hsbot.Core.MessageHandlers
 
             else
             {
-                var comic = string.IsNullOrEmpty(command.Id) ? await GetInfo() : await GetInfo(command.Id);
+                var comic = string.IsNullOrEmpty(command.Id)
+                    ? await _xkcdApiClient.GetInfo()
+                    : await _xkcdApiClient.GetInfo(command.Id);
 
                 await context.SendResponse($"{comic.Title}\n{comic.Img}");
                 await context.SendResponse($"{comic.Alt}");
-            }
-        }
-
-        private static async Task<XkcdInfo> GetInfo(string id = null)
-        {
-            var url = string.IsNullOrEmpty(id) ? $"{BaseUrl}{JsonTag}" : $"{BaseUrl}{id}/{JsonTag}";
-            using (var client = new HttpClient())
-            using (var request = new HttpRequestMessage(HttpMethod.Get, url))
-            using (var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead))
-            {
-                var stream = await response.Content.ReadAsStreamAsync();
-
-                if (!response.IsSuccessStatusCode)
-                    throw new Exception("Error: Service is not working.");
-
-                if (stream == null || stream.CanRead == false)
-                    throw new Exception("Error: Service is not working.");
-
-                using (var streamReader = new StreamReader(stream))
-                using (var jsonTextReader = new JsonTextReader(streamReader))
-                {
-                    return new JsonSerializer().Deserialize<XkcdInfo>(jsonTextReader);
-                }
             }
         }
 
@@ -89,7 +66,7 @@ namespace Hsbot.Core.MessageHandlers
 
             if (message.Match(XkcdRandomRegex).Success)
             {
-                var currentInfo = await GetInfo();
+                var currentInfo = await _xkcdApiClient.GetInfo();
                 id = RandomNumberGenerator.Generate(1, Int32.Parse(currentInfo.Num)).ToString();
                 commandType = CommandType.Random;
             }
@@ -124,14 +101,6 @@ namespace Hsbot.Core.MessageHandlers
             Latest,
             Random,
             Number
-        }
-
-        public class XkcdInfo
-        {
-            public string Num { get; set; }
-            public string Title { get; set; }
-            public string Img { get; set; }
-            public string Alt { get; set; }
         }
     }
 }

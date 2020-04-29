@@ -1,10 +1,11 @@
-﻿namespace Hsbot.Core.Tests.MessageHandler
-{
-    using System.Threading.Tasks;
-    using Infrastructure;
-    using MessageHandlers;
-    using Shouldly;
+﻿using Hsbot.Core.ApiClients;
+using System.Threading.Tasks;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
+using Hsbot.Core.MessageHandlers;
+using Shouldly;
 
+namespace Hsbot.Core.Tests.MessageHandler
+{
     public class XkcdMessageHandlerTests : MessageHandlerTestBase<XkcdMessageHandler>
     {
         private const string ResponseString = "xkcd.com";
@@ -28,7 +29,9 @@
         public async Task ShouldGetLatestComicFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
+
             var response = await messageHandler.TestHandleAsync("xkcd");
+
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
@@ -37,34 +40,45 @@
         public async Task ShouldGetLatestComicFromWebsiteWithKeyword()
         {
             var messageHandler = GetHandlerInstance();
-            var response = await messageHandler.TestHandleAsync("xkcd latest");
+
+            var response = await messageHandler.TestHandleAsync($"xkcd latest");
+
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
+            response.SentMessages[1].Text.ShouldNotContain("latest");
         }
 
         public async Task ShouldGetRandomComicFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
+
             var response = await messageHandler.TestHandleAsync("xkcd random");
+
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
+            response.SentMessages[1].Text.ShouldNotContain("random");
         }
 
         public async Task ShouldGetSpecificComicFromWebsite()
         {
             var messageHandler = GetHandlerInstance();
+
             var response = await messageHandler.TestHandleAsync("xkcd 15");
+
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
-            response.SentMessages[1].Text.ShouldContain($"{ResponseString}");
+            response.SentMessages[1].Text.ShouldContain(ResponseString);
+            response.SentMessages[1].Text.ShouldContain("15");
         }
 
         public async Task ShouldGetNoResponseString()
         {
             var messageHandler = GetHandlerInstance();
+
             var response = await messageHandler.TestHandleAsync("xkcd this is wrong");
+
             response.SentMessages.Count.ShouldBe(2);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain($"{NoResponseString}");
@@ -73,7 +87,18 @@
         protected override XkcdMessageHandler GetHandlerInstance()
         {
             var rng = new RandomNumberGeneratorFake { RandomIntValues = new[] { 24 }};
-            var handler = new XkcdMessageHandler(rng);
+            var xkcdApiClient = new TestXkcdApiClient
+            {
+                InfoToReturn = new XkcdInfo
+                {
+                    Num = "123",
+                    Img = "some image url",
+                    Alt = "some alt text",
+                    Title = "some title from xkcd.com",
+                }
+            };
+
+            var handler = new XkcdMessageHandler(rng, xkcdApiClient);
 
             return handler;
         }
