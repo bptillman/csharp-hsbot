@@ -1,8 +1,5 @@
-﻿using System.Reactive.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Hsbot.Core.Brain;
-using Hsbot.Core.Connection;
-using Hsbot.Core.Messaging;
 using Moq;
 
 namespace Hsbot.Core.Tests
@@ -16,20 +13,6 @@ namespace Hsbot.Core.Tests
             brainStorageMock.Setup(x => x.Save(It.IsAny<InMemoryBrain>())).Returns(Task.CompletedTask);
 
             return brainStorageMock;
-        }
-
-        public static Mock<IHsbotChatConnector> MockChatConnector()
-        {
-            var chatConnectorMock = new Mock<IHsbotChatConnector>();
-            chatConnectorMock.Setup(x => x.SendMessage(It.IsAny<OutboundResponse>())).Returns(Task.CompletedTask);
-            chatConnectorMock.Setup(x => x.Connect()).Returns(Task.CompletedTask);
-            chatConnectorMock.Setup(x => x.Disconnect()).Returns(Task.CompletedTask);
-            chatConnectorMock.Setup(x => x.Disconnected).Returns(Observable.Empty<IHsbotChatConnector>());
-            chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Empty<Task<InboundMessage>>());
-            chatConnectorMock.Setup(x => x.Reconnected).Returns(Observable.Empty<IHsbotChatConnector>());
-            chatConnectorMock.Setup(x => x.Reconnecting).Returns(Observable.Empty<IHsbotChatConnector>());
-
-            return chatConnectorMock;
         }
     }
 }

@@ -5,7 +5,9 @@ namespace Hsbot.Core
 {
     public interface IBotMessagingServices
     {
+        Task<IUser[]> GetAllUsers();
         Task<IUser> GetChatUserById(string userId);
         Task SendMessage(OutboundResponse response);
+        Task UploadFile(FileUploadResponse response);
     }
 }

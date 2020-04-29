@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
-using static Hsbot.Core.Tests.ServiceMocks;
-using Moq;
+using Hsbot.Core.Tests.Connection;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
 
 namespace Hsbot.Core.Tests
@@ -31,19 +31,31 @@ namespace Hsbot.Core.Tests
                 Username = "nobody"
             };
 
-            var chatConnectorMock = MockChatConnector();
-            chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
-
-            var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
-            messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
-                .Returns(new HandlesResult {HandlesMessage = true});
-
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
+            var messageHandler = new FakeMessageHandler();
+            var chatConnector = new FakeChatConnector();
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandler }, Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             await hsbot.Connect();
 
-            messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Once);
+            var message = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "test",
+                ChannelName = "test",
+                FullText = "test",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test",
+                TextWithoutBotName = "test",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            chatConnector.ReceiveMessage(message);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
         }
 
         public async Task ShouldNotCallHandlersWhenHelpMessageReceived()
@@ -65,26 +77,17 @@ namespace Hsbot.Core.Tests
                 Username = "nobody"
             };
 
-            var sentMessages = new List<OutboundResponse>();
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler();
 
-            var chatConnectorMock = MockChatConnector();
-            chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
-            chatConnectorMock.Setup(x => x.SendMessage(It.IsAny<OutboundResponse>()))
-                .Returns(Task.CompletedTask)
-                .Callback<OutboundResponse>(msg => sentMessages.Add(msg));
-
-            var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
-            messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
-                .Returns(new HandlesResult {HandlesMessage = true});
-
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandler }, Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             await hsbot.Connect();
 
-            messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Never);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Never);
-            sentMessages.Count.ShouldBe(1);
-            sentMessages.First().Text.ShouldStartWith("Available commands:");
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(0);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.First().Text.ShouldStartWith("Available commands:");
         }
 
         public async Task ShouldNotCallHandlerWhenItDoesNotHandleMessage()
@@ -106,46 +109,158 @@ namespace Hsbot.Core.Tests
                 Username = "nobody"
             };
 
-            var chatConnectorMock = MockChatConnector();
-            chatConnectorMock.Setup(x => x.MessageReceived).Returns(Observable.Return(Task.FromResult(inboundMessage)));
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler {HandlesMessage = false};
 
-            var outboundResponse = new OutboundResponse();
-            var messageHandlerMock = new Mock<IInboundMessageHandler>();
-            messageHandlerMock.Setup(x => x.HandleAsync(It.IsAny<InboundMessageContext>())).Returns(Task.CompletedTask);
-            messageHandlerMock.Setup(x => x.Handles(It.IsAny<InboundMessage>()))
-                .Returns(new HandlesResult {HandlesMessage = false});
-
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandlerMock.Object }, Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new []{ messageHandler }, Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             await hsbot.Connect();
 
-            messageHandlerMock.Verify(x => x.Handles(inboundMessage), Times.Once);
-            messageHandlerMock.Verify(x => x.HandleAsync(It.IsAny<InboundMessageContext>()), Times.Never);
-            chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Never);
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(0);
+            chatConnector.SentMessages.Count.ShouldBe(0);
         }
 
         public async Task ShouldGetChatUserViaChatConnector()
         {
-            var chatConnectorMock = MockChatConnector();
+            var chatConnector = new FakeChatConnector();
+            chatConnector.ChatUsers.Add("foo", new TestChatUser { Id = "foo", Email = "foo@bar.com", FullName = "Foo Bar", IsEmployee = true});
 
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             await hsbot.Connect();
 
-            await hsbot.GetChatUserById(string.Empty);
-
-            chatConnectorMock.Verify(x => x.GetChatUserById(string.Empty), Times.Once);
+            var user = await hsbot.GetChatUserById("foo");
+            user.Id.ShouldBe("foo");
+            user.Email.ShouldBe("foo@bar.com");
+            user.FullName.ShouldBe("Foo Bar");
+            user.IsEmployee.ShouldBeTrue();
         }
 
         public async Task ShouldSendMessageResponseViaChatConnector()
         {
-            var chatConnectorMock = MockChatConnector();
+            var chatConnector = new FakeChatConnector();
 
-            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnectorMock.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Enumerable.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             await hsbot.Connect();
             
             var outboundResponse = new OutboundResponse();
             await hsbot.SendMessage(outboundResponse);
 
-            chatConnectorMock.Verify(x => x.SendMessage(outboundResponse), Times.Once);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+        }
+
+        public async Task ShouldReportThrownExceptionBackToUser()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new Exception("exception message")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake { NextIntValue = barkIndex };
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe(hsbot.ErrorBarks[barkIndex]);
+        }
+
+        public async Task ShouldReportThrownMessageHandlerExceptionBackToUser()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new MessageHandlerException("error response to channel", "diagnostic info")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake {NextIntValue = barkIndex};
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe("error response to channel");
+        }
+
+        public async Task ShouldUseBarkForMessageHandlerExceptionWithNoResponse()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new MessageHandlerException("", "diagnostic info")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake { NextIntValue = barkIndex };
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe(hsbot.ErrorBarks[barkIndex]);
         }
     }
 }

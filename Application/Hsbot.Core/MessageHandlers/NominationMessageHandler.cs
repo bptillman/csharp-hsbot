@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -40,12 +41,20 @@ namespace Hsbot.Core.MessageHandlers
                 }
 
                 var nominator = await context.GetChatUserById(message.UserId);
+                if (nominator == null) throw new MessageHandlerException("", $"Could not locate user with id {message.UserId} via the chat connector");
+
                 var nominees = celebration.GetNomineeUserIds(match);
 
                 var successes = new List<(string FullName, string Key)>();
                 foreach (var nomineeUserId in nominees)
                 {
                     var nominee = await context.GetChatUserById(nomineeUserId);
+                    if (nominee == null)
+                    {
+                        await context.SendResponse($"Sorry, I couldn't locate a user with id {nomineeUserId}");
+                        continue;
+                    }
+
                     if (!nominee.IsEmployee)
                     {
                         await context.SendResponse(celebration.EmployeesOnlyMessage);
