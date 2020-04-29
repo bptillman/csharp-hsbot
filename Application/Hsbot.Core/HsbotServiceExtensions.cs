@@ -19,6 +19,8 @@ namespace Hsbot.Core
     {
         public static HsbotServiceConfigurator AddHsbot(this IServiceCollection services, HsbotConfig config)
         {
+            services.AddLogging();
+
             RegisterBrainServices(services);
             RegisterReminderServices(services);
             RegisterMemoryServices(services);
@@ -107,14 +109,6 @@ namespace Hsbot.Core
             where T : class, IBotBrainStorage<InMemoryBrain>
         {
             _serviceCollection.AddSingleton<IBotBrainStorage<InMemoryBrain>, T>();
-            return this;
-        }
-
-        public HsbotServiceConfigurator AddLogging<T>()
-            where T : class, IHsbotLog
-        {
-            _serviceCollection.AddLogging();
-            _serviceCollection.AddTransient<IHsbotLog, T>();
             return this;
         }
     }

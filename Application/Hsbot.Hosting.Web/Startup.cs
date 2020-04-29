@@ -24,8 +24,7 @@ namespace Hsbot.Hosting.Web
             services.AddLogging();
             services.AddHsbot(LoadConfig())
                 .AddBrainStorageProvider<AzureBrainStorage>()
-                .AddChatServices<HsbotSlackConnector, SlackChatMessageTextFormatter>()
-                .AddLogging<HsbotLog>();
+                .AddChatServices<HsbotSlackConnector, SlackChatMessageTextFormatter>();
 
             //This registration is what will actually run hsbot as a background
             //process within the website.  We'll need an external keep-alive to

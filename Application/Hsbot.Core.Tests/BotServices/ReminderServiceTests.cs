@@ -69,7 +69,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
             var chatConnector = MockChatConnector();
-            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
             var context = new BotServiceContext { Parent = hsbot };
 
             await reminderService.Start(context);
@@ -109,7 +109,7 @@ namespace Hsbot.Core.Tests.BotServices
         public void ShouldStartupAfterBrainService()
         {
             var reminderService = new ReminderService(new TestSystemClock(), new InlineChatMessageTextFormatter(), new FakeBrain());
-            var brainService = new HsbotBrainService(MockBrainStorage().Object, MockLog().Object);
+            var brainService = new HsbotBrainService(MockBrainStorage().Object, new FakeLogger<HsbotBrainService>());
 
             reminderService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
         }

@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
+using Microsoft.Extensions.Logging;
 
 namespace Hsbot.Core
 {
     public sealed class Hsbot : IBotMessagingServices, IDisposable
     {
-        private readonly IHsbotLog _log;
+        private readonly ILogger<Hsbot> _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
         private readonly IEnumerable<IBotService> _botServices;
         private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
@@ -25,7 +26,7 @@ namespace Hsbot.Core
         private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
 
-        public Hsbot(IHsbotLog log,
+        public Hsbot(ILogger<Hsbot> log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IEnumerable<IBotService> botServices,
             IHsbotChatConnector connection)
@@ -42,7 +43,7 @@ namespace Hsbot.Core
 
         public async Task Connect()
         {
-            _log.Info("Connecting to messaging service");
+            _log.LogInformation("Connecting to messaging service");
 
             await _connection.Connect();
             _onDisconnectSubscription =_connection.Disconnected
@@ -65,7 +66,7 @@ namespace Hsbot.Core
                 .Concat()
                 .Subscribe();
 
-            _log.Info("Connected successfully");
+            _log.LogInformation("Connected successfully");
 
             await StartServices();
         }
@@ -74,12 +75,12 @@ namespace Hsbot.Core
         {
             if (_disconnecting)
             {
-                _log.Info("Disconnected");
+                _log.LogInformation("Disconnected");
             }
 
             else
             {
-                _log.Info("Disconnected from server, attempting to reconnect automatically");
+                _log.LogInformation("Disconnected from server, attempting to reconnect automatically");
             }
             
             return Task.CompletedTask;
@@ -87,7 +88,7 @@ namespace Hsbot.Core
 
         public async Task Disconnect()
         {
-            _log.Info("Disconnecting");
+            _log.LogInformation("Disconnecting");
 
             _disconnecting = true;
             await _connection.Disconnect();
@@ -97,13 +98,13 @@ namespace Hsbot.Core
 
         private Task OnReconnecting()
         {
-            _log.Info("Attempting to reconnect");
+            _log.LogInformation("Attempting to reconnect");
             return Task.CompletedTask;
         }
 
         private Task OnReconnect()
         {
-            _log.Info("Reconnected successfully");
+            _log.LogInformation("Reconnected successfully");
             return Task.CompletedTask;
         }
 
@@ -123,7 +124,7 @@ namespace Hsbot.Core
             {
                 var handlerResult = inboundMessageHandler.Handles(message);
 
-                _log.Debug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
+                _log.LogDebug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
 
                 if (!handlerResult.HandlesMessage) continue;
 
@@ -133,7 +134,7 @@ namespace Hsbot.Core
                 }
                 catch (Exception e)
                 {
-                    _log.Error($"Error handling message: {e}");
+                    _log.LogError($"Error handling message: {e}");
                 }
             }
         }
@@ -159,7 +160,7 @@ namespace Hsbot.Core
 
             foreach (var botService in servicesToStart)
             {
-                _log.Info($"Starting {botService.GetType().Name}");
+                _log.LogInformation($"Starting {botService.GetType().Name}");
                 await botService.Start(botServiceContext);
             }
         }
@@ -171,7 +172,7 @@ namespace Hsbot.Core
 
             foreach (var botService in servicesToStop)
             {
-                _log.Info($"Stopping {botService.GetType().Name}");
+                _log.LogInformation($"Stopping {botService.GetType().Name}");
                 await botService.Stop();
             }
         }
