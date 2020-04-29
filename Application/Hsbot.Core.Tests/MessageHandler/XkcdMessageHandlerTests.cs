@@ -8,6 +8,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 {
     public class XkcdMessageHandlerTests : MessageHandlerTestBase<XkcdMessageHandler>
     {
+        private const string SomeAltText = "some alt text";
         private const string ResponseString = "xkcd.com";
         private const string NoResponseString = "Sorry";
 
@@ -35,6 +36,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
+            response.SentMessages[2].Text.ShouldBe(SomeAltText);
         }
 
         public async Task ShouldGetLatestComicFromWebsiteWithKeyword()
@@ -47,6 +49,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
             response.SentMessages[1].Text.ShouldNotContain("latest");
+            response.SentMessages[2].Text.ShouldBe(SomeAltText);
         }
 
         public async Task ShouldGetRandomComicFromWebsite()
@@ -59,6 +62,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
             response.SentMessages[1].Text.ShouldNotContain("random");
+            response.SentMessages[2].Text.ShouldBe(SomeAltText);
         }
 
         public async Task ShouldGetSpecificComicFromWebsite()
@@ -71,6 +75,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldContain(ResponseString);
             response.SentMessages[1].Text.ShouldContain("15");
+            response.SentMessages[2].Text.ShouldBe(SomeAltText);
         }
 
         public async Task ShouldGetNoResponseString()
@@ -93,7 +98,7 @@ namespace Hsbot.Core.Tests.MessageHandler
                 {
                     Num = "123",
                     Img = "some image url",
-                    Alt = "some alt text",
+                    Alt = SomeAltText,
                     Title = "some title from xkcd.com",
                 }
             };
