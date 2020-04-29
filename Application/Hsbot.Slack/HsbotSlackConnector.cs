@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Hsbot.Core;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
+using Microsoft.Extensions.Logging;
 using SlackConnector;
 using SlackConnector.EventHandlers;
 using SlackConnector.Models;
@@ -15,7 +16,7 @@ namespace Hsbot.Slack
     public class HsbotSlackConnector : IHsbotChatConnector
     {
         private readonly IHsbotConfig _config;
-        private readonly IHsbotLog _log;
+        private readonly ILogger<HsbotSlackConnector> _log;
         private ISlackConnection _connection;
 
         public string Id { get; private set; } //internal id of the bot
@@ -28,7 +29,7 @@ namespace Hsbot.Slack
         public IObservable<IHsbotChatConnector> Reconnected { get; private set; }
         public IObservable<Task<InboundMessage>> MessageReceived { get; private set; }
 
-        public HsbotSlackConnector(IHsbotConfig config, IHsbotLog log)
+        public HsbotSlackConnector(IHsbotConfig config, ILogger<HsbotSlackConnector> log)
         {
             _config = config;
             _log = log;
@@ -38,11 +39,11 @@ namespace Hsbot.Slack
         {
             if (_connection != null)
             {
-                _log.Warn($"Connection object in {nameof(HsbotSlackConnector)} is not null. I think I'm already connected, so I'm not attempting to connect again.");
+                _log.LogWarning($"Connection object in {nameof(HsbotSlackConnector)} is not null. I think I'm already connected, so I'm not attempting to connect again.");
                 return;
             }
 
-            _log.Info("Connecting to Slack");
+            _log.LogInformation("Connecting to Slack");
 
             var connector = new SlackConnector.SlackConnector();
             _connection = await connector.Connect(_config.SlackApiKey);
@@ -51,7 +52,7 @@ namespace Hsbot.Slack
             Name = _connection?.Self?.Name;
             AddressableNames = GetAddressableNames(Name, Id);
 
-            _log.Info($"Connected successfully with Id={Id}, Name={Name}");
+            _log.LogInformation($"Connected successfully with Id={Id}, Name={Name}");
 
             Disconnected = Observable.FromEvent<DisconnectEventHandler, Unit>
             (
@@ -99,7 +100,7 @@ namespace Hsbot.Slack
 
         public Task Disconnect()
         {
-            _log.Info("Disconnecting from Slack");
+            _log.LogInformation("Disconnecting from Slack");
             return _connection.Close();
         }
 
@@ -111,7 +112,7 @@ namespace Hsbot.Slack
             {
                 if (response.IndicateTyping)
                 {
-                    _log.Debug($"Sending IndicateTyping message to channel {chatHub.Name}");
+                    _log.LogDebug($"Sending IndicateTyping message to channel {chatHub.Name}");
                     await _connection.IndicateTyping(chatHub);
                 }
 
@@ -124,28 +125,51 @@ namespace Hsbot.Slack
                         Text = response.Text
                     };
 
-                    _log.Debug($"Sending message to channel {chatHub.Name} with {botMessage.Attachments.Count} attachments.  Response text='{response.Text}'");
+                    _log.LogDebug($"Sending message to channel {chatHub.Name} with {botMessage.Attachments.Count} attachments.  Response text='{response.Text}'");
                     await _connection.Say(botMessage);
                 }
             }
         }
 
-        public async Task<IUser> GetChatUserById(string userId)
+        public async Task UploadFile(FileUploadResponse response)
         {
-            if (!_connection.UserCache.TryGetValue(userId, out var user))
+            var chatHub = await GetChatHub(response);
+
+            if (chatHub != null)
             {
-                var users = await _connection.GetUsers();
-                user = users.Single(x => x.Id == userId);
+                await _connection.Upload(chatHub, response.FileStream, response.FileName);
+            }
+        }
+
+        public Task<IUser> GetChatUserById(string userId)
+        {
+            if (_connection.UserCache.TryGetValue(userId, out var user))
+            {
+                return Task.FromResult((IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                    TimeZoneOffset = GetTimeSpan(user.TimeZoneOffset),
+                });
             }
 
-            return new SlackUser
-            {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = $"{user.FirstName} {user.LastName}",
-                IsEmployee = !user.IsBot && !user.IsGuest,
-                TimeZoneOffset = GetTimeSpan(user.TimeZoneOffset),
-            };
+            return null;
+        }
+
+        public Task<IUser[]> GetAllUsers()
+        {
+            return Task.FromResult(_connection.UserCache.Values.Select(user =>
+                (IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                    TimeZoneOffset = GetTimeSpan(user.TimeZoneOffset),
+                })
+                .ToArray());
         }
 
         private TimeSpan GetTimeSpan(long offsetInSeconds)
@@ -154,7 +178,7 @@ namespace Hsbot.Slack
             return new TimeSpan(offsetInSeconds * millisecondsInSecond * TimeSpan.TicksPerMillisecond);
         }
 
-        private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
+        private async Task<SlackChatHub> GetChatHub(ResponseBase response)
         {
             switch (response.MessageRecipientType)
             {

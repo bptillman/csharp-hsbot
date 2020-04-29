@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Hsbot.Core.Brain;
+using Microsoft.Extensions.Logging;
 
 namespace Hsbot.Core.BotServices
 {
     public sealed class HsbotBrainService : IBotBrain, IBotService, IDisposable
     {
         private readonly IBotBrainStorage<InMemoryBrain> _botBrainStorage;
-        private readonly IHsbotLog _log;
+        private readonly ILogger<HsbotBrainService> _log;
         private InMemoryBrain _brain;
         private bool _persistenceEnabled;
 
         private IDisposable _brainChangedEventSubscription;
 
-        public HsbotBrainService(IBotBrainStorage<InMemoryBrain> botBrainStorage, IHsbotLog log)
+        public HsbotBrainService(IBotBrainStorage<InMemoryBrain> botBrainStorage, ILogger<HsbotBrainService> log)
         {
             _botBrainStorage = botBrainStorage;
             _log = log;
@@ -37,7 +38,7 @@ namespace Hsbot.Core.BotServices
 
             try
             {
-                _log.Info("Initializing brain");
+                _log.LogInformation("Initializing brain");
 
                 _brain = await _botBrainStorage.Load();
                 _brainChangedEventSubscription = _brain.BrainChanged
@@ -48,13 +49,13 @@ namespace Hsbot.Core.BotServices
 
                 _persistenceEnabled = true;
 
-                _log.Info("Brain loaded from storage successfully");
+                _log.LogInformation("Brain loaded from storage successfully");
             }
 
             catch (Exception e)
             {
-                _log.Error("Error loading brain - falling back to an in-memory brain without persistence.");
-                _log.Error("Brain load exception: {0}", e);
+                _log.LogError("Error loading brain - falling back to an in-memory brain without persistence.");
+                _log.LogError("Brain load exception: {0}", e);
 
                 _brain = new InMemoryBrain();
             }
@@ -66,15 +67,15 @@ namespace Hsbot.Core.BotServices
             {
                 if (_persistenceEnabled)
                 {
-                    _log.Info("Saving brain to storage");
+                    _log.LogInformation("Saving brain to storage");
                     await _botBrainStorage.Save(brain);
-                    _log.Info("Brain saved successfully");
+                    _log.LogInformation("Brain saved successfully");
                 }
             }
 
             catch (Exception e)
             {
-                _log.Error("Failed to save brain to storage: {0}", e);
+                _log.LogError("Failed to save brain to storage: {0}", e);
             }
         }
 
@@ -92,12 +93,17 @@ namespace Hsbot.Core.BotServices
 
         public PersistenceState SetItem<T>(string key, T value) where T : class
         {
-            _log.Debug($"Saving new value to brain for Key={key}");
+            _log.LogDebug($"Saving new value to brain for Key={key}");
             _brain.SetItem(key, value);
 
             return _persistenceEnabled
                 ? PersistenceState.Persisted
                 : PersistenceState.InMemoryOnly;
+        }
+
+        public string BrainDump()
+        {
+            return _brain.BrainDump();
         }
 
         public void Dispose()

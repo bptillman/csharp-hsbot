@@ -6,15 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.Connection;
+using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
+using Hsbot.Core.Random;
+using Microsoft.Extensions.Logging;
 
 namespace Hsbot.Core
 {
     public sealed class Hsbot : IBotMessagingServices, IDisposable
     {
-        private readonly IHsbotLog _log;
+        private readonly ILogger<Hsbot> _log;
         private readonly IEnumerable<IInboundMessageHandler> _messageHandlers;
         private readonly IEnumerable<IBotService> _botServices;
+        private readonly IRandomNumberGenerator _rng;
         private readonly List<MessageHandlerDescriptor> _messageHandlerDescriptors;
         
         private IDisposable _onDisconnectSubscription;
@@ -25,14 +29,25 @@ namespace Hsbot.Core
         private readonly IHsbotChatConnector _connection;
         private bool _disconnecting = false;
 
-        public Hsbot(IHsbotLog log,
+        public readonly string[] ErrorBarks = 
+        {
+            //"I'm afraid I can't do that, {User}", //TODO: Refactor chat message formatter to allow automatic formatting on all outbound messages
+            "My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:",
+            ":shrug: What you requested should have worked, BUT it didn't",
+            "Bad news: it didn't work :kaboom:; good news: I'm alive! I'm alive! :awesome: Wait, no...that is Johnny # 5, there is no good news :evil_burns:",
+            "https://media.giphy.com/media/owRSsSHHoVYFa/giphy.gif"
+        };
+
+        public Hsbot(ILogger<Hsbot> log,
             IEnumerable<IInboundMessageHandler> messageHandlers,
             IEnumerable<IBotService> botServices,
+            IRandomNumberGenerator rng,
             IHsbotChatConnector connection)
         {
             _log = log;
             _messageHandlers = messageHandlers;
             _botServices = botServices;
+            _rng = rng;
             _connection = connection;
             _messageHandlerDescriptors = _messageHandlers
                 .SelectMany(mh => mh.GetCommandDescriptors())
@@ -42,7 +57,7 @@ namespace Hsbot.Core
 
         public async Task Connect()
         {
-            _log.Info("Connecting to messaging service");
+            _log.LogInformation("Connecting to messaging service");
 
             await _connection.Connect();
             _onDisconnectSubscription =_connection.Disconnected
@@ -65,7 +80,7 @@ namespace Hsbot.Core
                 .Concat()
                 .Subscribe();
 
-            _log.Info("Connected successfully");
+            _log.LogInformation("Connected successfully");
 
             await StartServices();
         }
@@ -74,12 +89,12 @@ namespace Hsbot.Core
         {
             if (_disconnecting)
             {
-                _log.Info("Disconnected");
+                _log.LogInformation("Disconnected");
             }
 
             else
             {
-                _log.Info("Disconnected from server, attempting to reconnect automatically");
+                _log.LogInformation("Disconnected from server, attempting to reconnect automatically");
             }
             
             return Task.CompletedTask;
@@ -87,7 +102,7 @@ namespace Hsbot.Core
 
         public async Task Disconnect()
         {
-            _log.Info("Disconnecting");
+            _log.LogInformation("Disconnecting");
 
             _disconnecting = true;
             await _connection.Disconnect();
@@ -97,13 +112,13 @@ namespace Hsbot.Core
 
         private Task OnReconnecting()
         {
-            _log.Info("Attempting to reconnect");
+            _log.LogInformation("Attempting to reconnect");
             return Task.CompletedTask;
         }
 
         private Task OnReconnect()
         {
-            _log.Info("Reconnected successfully");
+            _log.LogInformation("Reconnected successfully");
             return Task.CompletedTask;
         }
 
@@ -123,7 +138,7 @@ namespace Hsbot.Core
             {
                 var handlerResult = inboundMessageHandler.Handles(message);
 
-                _log.Debug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
+                _log.LogDebug($"Message [{messageSnippet}]: {inboundMessageHandler.GetType().Name} -> HandlesMessage={handlerResult.HandlesMessage}, BotIsMentioned={handlerResult.BotIsMentioned}, RandomRoll={handlerResult.RandomRoll}, MessageChannel={handlerResult.MessageChannel}");
 
                 if (!handlerResult.HandlesMessage) continue;
 
@@ -131,9 +146,27 @@ namespace Hsbot.Core
                 {
                     await inboundMessageHandler.HandleAsync(messageContext);
                 }
+
+                catch (MessageHandlerException e)
+                {
+                    var responseText = e.ResponseToChannel;
+                    if (string.IsNullOrEmpty(responseText))
+                    {
+                        responseText = _rng.GetRandomValue(ErrorBarks);
+                    }
+
+                    var response = message.CreateResponse(responseText);
+                    await SendMessage(response);
+
+                    _log.LogError($"Error handling {messageSnippet}: {e}");
+                }
+
                 catch (Exception e)
                 {
-                    _log.Error($"Error handling message: {e}");
+                    var response = message.CreateResponse(_rng.GetRandomValue(ErrorBarks));
+                    await SendMessage(response);
+
+                    _log.LogError($"Error handling {messageSnippet}: {e}");
                 }
             }
         }
@@ -159,7 +192,7 @@ namespace Hsbot.Core
 
             foreach (var botService in servicesToStart)
             {
-                _log.Info($"Starting {botService.GetType().Name}");
+                _log.LogInformation($"Starting {botService.GetType().Name}");
                 await botService.Start(botServiceContext);
             }
         }
@@ -171,7 +204,7 @@ namespace Hsbot.Core
 
             foreach (var botService in servicesToStop)
             {
-                _log.Info($"Stopping {botService.GetType().Name}");
+                _log.LogInformation($"Stopping {botService.GetType().Name}");
                 await botService.Stop();
             }
         }
@@ -184,14 +217,24 @@ namespace Hsbot.Core
             }
         }
 
-        public async Task<IUser> GetChatUserById(string userId)
+        public Task<IUser[]> GetAllUsers()
         {
-            return await _connection.GetChatUserById(userId);
+            return _connection.GetAllUsers();
+        }
+
+        public Task<IUser> GetChatUserById(string userId)
+        {
+            return _connection.GetChatUserById(userId);
         }
 
         public Task SendMessage(OutboundResponse response)
         {
             return _connection.SendMessage(response);
+        }
+
+        public Task UploadFile(FileUploadResponse response)
+        {
+            return _connection.UploadFile(response);
         }
 
         public void Dispose()

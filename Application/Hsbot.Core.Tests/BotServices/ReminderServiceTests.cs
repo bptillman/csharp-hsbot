@@ -7,9 +7,9 @@ using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Messaging.Formatting;
 using Hsbot.Core.Tests.Brain;
+using Hsbot.Core.Tests.Connection;
 using Hsbot.Core.Tests.Infrastructure;
-using static Hsbot.Core.Tests.ServiceMocks;
-using Moq;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.BotServices
@@ -68,8 +68,8 @@ namespace Hsbot.Core.Tests.BotServices
             var brain = new InMemoryBrain();
 
             var reminderService = new ReminderService(systemClock, new InlineChatMessageTextFormatter(), brain);
-            var chatConnector = MockChatConnector();
-            var hsbot = new Hsbot(MockLog().Object, Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), chatConnector.Object);
+            var chatConnector = new FakeChatConnector();
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), Array.Empty<IInboundMessageHandler>(), Enumerable.Empty<IBotService>(), new RandomNumberGeneratorFake(), chatConnector);
             var context = new BotServiceContext { Parent = hsbot };
 
             await reminderService.Start(context);
@@ -98,7 +98,7 @@ namespace Hsbot.Core.Tests.BotServices
 
             await reminderService.ProcessReminders();
 
-            chatConnector.Verify(x => x.SendMessage(It.IsAny<OutboundResponse>()), Times.Once);
+            chatConnector.SentMessages.Count.ShouldBe(1);
 
             reminderList = brain.GetItem<List<Reminder>>(ReminderService.BrainStorageKey);
             reminderList.Count.ShouldBe(1);
@@ -109,7 +109,7 @@ namespace Hsbot.Core.Tests.BotServices
         public void ShouldStartupAfterBrainService()
         {
             var reminderService = new ReminderService(new TestSystemClock(), new InlineChatMessageTextFormatter(), new FakeBrain());
-            var brainService = new HsbotBrainService(MockBrainStorage().Object, MockLog().Object);
+            var brainService = new HsbotBrainService(new FakeBrainStorage<InMemoryBrain>(), new FakeLogger<HsbotBrainService>());
 
             reminderService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
         }
