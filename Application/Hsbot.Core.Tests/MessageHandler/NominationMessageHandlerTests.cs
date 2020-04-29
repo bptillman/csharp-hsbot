@@ -87,7 +87,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         {
             var messageHandler = GetHandlerInstance();
             var message = GetMessage(messageHandler, "hva to <@bob> for dfe this person is great");
-            message.Channel = _bragRoom;
+            message.ChannelName = _bragRoom;
             var context = GetMessageContext(message);
 
             await messageHandler.HandleAsync(context);
