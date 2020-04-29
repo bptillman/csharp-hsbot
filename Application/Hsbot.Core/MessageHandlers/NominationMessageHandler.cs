@@ -82,7 +82,7 @@ namespace Hsbot.Core.MessageHandlers
                     await context.SendResponse(celebration.GetRoomMessage(successes));
                 }
 
-                if (message.Channel != _bragAndAwardChannel && successes.Any())
+                if (message.ChannelName != _bragAndAwardChannel && successes.Any())
                 {
                     var hvaSuccessMessage = new OutboundResponse
                     {
