@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Hsbot.Core.Messaging
@@ -29,6 +29,11 @@ namespace Hsbot.Core.Messaging
             return context.Bot.GetChatUserById(userId);
         }
 
+        public static Task<IUser[]> GetAllUsers(this IInboundMessageContext context)
+        {
+            return context.Bot.GetAllUsers();
+        }
+
         public static Task SendResponse(this IInboundMessageContext context, OutboundResponse response)
         {
             return context.Bot.SendMessage(response);
@@ -47,6 +52,18 @@ namespace Hsbot.Core.Messaging
         public static Task SendTypingOnChannelResponse(this IInboundMessageContext context)
         {
             return context.Bot.SendMessage(context.Message.CreateTypingOnChannelResponse());
+        }
+
+        public static Task UploadFile(this IInboundMessageContext context, string fileContents, string fileName)
+        {
+            var fileBytes = Encoding.UTF8.GetBytes(fileContents);
+            return context.UploadFile(fileBytes, fileName);
+        }
+
+        public static async Task UploadFile(this IInboundMessageContext context, byte[] fileBytes, string fileName)
+        {
+            await using var ms = new MemoryStream(fileBytes);
+            await context.Bot.UploadFile(context.Message.CreateFileUploadResponse(ms, fileName));
         }
     }
 }

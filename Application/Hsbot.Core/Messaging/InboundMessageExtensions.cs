@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -32,6 +33,15 @@ namespace Hsbot.Core.Messaging
         public static bool Contains(this InboundMessage message, string text)
         {
             return message.TextWithoutBotName.ToLowerInvariant().Contains(text.ToLowerInvariant());
+        }
+
+        /// <summary>
+        /// Determines if message.TargetedText equals the supplied string (case insensitive)
+        /// </summary>
+        /// <returns>True if message.TargetedText equals the supplied string, false otherwise</returns>
+        public static bool Is(this InboundMessage message, string text, StringComparison compareType = StringComparison.OrdinalIgnoreCase)
+        {
+            return message.TextWithoutBotName.Equals(text, compareType);
         }
 
         /// <summary>
@@ -104,6 +114,20 @@ namespace Hsbot.Core.Messaging
                 MessageRecipientType = MessageRecipientType.Channel,
                 Text = "",
                 IndicateTyping = true
+            };
+        }
+
+        /// <summary>
+        /// Will upload a file and push a response to the channel with a link to the file
+        /// </summary>
+        public static FileUploadResponse CreateFileUploadResponse(this InboundMessage message, Stream fileStream, string fileName)
+        {
+            return new FileUploadResponse
+            {
+                Channel = message.Channel,
+                FileName = fileName,
+                FileStream = fileStream,
+                MessageRecipientType = MessageRecipientType.Channel
             };
         }
     }

@@ -131,24 +131,46 @@ namespace Hsbot.Slack
             }
         }
 
-        public async Task<IUser> GetChatUserById(string userId)
+        public async Task UploadFile(FileUploadResponse response)
         {
-            if (!_connection.UserCache.TryGetValue(userId, out var user))
-            {
-                var users = await _connection.GetUsers();
-                user = users.Single(x => x.Id == userId);
-            }
+            var chatHub = await GetChatHub(response);
 
-            return new SlackUser
+            if (chatHub != null)
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = $"{user.FirstName} {user.LastName}",
-                IsEmployee = !user.IsBot && !user.IsGuest,
-            };
+                await _connection.Upload(chatHub, response.FileStream, response.FileName);
+            }
         }
 
-        private async Task<SlackChatHub> GetChatHub(OutboundResponse response)
+        public Task<IUser> GetChatUserById(string userId)
+        {
+            if (_connection.UserCache.TryGetValue(userId, out var user))
+            {
+                return Task.FromResult((IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                });
+            }
+
+            return null;
+        }
+
+        public Task<IUser[]> GetAllUsers()
+        {
+            return Task.FromResult(_connection.UserCache.Values.Select(user =>
+                (IUser) new SlackUser
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = $"{user.FirstName} {user.LastName}",
+                    IsEmployee = !user.IsBot && !user.IsGuest,
+                })
+                .ToArray());
+        }
+
+        private async Task<SlackChatHub> GetChatHub(ResponseBase response)
         {
             switch (response.MessageRecipientType)
             {

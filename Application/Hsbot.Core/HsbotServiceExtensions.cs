@@ -34,6 +34,7 @@ namespace Hsbot.Core
             services.AddHttpClient<ISimpsonApiClient, SimpsonApiClient>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
             services.AddHttpClient<IJiraApiClient, JiraApiClient>();
+            services.AddHttpClient<IXkcdApiClient, XkcdApiClient>();
             services.AddSingleton<Hsbot>();
 
             return new HsbotServiceConfigurator(services);
