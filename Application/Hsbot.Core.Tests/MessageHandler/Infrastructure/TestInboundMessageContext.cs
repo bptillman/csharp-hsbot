@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
 
@@ -43,14 +42,6 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
                     return Task.CompletedTask;
                 }
             };
-        }
-
-        public class TestFileUpload
-        {
-            public string FileName { get; set; }
-            public byte[] FileBytes { get; set; }
-
-            public string AsString(Encoding encoding = null) => (encoding ?? Encoding.UTF8).GetString(FileBytes);
         }
 
         private class TestBotMessagingServices : IBotMessagingServices
