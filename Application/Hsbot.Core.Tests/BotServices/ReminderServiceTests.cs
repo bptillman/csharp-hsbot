@@ -10,8 +10,6 @@ using Hsbot.Core.Tests.Brain;
 using Hsbot.Core.Tests.Connection;
 using Hsbot.Core.Tests.Infrastructure;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
-using static Hsbot.Core.Tests.ServiceMocks;
-using Moq;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.BotServices
@@ -111,7 +109,7 @@ namespace Hsbot.Core.Tests.BotServices
         public void ShouldStartupAfterBrainService()
         {
             var reminderService = new ReminderService(new TestSystemClock(), new InlineChatMessageTextFormatter(), new FakeBrain());
-            var brainService = new HsbotBrainService(MockBrainStorage().Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(new FakeBrainStorage<InMemoryBrain>(), new FakeLogger<HsbotBrainService>());
 
             reminderService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
         }

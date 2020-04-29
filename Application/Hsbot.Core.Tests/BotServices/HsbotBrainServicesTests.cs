@@ -1,9 +1,8 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
-using static Hsbot.Core.Tests.ServiceMocks;
-using Moq;
+using Hsbot.Core.Tests.Brain;
 using Shouldly;
 
 namespace Hsbot.Core.Tests.BotServices
@@ -12,44 +11,54 @@ namespace Hsbot.Core.Tests.BotServices
     {
         public async Task ShouldLoadBrainOnStart()
         {
-            var brainStorageMock = MockBrainStorage();
+            var brainStorage = new FakeBrainStorage<InMemoryBrain>
+            {
+                Brain = new InMemoryBrain(new Dictionary<string, string> {{"foo", "\"bar\""}})
+            };
 
-            var brainService = new HsbotBrainService(brainStorageMock.Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(brainStorage, new FakeLogger<HsbotBrainService>());
             await brainService.Start(new BotServiceContext());
 
-            brainStorageMock.Verify(x => x.Load(), Times.Once);
+            brainService.GetItem<string>("foo").ShouldBe("bar");
         }
 
         public async Task ShouldSaveBrainWhenItChanges()
         {
-            var brainStorageMock = MockBrainStorage();
+            var brainStorage = new FakeBrainStorage<InMemoryBrain>
+            {
+                Brain = new InMemoryBrain(new Dictionary<string, string> { { "foo", "\"bar\"" } })
+            };
 
-            var brainService = new HsbotBrainService(brainStorageMock.Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(brainStorage, new FakeLogger<HsbotBrainService>());
             await brainService.Start(new BotServiceContext());
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Once);
+            brainStorage.SavedBrains.Count.ShouldBe(1);
+            brainStorage.SavedBrains[0].Keys.Contains("foo").ShouldBeTrue();
+            brainStorage.SavedBrains[0].Keys.Contains("test").ShouldBeTrue();
         }
 
         public async Task ShouldNotSaveBrainIfInitialLoadFailed()
         {
-            var brainStorageMock = MockBrainStorage();
-            brainStorageMock.Setup(x => x.Load()).Throws(new Exception());
+            var brainStorage = new FakeBrainStorage<InMemoryBrain>
+            {
+                ThrowExceptionOnLoad = true
+            };
 
-            var brainService = new HsbotBrainService(brainStorageMock.Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(brainStorage, new FakeLogger<HsbotBrainService>());
             await brainService.Start(new BotServiceContext());
 
             brainService.SetItem("test", "value");
 
-            brainStorageMock.Verify(x => x.Save(It.IsAny<InMemoryBrain>()), Times.Never);
+            brainStorage.Brain.Keys.Count.ShouldBe(0);
         }
 
         public async Task SetItemShouldPersistToStorageWhenInitialLoadSucceeds()
         {
-            var brainStorageMock = MockBrainStorage();
+            var brainStorage = new FakeBrainStorage<InMemoryBrain>();
 
-            var brainService = new HsbotBrainService(brainStorageMock.Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(brainStorage, new FakeLogger<HsbotBrainService>());
             await brainService.Start(new BotServiceContext());
 
             var persistenceState = brainService.SetItem("test", "value");
@@ -58,10 +67,13 @@ namespace Hsbot.Core.Tests.BotServices
 
         public async Task SetItemShouldSaveInMemoryWhenInitialLoadFailed()
         {
-            var brainStorageMock = MockBrainStorage();
-            brainStorageMock.Setup(x => x.Load()).Throws(new Exception());
+            var brainStorage = new FakeBrainStorage<InMemoryBrain>
+            {
+                Brain = new InMemoryBrain(new Dictionary<string, string> { { "foo", "\"bar\"" } }),
+                ThrowExceptionOnLoad = true
+            };
 
-            var brainService = new HsbotBrainService(brainStorageMock.Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(brainStorage, new FakeLogger<HsbotBrainService>());
             await brainService.Start(new BotServiceContext());
 
             var persistenceState = brainService.SetItem("test", "value");

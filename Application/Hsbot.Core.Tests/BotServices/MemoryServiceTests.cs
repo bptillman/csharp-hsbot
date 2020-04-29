@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.Brain;
 using Hsbot.Core.Tests.Brain;
 using Shouldly;
-using static Hsbot.Core.Tests.ServiceMocks;
 
 namespace Hsbot.Core.Tests.BotServices
 {
@@ -98,7 +98,7 @@ namespace Hsbot.Core.Tests.BotServices
         public void ShouldStartupAfterBrainService()
         {
             var memoryService = new MemoryService(new FakeBrain());
-            var brainService = new HsbotBrainService(MockBrainStorage().Object, new FakeLogger<HsbotBrainService>());
+            var brainService = new HsbotBrainService(new FakeBrainStorage<InMemoryBrain>(), new FakeLogger<HsbotBrainService>());
 
             memoryService.GetStartupOrder().ShouldBeGreaterThan(brainService.GetStartupOrder());
         }
