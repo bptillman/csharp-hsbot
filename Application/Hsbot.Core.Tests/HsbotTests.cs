@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Hsbot.Core.BotServices;
+using Hsbot.Core.MessageHandlers;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Tests.Connection;
 using Hsbot.Core.Tests.MessageHandler.Infrastructure;
@@ -145,6 +147,120 @@ namespace Hsbot.Core.Tests
             await hsbot.SendMessage(outboundResponse);
 
             chatConnector.SentMessages.Count.ShouldBe(1);
+        }
+
+        public async Task ShouldReportThrownExceptionBackToUser()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new Exception("exception message")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake { NextIntValue = barkIndex };
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe(hsbot.ErrorBarks[barkIndex]);
+        }
+
+        public async Task ShouldReportThrownMessageHandlerExceptionBackToUser()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new MessageHandlerException("error response to channel", "diagnostic info")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake {NextIntValue = barkIndex};
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe("error response to channel");
+        }
+
+        public async Task ShouldUseBarkForMessageHandlerExceptionWithNoResponse()
+        {
+            var inboundMessage = new InboundMessage
+            {
+                BotIsMentioned = true,
+                BotId = "test",
+                BotName = "test",
+                Channel = "fake channel",
+                ChannelName = "fake channel",
+                FullText = "test message",
+                MessageRecipientType = MessageRecipientType.Channel,
+                RawText = "test message",
+                TextWithoutBotName = "test message",
+                UserChannel = "",
+                UserEmail = "test@test.com",
+                UserId = "nobody",
+                Username = "nobody"
+            };
+
+            var chatConnector = new FakeChatConnector();
+            var messageHandler = new FakeMessageHandler
+            {
+                HandlesMessage = true,
+                HandlerAction = c => throw new MessageHandlerException("", "diagnostic info")
+            };
+
+            var barkIndex = 1;
+            var randomNumberGeneratorFake = new RandomNumberGeneratorFake { NextIntValue = barkIndex };
+            var hsbot = new Hsbot(new FakeLogger<Hsbot>(), new[] { messageHandler }, Enumerable.Empty<IBotService>(), randomNumberGeneratorFake, chatConnector);
+            await hsbot.Connect();
+
+            chatConnector.ReceiveMessage(inboundMessage);
+
+            messageHandler.HandledMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages.Count.ShouldBe(1);
+            chatConnector.SentMessages[0].Text.ShouldBe(hsbot.ErrorBarks[barkIndex]);
         }
     }
 }

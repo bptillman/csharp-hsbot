@@ -1,28 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
 
-public class FakeMessageHandler : IInboundMessageHandler
+namespace Hsbot.Core.Tests
 {
-    public bool HandlesMessage { get; set; } = true;
-    public List<IInboundMessageContext> HandledMessages { get; } = new List<IInboundMessageContext>();
-
-    public IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
+    public class FakeMessageHandler : IInboundMessageHandler
     {
-        yield break;
-    }
+        public bool HandlesMessage { get; set; } = true;
+        public List<IInboundMessageContext> HandledMessages { get; } = new List<IInboundMessageContext>();
+        public Action<IInboundMessageContext> HandlerAction { get; set; } = c => { };
 
-    public HandlesResult Handles(InboundMessage message)
-    {
-        return new HandlesResult
+        public IEnumerable<MessageHandlerDescriptor> GetCommandDescriptors()
         {
-            HandlesMessage = HandlesMessage
-        };
-    }
+            yield break;
+        }
 
-    public Task HandleAsync(IInboundMessageContext messageContext)
-    {
-        HandledMessages.Add(messageContext);
-        return Task.CompletedTask;
+        public HandlesResult Handles(InboundMessage message)
+        {
+            return new HandlesResult
+            {
+                HandlesMessage = HandlesMessage
+            };
+        }
+
+        public Task HandleAsync(IInboundMessageContext messageContext)
+        {
+            HandledMessages.Add(messageContext);
+            HandlerAction(messageContext);
+            return Task.CompletedTask;
+        }
     }
 }
