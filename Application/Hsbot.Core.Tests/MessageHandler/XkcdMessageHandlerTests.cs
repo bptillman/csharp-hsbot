@@ -41,7 +41,7 @@ namespace Hsbot.Core.Tests.MessageHandler
         {
             var messageHandler = GetHandlerInstance();
 
-            var response = await messageHandler.TestHandleAsync($"xkcd latest");
+            var response = await messageHandler.TestHandleAsync("xkcd latest");
 
             response.SentMessages.Count.ShouldBe(3);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
