@@ -1,9 +1,12 @@
-﻿namespace Hsbot.Core.Tests.MessageHandler
+﻿using System.Collections.Generic;
+using Hsbot.Core.Tests.MessageHandler.Infrastructure;
+using Hsbot.Core.MessageHandlers;
+using Shouldly;
+using System.Threading.Tasks;
+using Hsbot.Core.ApiClients;
+
+namespace Hsbot.Core.Tests.MessageHandler
 {
-    using System.Threading.Tasks;
-    using Infrastructure;
-    using MessageHandlers;
-    using Shouldly;
 
     public class SimpsonMessageHandlerTests : MessageHandlerTestBase<SimpsonMessageHandler>
     {
@@ -70,7 +73,7 @@
 
         public async Task ShouldNotGetImageFromWebsite()
         {
-            var messageHandler = GetHandlerInstance();
+            var messageHandler = GetHandlerInstance(new List<FrinkiacImage>());
             var response = await messageHandler.TestHandleAsync("simpson me xqmrtvzpq123");
             response.SentMessages.Count.ShouldBe(2);
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
@@ -99,7 +102,7 @@
 
         public async Task ShouldNotGetGifFromWebsite()
         {
-            var messageHandler = GetHandlerInstance();
+            var messageHandler = GetHandlerInstance(new List<FrinkiacImage>());
             var response = await messageHandler.TestHandleAsync("simpson gif me xqmrtvzpq123");
             response.SentMessages.Count.ShouldBe(2);
             response.SentMessages[1].Text.ShouldBe(GifNotFound);
@@ -114,6 +117,36 @@
             response.SentMessages[0].IndicateTyping.ShouldBe(true);
             response.SentMessages[1].Text.ShouldStartWith(GifResponse);
             response.SentMessages[1].Text.ShouldEndWith("?b64lines=" + SimpsonMessageHandler.Base64Encode(meme));
+        }
+
+        protected override SimpsonMessageHandler GetHandlerInstance()
+        {
+            return GetHandlerInstance(new[]
+            {
+                new FrinkiacImage
+                {
+                    Id = 123,
+                    Episode = "An Episode",
+                    TimeStamp = 123123,
+                }
+            });
+        }
+
+        private SimpsonMessageHandler GetHandlerInstance(IEnumerable<FrinkiacImage> images)
+        {
+            //Since this RNG will always return 0, the check on the random roll in the handler will
+            //always succeed, meaning the random roll will not cause the result of ShouldHandle
+            //to be false
+            var rng = new RandomNumberGeneratorFake { NextDoubleValue = 0.0 };
+
+            var testSimpsonsApiClient = new TestSimpsonApiClient
+            {
+                Images = images,
+            };
+
+            var handler = new SimpsonMessageHandler(rng, testSimpsonsApiClient);
+
+            return handler;
         }
     }
 }
