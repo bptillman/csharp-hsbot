@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Hsbot.Core.Brain;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Hsbot.Core.Tests.Brain
 {
@@ -29,7 +30,14 @@ namespace Hsbot.Core.Tests.Brain
 
         public string BrainDump()
         {
-            return JsonConvert.SerializeObject(BrainContents);
+            var brainAsObject = new Dictionary<string, JObject>();
+            foreach (var key in Keys)
+            {
+                var obj = JObject.Parse(BrainContents[key]);
+                brainAsObject[key] = obj;
+            }
+
+            return JsonConvert.SerializeObject(brainAsObject);
         }
     }
 }
