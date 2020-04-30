@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Hsbot.Azure;
 using Hsbot.Core;
 using Hsbot.Hosting.Web.LocalDebug;
@@ -76,8 +77,13 @@ namespace Hsbot.Hosting.Web
                 app.UseRouting();
                 app.UseEndpoints(endpoints =>
                 {
-                    //endpoints.MapBlazorHub();
-                    endpoints.MapFallbackToFile("_content/Hsbot.Blazor.Client/debug.html");
+                    endpoints.Map("/", ctx =>
+                    {
+                        ctx.Response.Redirect("/index.html");
+                        return Task.CompletedTask;
+                    });
+                    endpoints.MapHub<LocalDebug.Hubs.ChatHub>("/LocalDebug/Chat");
+                    endpoints.MapFallbackToFile("_content/Hsbot.Blazor.Client/index.html");
                 });
             }
 
