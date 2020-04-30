@@ -13,10 +13,12 @@ namespace Hsbot.Hosting.Web
     public class Startup
     {
         private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public Startup(IConfiguration config)
+        public Startup(IConfiguration config, IWebHostEnvironment webHostEnvironment)
         {
             _config = config;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -49,18 +51,31 @@ namespace Hsbot.Hosting.Web
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseStaticFiles();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseWebAssemblyDebugging();
+                app.UseBlazorFrameworkFiles();
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    //endpoints.MapBlazorHub();
+                    endpoints.MapFallbackToFile("_content/Hsbot.Blazor.Client/debug.html");
+                });
             }
 
-            //We're not actually serving up any web content at present.
-            //This website is only acting as a host for the hsbot service,
-            //so no need to wire up anything other than a static reply.
-            app.Run(async (context) =>
+            else
             {
-                await context.Response.WriteAsync("Beep boop bop");
-            });
+                //We're not actually serving up any web content at present.
+                //This website is only acting as a host for the hsbot service,
+                //so no need to wire up anything other than a static reply.
+                app.Run(async (context) =>
+                {
+                    await context.Response.WriteAsync("Beep boop bop");
+                });
+            }
         }
     }
 }
