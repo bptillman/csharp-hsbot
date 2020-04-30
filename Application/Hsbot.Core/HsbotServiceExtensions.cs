@@ -31,6 +31,7 @@ namespace Hsbot.Core
             services.AddSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
+            services.AddHttpClient<ISimpsonApiClient, SimpsonApiClient>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
             services.AddHttpClient<IJiraApiClient, JiraApiClient>();
             services.AddHttpClient<IXkcdApiClient, XkcdApiClient>();
