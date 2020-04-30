@@ -181,3 +181,40 @@ app {
         display: block;
     }
 }
+
+textarea {
+    border: 1px dashed #888;
+    border-radius: .25rem;
+    width: 80%;
+    overflow: auto;
+    background: #f7f7f7
+}
+
+.chat-content {
+    padding: 10px 0px 10px 6px;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    margin: 10px 0px 10px 0px;
+}
+
+.channel {
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #aaaaaa;
+}
+
+.user {
+    font-size: 0.8em;
+    color: white;
+    background-color: #03a9f4;
+    border-radius: .25rem;
+    padding: 3px;
+}
+
+.msg {
+    /*display: inline;*/
+}
+
+.msg.typing {
+    font-style: italic
+}

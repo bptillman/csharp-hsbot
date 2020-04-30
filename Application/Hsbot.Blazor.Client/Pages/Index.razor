@@ -1,7 +1,158 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+@inject NavigationManager NavigationManager
 
-Welcome to your new app.
+<div class="content px-4">
+    <div class="form-row">
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">#</div>
+                </div>
+                <input id="channel" class="form-control" placeholder="Channel" type="text" maxlength="32" @bind="@_channel" />
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">@@</div>
+                </div>
+                <input id="username" class="form-control" placeholder="Username" type="text" maxlength="32" @bind="@_userName" />
+            </div>
+        </div>
+    </div>
+    <div class="chat-content">
+        @if (_messages.Count == 0)
+        {
+            <div class="channel">No messages sent yet.</div>
+        }
+        @foreach (var item in _messages)
+        {
+            @if (item.IndicateTyping)
+            {
+                <div class="@item.Css">
+                    <div class="channel">@item.Channel</div>
+                    <div class="msg typing">@item.Username is typing...</div>
+                </div>
+            }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+            @if (!string.IsNullOrEmpty(item.Body))
+            {
+                <div class="@item.Css">
+                    <span class="channel">@item.Channel</span>
+                    <span class="user">@item.Username</span>
+                    <span class="msg">@item.Body</span>
+                </div>
+            }
+        }
+    </div>
+    <div class="form-row">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="enter your comment" @bind="@_newMessage" @onkeyup="@OnMessageKeyUp" />
+            <div class="input-group-append">
+                <button class="btn btn-success" type="button" @onclick="@SendAsync"><span class="oi oi-share"></span></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code  {
+    bool _connected = false;
+    string _channel = null;
+    string _userName = null;
+    ChatClient _client = null;
+    string _message = null;
+    string _newMessage = null;
+    List<Message> _messages = new List<Message>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Connect();
+        await base.OnInitializedAsync();
+    }
+
+    async Task Connect()
+    {
+        if (_connected) return;
+
+        try
+        {
+            _messages.Clear();
+
+            _client = new ChatClient(NavigationManager.BaseUri);
+            _client.MessageReceived += MessageReceived;
+            
+            Console.WriteLine("Index: chart starting...");
+            await _client.StartAsync();
+            Console.WriteLine("Index: chart started?");
+
+            _connected = true;
+        }
+
+        catch (Exception e)
+        {
+            _message = $"ERROR: Failed to start chat client: {e.Message}";
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
+        }
+    }
+
+    void MessageReceived(object sender, ChatClient.MessageReceivedEventArgs e)
+    {
+        Console.WriteLine($"Blazor: receive {e.ChannelName}: {e.UserName} {e.MessageText}");
+        
+        var isMine = false;
+        if (!string.IsNullOrWhiteSpace(e.UserName))
+        {
+            isMine = string.Equals(e.UserName, _userName, StringComparison.CurrentCultureIgnoreCase);
+        }
+
+        var newMsg = new Message(e.ChannelName, e.UserName, e.MessageText, e.IndicateTyping, isMine);
+        _messages.Add(newMsg);
+
+        StateHasChanged();
+    }
+
+    async Task SendAsync()
+    {
+        if (!_connected) await Connect();
+
+        if (_connected && !string.IsNullOrWhiteSpace(_newMessage))
+        {
+            var userName = _userName.StartsWith("@") ? _userName : "@" + _userName;
+            var channel = _channel.StartsWith("#") ? _channel : "#" + _channel;
+
+            _messages.Add(new Message(channel, userName, _newMessage, false, true));
+            await _client.SendAsync(channel, userName, _newMessage);
+            _newMessage = "";
+        }
+    }
+
+    async Task OnMessageKeyUp(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter")
+        {
+            await SendAsync();
+        }
+    }
+
+    class Message
+    {
+        public Message(string channel, string username, string body, bool indicateTyping, bool mine)
+        {
+            Channel = channel;
+            Username = username;
+            Body = body;
+            IndicateTyping = indicateTyping;
+            Mine = mine;
+        }
+
+        public string Channel { get; set; }
+        public string Username { get; set; }
+        public string Body { get; set; }
+        public bool IndicateTyping { get; }
+        public bool Mine { get; set; }
+
+        public string Css => Mine ? "sent" : "received";
+    }
+}
