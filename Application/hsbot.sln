@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2047
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30002.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Hosting.Web", "Hsbot.Hosting.Web\Hsbot.Hosting.Web.csproj", "{03B176DF-306F-4BA0-8A4B-077A14D7C6CD}"
 EndProject
@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Core.Tests", "Hsbot.C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack", "Hsbot.Slack\Hsbot.Slack.csproj", "{72DD27E5-6FAB-413C-BFD6-7197810C8637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hsbot.Azure", "Hsbot.Azure\Hsbot.Azure.csproj", "{877093C0-0AC5-4536-A305-10BA513F741D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Azure", "Hsbot.Azure\Hsbot.Azure.csproj", "{877093C0-0AC5-4536-A305-10BA513F741D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Blazor.Client", "Hsbot.Blazor.Client\Hsbot.Blazor.Client.csproj", "{7EB96890-EA10-48C0-98D5-BB132C4B032D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{877093C0-0AC5-4536-A305-10BA513F741D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{877093C0-0AC5-4536-A305-10BA513F741D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{877093C0-0AC5-4536-A305-10BA513F741D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
