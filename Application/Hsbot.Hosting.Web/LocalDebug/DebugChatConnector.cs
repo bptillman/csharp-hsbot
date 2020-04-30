@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using Hsbot.Core;
 using Hsbot.Core.Connection;
 using Hsbot.Core.Messaging;
+using Hsbot.Hosting.Web.LocalDebug.Hubs;
 using Hsbot.Slack;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Hsbot.Hosting.Web.LocalDebug
 {
     public class DebugChatConnector : IHsbotChatConnector
     {
+        private readonly IHubContext<ChatHub> _chatHubContext;
         private readonly Subject<IHsbotChatConnector> _disconnectedEvent = new Subject<IHsbotChatConnector>();
         private readonly Subject<IHsbotChatConnector> _reconnectingEvent = new Subject<IHsbotChatConnector>();
         private readonly Subject<IHsbotChatConnector> _reconnectedEvent = new Subject<IHsbotChatConnector>();
         private readonly Subject<Task<InboundMessage>> _messageReceivedEvent = new Subject<Task<InboundMessage>>();
-        private readonly Subject<OutboundResponse> _messageSentEvent = new Subject<OutboundResponse>();
-        private readonly Subject<FileUploadResponse> _fileUploadedEvent = new Subject<FileUploadResponse>();
 
         public readonly Dictionary<string, SlackUser> ChatUsers = new Dictionary<string, SlackUser>();
 
@@ -25,17 +26,17 @@ namespace Hsbot.Hosting.Web.LocalDebug
         public IObservable<IHsbotChatConnector> Reconnecting { get; }
         public IObservable<IHsbotChatConnector> Reconnected { get; }
         public IObservable<Task<InboundMessage>> MessageReceived { get; }
-        public IObservable<OutboundResponse> MessageSent { get; }
-        public IObservable<FileUploadResponse> FileUploaded { get; }
 
-        public DebugChatConnector()
+        public readonly string BotName = "@hsbot";
+        public readonly string[] BotAliases = { "hsbot", "@hsbot", "csharpbot", "@csharpbot" };
+
+        public DebugChatConnector(IHubContext<ChatHub> chatHubContext)
         {
+            _chatHubContext = chatHubContext;
             Disconnected = _disconnectedEvent;
             Reconnecting = _reconnectingEvent;
             Reconnected = _reconnectedEvent;
             MessageReceived = _messageReceivedEvent;
-            MessageSent = _messageSentEvent;
-            FileUploaded = _fileUploadedEvent;
         }
 
         public Task Connect()
@@ -54,16 +55,16 @@ namespace Hsbot.Hosting.Web.LocalDebug
             _messageReceivedEvent.OnNext(Task.FromResult(message));
         }
 
-        public Task SendMessage(OutboundResponse response)
+        public async Task SendMessage(OutboundResponse response)
         {
-            _messageSentEvent.OnNext(response);
-            return Task.CompletedTask;
+            if (string.IsNullOrEmpty(response.UserId)) response.UserId = BotName;
+            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveMethodName, response.Channel, response.UserId, response.Text, response.IndicateTyping);
         }
 
-        public Task UploadFile(FileUploadResponse response)
+        public async Task UploadFile(FileUploadResponse response)
         {
-            _fileUploadedEvent.OnNext(response);
-            return Task.CompletedTask;
+            if (string.IsNullOrEmpty(response.UserId)) response.UserId = BotName;
+            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveMethodName, response.Channel, response.UserId, response.FileName, false);
         }
 
         public Task<IUser> GetChatUserById(string userId)
