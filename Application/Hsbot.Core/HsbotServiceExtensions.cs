@@ -34,6 +34,8 @@ namespace Hsbot.Core
             services.AddSingleton<IFoodTruckProvider, FoodTruckProvider>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
+            services.AddHttpClient<IDictionaryApiClient, DictionaryApiClient>();
+            services.AddHttpClient<IThesaurusApiClient, ThesaurusApiClient>();
             services.AddHttpClient<IJiraApiClient, JiraApiClient>();
             services.AddHttpClient<IXkcdApiClient, XkcdApiClient>();
             services.AddSingleton<Hsbot>();
