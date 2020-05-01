@@ -11,7 +11,7 @@
                 <div class="input-group-prepend">
                     <div class="input-group-text">#</div>
                 </div>
-                <input id="channel" class="form-control" placeholder="Channel" type="text" maxlength="32" @bind="@_channel" />
+                <input id="channel" class="form-control @channelValidationState" placeholder="Channel" type="text" maxlength="32" @bind="@_channel" required />
             </div>
         </div>
         <div class="col">
@@ -19,7 +19,7 @@
                 <div class="input-group-prepend">
                     <div class="input-group-text">@@</div>
                 </div>
-                <input id="username" class="form-control" placeholder="Username" type="text" maxlength="32" @bind="@_userName" />
+                <input id="username" class="form-control @userNameValidationState" placeholder="Username" type="text" maxlength="32" @bind="@_userName" required />
             </div>
         </div>
     </div>
@@ -91,6 +91,9 @@
     string _newMessage = null;
     List<Message> _messages = new List<Message>();
 
+    string channelValidationState = "";
+    string userNameValidationState = "";
+
     protected override async Task OnInitializedAsync()
     {
         await Connect();
@@ -149,6 +152,8 @@
     {
         if (!_connected) await Connect();
 
+        if (!Validate()) return;
+
         if (_connected && !string.IsNullOrWhiteSpace(_newMessage))
         {
             var userName = _userName.StartsWith("@") ? _userName : "@" + _userName;
@@ -166,6 +171,14 @@
         {
             await SendAsync();
         }
+    }
+
+    bool Validate()
+    {
+        channelValidationState = string.IsNullOrWhiteSpace(_channel) ? "is-invalid" : "";
+        userNameValidationState = string.IsNullOrWhiteSpace(_userName) ? "is-invalid" : "";
+
+        return string.IsNullOrEmpty(channelValidationState) && string.IsNullOrEmpty(userNameValidationState);
     }
 
     static readonly Regex BoldRegex = new Regex(@"\*(?<content>.*)\*");
