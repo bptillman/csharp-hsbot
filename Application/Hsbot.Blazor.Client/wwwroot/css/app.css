@@ -197,24 +197,45 @@ textarea {
     margin: 10px 0px 10px 0px;
 }
 
-.channel {
+.message {
+    margin-bottom: 4px;
     font-size: 0.8em;
+}
+
+.channel {
     font-weight: bold;
     color: #aaaaaa;
 }
 
 .user {
-    font-size: 0.8em;
     color: white;
     background-color: #03a9f4;
     border-radius: .25rem;
     padding: 3px;
 }
 
-.msg {
-    /*display: inline;*/
+.msg.typing {
+    font-style: italic;
+    color: #cccccc;
 }
 
-.msg.typing {
-    font-style: italic
+.file-contents, .inline-code, .at-mention {
+    border-radius: .25rem;
+    color: #cd5c5c;
+    border: 1px solid #ced4da;
+    background-color: #f6f6f6;
+    padding: 3px;
+}
+
+.file-name {
+    color: #aaaaaa;
+    font-family: monospace;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italics {
+    font-style: italic;
 }

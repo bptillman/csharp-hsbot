@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Hsbot.Core.Messaging
+@using System.Text.RegularExpressions
 
 @inject NavigationManager NavigationManager
 
@@ -30,18 +32,42 @@
         {
             @if (item.IndicateTyping)
             {
-                <div class="@item.Css">
-                    <div class="channel">@item.Channel</div>
-                    <div class="msg typing">@item.Username is typing...</div>
+                <div class="message">
+                    <span class="channel">@item.Channel</span>
+                    <span class="msg typing">@item.Username is typing...</span>
                 </div>
             }
 
             @if (!string.IsNullOrEmpty(item.Body))
             {
-                <div class="@item.Css">
+                <div class="message">
                     <span class="channel">@item.Channel</span>
                     <span class="user">@item.Username</span>
-                    <span class="msg">@item.Body</span>
+                    <span class="msg">@((MarkupString)FormatText(item.Body))</span>
+                </div>
+            }
+
+            @if (item.Attachments != null && item.Attachments.Count > 0)
+            {
+                foreach (var attachment in item.Attachments)
+                {
+                    <div class="message">
+                        <span class="channel">@item.Channel</span>
+                        <span class="user">@item.Username</span>
+                        <span class="msg">@attachment.ImageUrl</span>
+                    </div>
+                }
+            }
+
+            @if (!string.IsNullOrEmpty(item.FileName))
+            {
+                <div class="message">
+                    <span class="channel">@item.Channel</span>
+                    <span class="user">@item.Username</span>
+                    <span class="file-name">@item.FileName</span>
+                </div>
+                <div class="file-contents">
+                    @item.FileContents
                 </div>
             }
         }
@@ -81,7 +107,8 @@
 
             _client = new ChatClient(NavigationManager.BaseUri);
             _client.MessageReceived += MessageReceived;
-            
+            _client.FileUploadReceived += UploadReceived;
+
             Console.WriteLine("Index: chart starting...");
             await _client.StartAsync();
             Console.WriteLine("Index: chart started?");
@@ -97,21 +124,26 @@
         }
     }
 
-    void MessageReceived(object sender, ChatClient.MessageReceivedEventArgs e)
+    void MessageReceived(object sender, OutboundResponse e)
     {
-        Console.WriteLine($"Blazor: receive {e.ChannelName}: {e.UserName} {e.MessageText}");
-        
-        var isMine = false;
-        if (!string.IsNullOrWhiteSpace(e.UserName))
-        {
-            isMine = string.Equals(e.UserName, _userName, StringComparison.CurrentCultureIgnoreCase);
-        }
+        Console.WriteLine($"Blazor: receive {e.Channel}: {e.UserId} {e.Text}");
 
-        var newMsg = new Message(e.ChannelName, e.UserName, e.MessageText, e.IndicateTyping, isMine);
+        var newMsg = new Message(e);
         _messages.Add(newMsg);
 
         StateHasChanged();
     }
+
+    void UploadReceived(object sender, FileContentResponse e)
+    {
+        Console.WriteLine($"Blazor: receive {e.Channel}: {e.UserId} {e.FileName}");
+
+        var newMsg = new Message(e);
+        _messages.Add(newMsg);
+
+        StateHasChanged();
+    }
+
 
     async Task SendAsync()
     {
@@ -122,7 +154,7 @@
             var userName = _userName.StartsWith("@") ? _userName : "@" + _userName;
             var channel = _channel.StartsWith("#") ? _channel : "#" + _channel;
 
-            _messages.Add(new Message(channel, userName, _newMessage, false, true));
+            _messages.Add(new Message(channel, userName, _newMessage));
             await _client.SendAsync(channel, userName, _newMessage);
             _newMessage = "";
         }
@@ -136,23 +168,55 @@
         }
     }
 
+    static readonly Regex BoldRegex = new Regex(@"\*(?<content>.*)\*");
+    static readonly Regex ItalicsRegex = new Regex(@"_(?<content>.*)_");
+    static readonly Regex InlineCodeRegex = new Regex(@"`(?<content>.*)`");
+    static readonly Regex AtMentionRegex = new Regex(@"(?<content>@(\w+)\b)");
+
+    string FormatText(string text)
+    {
+        text = BoldRegex.Replace(text, "<span class=\"bold\">${content}</span>");
+        text = ItalicsRegex.Replace(text, "<span class=\"italics\">${content}</span>");
+        text = InlineCodeRegex.Replace(text, "<span class=\"inline-code\">${content}</span>");
+        text = AtMentionRegex.Replace(text, "<span class=\"at-mention\">${content}</span>");
+
+        return text;
+    }
+
     class Message
     {
-        public Message(string channel, string username, string body, bool indicateTyping, bool mine)
+        public Message(OutboundResponse response)
+        {
+            Channel = response.Channel;
+            Username = response.UserId;
+            Body = response.Text;
+            IndicateTyping = response.IndicateTyping;
+            Attachments = response.Attachments;
+        }
+
+        public Message(FileContentResponse response)
+        {
+            Channel = response.Channel;
+            Username = response.UserId;
+            FileName = response.FileName;
+            FileContents = response.AsString();
+        }
+
+        public Message(string channel, string username, string body)
         {
             Channel = channel;
             Username = username;
             Body = body;
-            IndicateTyping = indicateTyping;
-            Mine = mine;
         }
 
         public string Channel { get; set; }
         public string Username { get; set; }
         public string Body { get; set; }
-        public bool IndicateTyping { get; }
-        public bool Mine { get; set; }
+        public bool IndicateTyping { get; set; }
 
-        public string Css => Mine ? "sent" : "received";
+        public List<Attachment> Attachments { get; set; }
+
+        public string FileName { get; set; }
+        public string FileContents { get; set; }
     }
 }
