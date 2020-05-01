@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Threading.Tasks;
@@ -58,13 +59,26 @@ namespace Hsbot.Hosting.Web.LocalDebug
         public async Task SendMessage(OutboundResponse response)
         {
             if (string.IsNullOrEmpty(response.UserId)) response.UserId = BotName;
-            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveMethodName, response.Channel, response.UserId, response.Text, response.IndicateTyping);
+            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveMethodName, response);
         }
 
         public async Task UploadFile(FileUploadResponse response)
         {
             if (string.IsNullOrEmpty(response.UserId)) response.UserId = BotName;
-            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveMethodName, response.Channel, response.UserId, response.FileName, false);
+
+            await using var ms = new MemoryStream();
+            response.FileStream.CopyTo(ms);
+
+            var fileContentResponse = new FileContentResponse
+            {
+                Channel = response.Channel,
+                UserId = response.UserId,
+                MessageRecipientType = response.MessageRecipientType,
+                FileBytes = ms.ToArray(),
+                FileName = response.FileName,
+            };
+
+            await _chatHubContext.Clients.All.SendAsync(ChatHub.ReceiveUploadMethodName, fileContentResponse);
         }
 
         public Task<IUser> GetChatUserById(string userId)

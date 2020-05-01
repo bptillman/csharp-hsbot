@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Hsbot.Core.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Hsbot.Blazor.Client
@@ -9,6 +10,7 @@ namespace Hsbot.Blazor.Client
         public const string HubUrl = "/LocalDebug/Chat";
         public const string SendMessageMethodName = "SendMessage";
         public const string ReceiveMessageMethodName = "ReceiveMessage";
+        public const string ReceiveUploadMethodName = "ReceiveUpload";
 
         private bool _started = false;
 
@@ -31,7 +33,8 @@ namespace Hsbot.Blazor.Client
 
                 Console.WriteLine("ChatClient: calling Start()");
 
-                _hubConnection.On<string, string, string, bool>(ReceiveMessageMethodName, HandleReceiveMessage);
+                _hubConnection.On<OutboundResponse>(ReceiveMessageMethodName, HandleReceiveMessage);
+                _hubConnection.On<FileContentResponse>(ReceiveUploadMethodName, HandleReceiveUpload);
 
                 await _hubConnection.StartAsync();
 
@@ -58,7 +61,7 @@ namespace Hsbot.Blazor.Client
 
             await _hubConnection.SendAsync(SendMessageMethodName, channelName, userName, messageText);
         }
-        
+
         public async ValueTask DisposeAsync()
         {
             Console.WriteLine("ChatClient: Disposing");
@@ -66,27 +69,19 @@ namespace Hsbot.Blazor.Client
         }
 
         public event MessageReceivedEventHandler MessageReceived;
-        public delegate void MessageReceivedEventHandler(object sender, MessageReceivedEventArgs e);
+        public delegate void MessageReceivedEventHandler(object sender, OutboundResponse response);
 
-        private void HandleReceiveMessage(string channelName, string userName, string messageText, bool indicateTyping)
+        private void HandleReceiveMessage(OutboundResponse response)
         {
-            var messageReceivedEvent = new MessageReceivedEventArgs
-            {
-                ChannelName = channelName,
-                IndicateTyping = indicateTyping,
-                MessageText = messageText,
-                UserName = userName
-            };
-
-            MessageReceived?.Invoke(this, messageReceivedEvent);
+            MessageReceived?.Invoke(this, response);
         }
 
-        public class MessageReceivedEventArgs : EventArgs
+        public event FileUploadReceivedEventHandler FileUploadReceived;
+        public delegate void FileUploadReceivedEventHandler(object sender, FileContentResponse response);
+
+        private void HandleReceiveUpload(FileContentResponse response)
         {
-            public string ChannelName { get; set; }
-            public string UserName { get; set; }
-            public string MessageText { get; set; }
-            public bool IndicateTyping { get; set; }
+            FileUploadReceived?.Invoke(this, response);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace Hsbot.Hosting.Web.LocalDebug.Hubs
     {
         private readonly DebugChatConnector _debugChatConnector;
         public const string ReceiveMethodName = "ReceiveMessage";
+        public const string ReceiveUploadMethodName = "ReceiveUpload";
 
         public ChatHub(DebugChatConnector debugChatConnector)
         {
