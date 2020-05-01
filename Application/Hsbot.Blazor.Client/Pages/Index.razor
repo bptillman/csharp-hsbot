@@ -172,6 +172,7 @@
     static readonly Regex ItalicsRegex = new Regex(@"_(?<content>.*)_");
     static readonly Regex InlineCodeRegex = new Regex(@"`(?<content>.*)`");
     static readonly Regex AtMentionRegex = new Regex(@"(?<content>@(\w+)\b)");
+    static readonly Regex UrlRegex = new Regex(@"(?<content>(www|http:|https:)+[^\s]+[\w])");
 
     string FormatText(string text)
     {
@@ -179,6 +180,7 @@
         text = ItalicsRegex.Replace(text, "<span class=\"italics\">${content}</span>");
         text = InlineCodeRegex.Replace(text, "<span class=\"inline-code\">${content}</span>");
         text = AtMentionRegex.Replace(text, "<span class=\"at-mention\">${content}</span>");
+        text = UrlRegex.Replace(text, "<a href=\"${content}\">${content}</a>");
 
         return text;
     }
