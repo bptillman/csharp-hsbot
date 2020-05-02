@@ -7,8 +7,8 @@ namespace Hsbot.Core.FoodTrucks
     public class FoodTruckProvider : IFoodTruckProvider
     {
         private static readonly int[] OddWeeks = { 1, 3, 5 };
-        private static readonly int[] EvenWeeks = { 2, 4, 6 };
-        private static readonly int[] AllWeeks = { 1, 2, 3, 4, 5, 6 };
+        private static readonly int[] EvenWeeks = { 2, 4 };
+        private static readonly int[] AllWeeks = { 1, 2, 3, 4, 5 };
 
         private readonly IEnumerable<Truck> _trucks = new[]
         {
