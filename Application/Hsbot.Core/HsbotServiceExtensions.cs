@@ -5,6 +5,7 @@ using Hsbot.Core.ApiClients;
 using Hsbot.Core.BotServices;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Connection;
+using Hsbot.Core.FoodTrucks;
 using Hsbot.Core.Infrastructure;
 using Hsbot.Core.Maps;
 using Hsbot.Core.MessageHandlers.Celebrations;
@@ -30,6 +31,7 @@ namespace Hsbot.Core
             services.AddSingleton<IHsbotConfig>(svc => config);
             services.AddSingleton<IRandomNumberGenerator, RandomNumberGenerator>();
             services.AddSingleton<ISystemClock, SystemClock>();
+            services.AddSingleton<IFoodTruckProvider, FoodTruckProvider>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
             services.AddHttpClient<ISimpsonApiClient, SimpsonApiClient>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();

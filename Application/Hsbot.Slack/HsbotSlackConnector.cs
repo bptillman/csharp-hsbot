@@ -151,6 +151,7 @@ namespace Hsbot.Slack
                     Email = user.Email,
                     FullName = $"{user.FirstName} {user.LastName}",
                     IsEmployee = !user.IsBot && !user.IsGuest,
+                    TimeZoneOffset = GetTimeSpan(user.TimeZoneOffset),
                 });
             }
 
@@ -166,8 +167,15 @@ namespace Hsbot.Slack
                     Email = user.Email,
                     FullName = $"{user.FirstName} {user.LastName}",
                     IsEmployee = !user.IsBot && !user.IsGuest,
+                    TimeZoneOffset = GetTimeSpan(user.TimeZoneOffset),
                 })
                 .ToArray());
+        }
+
+        private TimeSpan GetTimeSpan(long offsetInSeconds)
+        {
+            const int millisecondsInSecond = 1000;
+            return new TimeSpan(offsetInSeconds * millisecondsInSecond * TimeSpan.TicksPerMillisecond);
         }
 
         private async Task<SlackChatHub> GetChatHub(ResponseBase response)
