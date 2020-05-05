@@ -42,6 +42,8 @@ namespace Hsbot.Hosting.Web
                 BrainStorageKey = _config["brain:storageKey"],
                 TumblrApiKey = _config["tumblr:apiKey"],
                 JiraApiKey = _config["jira:apiKey"],
+                DictionaryApiKey = _config["dictionary:apiKey"],
+                ThesaurusApiKey= _config["thesaurus:apiKey"],
             };
         }
 

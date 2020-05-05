@@ -8,6 +8,8 @@ namespace Hsbot.Core
         string BrainName { get; }
         string TumblrApiKey { get; }
         string JiraApiKey { get; set; }
+        string DictionaryApiKey { get; set; }
+        string ThesaurusApiKey { get; set; }
     }
 
     public class HsbotConfig : IHsbotConfig
@@ -18,5 +20,7 @@ namespace Hsbot.Core
       public string BrainName { get; set; }
       public string TumblrApiKey { get; set; }
       public string JiraApiKey { get; set; }
+      public string DictionaryApiKey { get; set; }
+      public string ThesaurusApiKey { get; set; }
     }
 }
