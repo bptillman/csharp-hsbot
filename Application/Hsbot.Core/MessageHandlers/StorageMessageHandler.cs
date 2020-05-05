@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Hsbot.Core.Brain;
 using Hsbot.Core.Messaging;
 using Hsbot.Core.Random;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Hsbot.Core.MessageHandlers
 {
@@ -37,7 +39,7 @@ namespace Hsbot.Core.MessageHandlers
         {
             if (context.Message.Is(ShowStorageCommand))
             {
-                var brainContents = _brain.BrainDump();
+                var brainContents = SerializeBrainToJson();
                 await context.UploadFile(brainContents, $"HsBotBrainDump-{DateTime.Now.ToFileTime()}.json");
             }
 
@@ -54,6 +56,18 @@ namespace Hsbot.Core.MessageHandlers
 
                 await context.UploadFile(response.ToString(), $"HsBotUserCache-{DateTime.Now.ToFileTime()}.csv");
             }
+        }
+
+        private string SerializeBrainToJson()
+        {
+            var brainObject = new JObject();
+
+            foreach (var key in _brain.Keys)
+            {
+                brainObject.Add(new JProperty(key, _brain.GetItem<object>(key)));
+            }
+
+            return JsonConvert.SerializeObject(brainObject, Formatting.Indented);
         }
     }
 }

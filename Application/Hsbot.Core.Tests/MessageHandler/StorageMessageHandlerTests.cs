@@ -50,7 +50,13 @@ namespace Hsbot.Core.Tests.MessageHandler
             fileName.ShouldEndWith(".json");
 
             var fileContents = context.FileUploads[fileName].AsString(Encoding.UTF8);
-            fileContents.ShouldBe("{\"Test\":{\"IntValue\":23,\"StringValue\":\"foo bar\"}}");
+            var expectedContents = @"{
+  ""Test"": {
+    ""IntValue"": 23,
+    ""StringValue"": ""foo bar""
+  }
+}";
+            fileContents.ShouldBe(expectedContents);
         }
 
         public async Task ShouldExportUsersAsCsv()
