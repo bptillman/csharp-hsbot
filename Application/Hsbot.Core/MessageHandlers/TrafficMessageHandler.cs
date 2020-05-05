@@ -33,7 +33,7 @@ namespace Hsbot.Core.MessageHandlers
         {
             yield return new MessageHandlerDescriptor
             {
-                Command = "traffic aus|hou|dal|mty|gau",
+                Command = "traffic aus|hou|dal|mty|gua",
                 Description = "traffic <placeCode>. Only works for Austin(aus), Houston(hou), Dallas(dal), Monterrey(mty), and Guadalajara(gua)."
             };
         }
