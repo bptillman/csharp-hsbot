@@ -17,13 +17,13 @@ namespace Hsbot.Core.Tests.MessageHandler
             var messageHandler1 = GetHandlerInstance(rng1);
             var response1 = await messageHandler1.TestHandleAsync();
             response1.SentMessages.Count.ShouldBe(1);
-            response1.SentMessages.First().Text.ShouldBe("It is certain");
+            response1.SentMessages.First().Text.ShouldBe(":magic8ball: It is certain");
 
             var rng2 = new RandomNumberGeneratorFake { NextIntValue = 10 };
             var messageHandler2 = GetHandlerInstance(rng2);
             var response2 = await messageHandler2.TestHandleAsync();
             response2.SentMessages.Count.ShouldBe(1);
-            response2.SentMessages.First().Text.ShouldBe("Reply hazy try again");
+            response2.SentMessages.First().Text.ShouldBe(":magic8ball: Reply hazy try again");
         }
     }
 }
