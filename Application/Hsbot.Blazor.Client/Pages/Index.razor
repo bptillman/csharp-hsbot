@@ -191,6 +191,9 @@
         text = InlineCodeRegex.Replace(text, "<span class=\"inline-code\">${content}</span>");
         text = AtMentionRegex.Replace(text, "<span class=\"at-mention\">${content}</span>");
         text = UrlRegex.Replace(text, "<a href=\"${content}\">${content}</a>");
+        text = text.Replace("\r\n", "<br/>");
+        text = text.Replace("\n", "<br/>");
+        text = text.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
         return text;
     }
