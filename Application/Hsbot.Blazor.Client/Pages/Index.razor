@@ -87,7 +87,6 @@
     string _channel = null;
     string _userName = null;
     ChatClient _client = null;
-    string _message = null;
     string _newMessage = null;
     List<Message> _messages = new List<Message>();
 
@@ -112,16 +111,15 @@
             _client.MessageReceived += MessageReceived;
             _client.FileUploadReceived += UploadReceived;
 
-            Console.WriteLine("Index: chart starting...");
+            Console.WriteLine("Index: chat starting...");
             await _client.StartAsync();
-            Console.WriteLine("Index: chart started?");
+            Console.WriteLine("Index: chat started.");
 
             _connected = true;
         }
 
         catch (Exception e)
         {
-            _message = $"ERROR: Failed to start chat client: {e.Message}";
             Console.WriteLine(e.Message);
             Console.WriteLine(e.StackTrace);
         }
@@ -146,7 +144,6 @@
 
         StateHasChanged();
     }
-
 
     async Task SendAsync()
     {

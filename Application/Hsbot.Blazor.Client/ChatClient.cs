@@ -24,7 +24,6 @@ namespace Hsbot.Blazor.Client
 
         public async Task StartAsync()
         {
-            
             if (!_started)
             {
                 _hubConnection = new HubConnectionBuilder()
