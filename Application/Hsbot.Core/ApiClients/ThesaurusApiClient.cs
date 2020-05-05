@@ -18,7 +18,7 @@ namespace Hsbot.Core.ApiClients
 
         public bool HasDefinitions => Definitions?.Any() ?? false;
         public bool HasSynonyms => Synonyms?.Any() ?? false;
-        public bool HasAntonyms => Synonyms?.Any() ?? false;
+        public bool HasAntonyms => Antonyms?.Any() ?? false;
 
         public bool HasSomething => HasAntonyms || HasSynonyms || HasDefinitions;
     }
