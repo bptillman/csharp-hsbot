@@ -8,8 +8,8 @@ namespace Hsbot.Core.Tests.MessageHandler
 {
     public class SubmitTimeSheetHandlerTests : MessageHandlerTestBase<SubmitTimeSheetHandler>
     {
-        protected override string[] MessageTextsThatShouldBeHandled => new [] {"submit your time", "submit something time"};
-        protected override string[] MessageTextsThatShouldNotBeHandled => new[] {"submit", "time", "something", "submit time" };
+        protected override string[] MessageTextsThatShouldBeHandled => new [] {"submit your time", "submit something time", "submit time" };
+        protected override string[] MessageTextsThatShouldNotBeHandled => new[] {"submit", "time", "something" };
 
         public async Task ShouldReturnResponse()
         {

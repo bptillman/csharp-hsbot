@@ -8,7 +8,7 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class SubmitTimeSheetHandler : MessageHandlerBase
     {
-        private Regex regex = new Regex("submit (.*) time");
+        private Regex regex = new Regex("submit ?(.*) time");
 
         public override string[] CannedResponses => new[]
         {
