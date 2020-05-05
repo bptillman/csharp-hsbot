@@ -105,7 +105,8 @@ namespace Hsbot.Core
             where TConnector : class, IHsbotChatConnector
             where TMessageFormatter : class, IChatMessageTextFormatter
         {
-            _serviceCollection.AddSingleton<IHsbotChatConnector, TConnector>();
+            _serviceCollection.AddSingleton<TConnector>();
+            _serviceCollection.AddSingleton<IHsbotChatConnector, TConnector>(x => x.GetRequiredService<TConnector>());
             _serviceCollection.AddSingleton<IChatMessageTextFormatter, TMessageFormatter>();
 
             return this;
