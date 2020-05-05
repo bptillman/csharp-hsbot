@@ -33,6 +33,7 @@ namespace Hsbot.Core
             services.AddSingleton<ISystemClock, SystemClock>();
             services.AddSingleton<IFoodTruckProvider, FoodTruckProvider>();
             services.AddSingleton<IMapProvider, GoogleMapProvider>();
+            services.AddHttpClient<ISimpsonApiClient, SimpsonApiClient>();
             services.AddHttpClient<ITumblrApiClient, TumblrApiClient>();
             services.AddHttpClient<IJiraApiClient, JiraApiClient>();
             services.AddHttpClient<IXkcdApiClient, XkcdApiClient>();
