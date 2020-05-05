@@ -60,7 +60,6 @@ namespace Hsbot.Core.MessageHandlers
 
             if (response.HasDefinitions)
             {
-
                 await context.SendResponse($"Definitions:\n\t - {string.Join("\n\t - ", response.Definitions)}");
             }
         }
