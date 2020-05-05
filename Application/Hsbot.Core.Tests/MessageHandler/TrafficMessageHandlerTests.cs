@@ -28,7 +28,7 @@ namespace Hsbot.Core.Tests.MessageHandler
             var response = await messageHandler.TestHandleAsync("traffic moon");
 
             response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages.First().Text.ShouldBe("Could not find data for moon. I only have data for: aus, hou, dal, mty, gau");
+            response.SentMessages.First().Text.ShouldBe("Could not find data for moon. I only have data for: aus, hou, dal, mty, gua");
         }
     }
 }
