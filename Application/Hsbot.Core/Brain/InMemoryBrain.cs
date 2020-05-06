@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Hsbot.Core.Brain
 {
@@ -51,18 +50,6 @@ namespace Hsbot.Core.Brain
             _brainChanged.OnNext(this);
 
             return PersistenceState.InMemoryOnly;
-        }
-
-        public string BrainDump()
-        {
-            var brainAsObject = new Dictionary<string, JObject>();
-            foreach (var key in Keys)
-            {
-                var obj = JObject.Parse(_brainContents[key]);
-                brainAsObject[key] = obj;
-            }
-
-            return JsonConvert.SerializeObject(brainAsObject);
         }
     }
 }
