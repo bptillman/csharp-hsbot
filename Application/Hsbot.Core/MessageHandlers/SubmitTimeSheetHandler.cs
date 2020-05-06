@@ -8,7 +8,7 @@ namespace Hsbot.Core.MessageHandlers
 {
     public class SubmitTimeSheetHandler : MessageHandlerBase
     {
-        private Regex regex = new Regex("submit ?(.*) time");
+        private Regex regex = new Regex("submit ?(.*) time", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         public override string[] CannedResponses => new[]
         {
@@ -44,9 +44,9 @@ namespace Hsbot.Core.MessageHandlers
         {
         }
 
-        public override string[] TargetedChannels => FunChannels;
+        public override string[] TargetedChannels => new[] {"#headspring", "#hsbottesting"};
         public override bool DirectMentionOnly => false;
-        
+
         public override double GetHandlerOdds(InboundMessage message)
         {
             return 0.67;
