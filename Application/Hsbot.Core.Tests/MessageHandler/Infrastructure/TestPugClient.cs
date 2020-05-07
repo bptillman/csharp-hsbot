@@ -11,7 +11,7 @@ namespace Hsbot.Core.Tests.MessageHandler.Infrastructure
         
         public Task<PugInfo[]> GetPugs(int count = 1)
         {
-            return Task.FromResult(Pugs.ToArray());
+            return Task.FromResult(Pugs.Take(count).ToArray());
         }
     }
 }
