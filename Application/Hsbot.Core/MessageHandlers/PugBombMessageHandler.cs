@@ -27,7 +27,7 @@ namespace Hsbot.Core.MessageHandlers
 
         protected override bool CanHandle(InboundMessage message)
         {
-            throw new NotImplementedException();
+            return message.StartsWith("pug me") || message.StartsWith("pug bomb");
         }
 
         public override Task HandleAsync(IInboundMessageContext context)
