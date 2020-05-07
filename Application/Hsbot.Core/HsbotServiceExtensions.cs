@@ -39,6 +39,7 @@ namespace Hsbot.Core
             services.AddHttpClient<IThesaurusApiClient, ThesaurusApiClient>();
             services.AddHttpClient<IJiraApiClient, JiraApiClient>();
             services.AddHttpClient<IXkcdApiClient, XkcdApiClient>();
+            services.AddHttpClient<IPugClient, PugClient>();
             services.AddSingleton<Hsbot>();
 
             return new HsbotServiceConfigurator(services);
