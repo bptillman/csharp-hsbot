@@ -1,4 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace Hsbot.Core.ApiClients
 {
@@ -9,9 +13,27 @@ namespace Hsbot.Core.ApiClients
 
     public class PugClient : IPugClient
     {
-        public Task<PugInfo[]> GetPugs(int count = 1)
+        private readonly HttpClient _httpClient;
+
+        public PugClient(HttpClient httpClient)
         {
-            throw new System.NotImplementedException();
+            _httpClient = httpClient;
+        }
+
+        public async Task<PugInfo[]> GetPugs(int count = 1)
+        {
+            try
+            {
+                var requestUrl = "http://pugme.herokuapp.com/bomb?count=" + count;
+                var response = await _httpClient.GetStringAsync(requestUrl);
+                var pugResponse = JObject.Parse(response);
+                var pugs = pugResponse["pugs"];
+                return pugs.Select(i => new PugInfo{ Img = i.ToString()}).ToArray();
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Error: Service is not working. {e}");
+            }
         }
     }
 
