@@ -54,7 +54,7 @@
                     <div class="message">
                         <span class="channel">@item.Channel</span>
                         <span class="user">@item.Username</span>
-                        <span class="msg"><img src="@attachment.ImageUrl"/></span>
+                        <span class="msg">@((MarkupString)FormatImageUrl(attachment.ImageUrl))</span>
                     </div>
                 }
             }
@@ -186,6 +186,12 @@
 
     string FormatText(string text)
     {
+        var urlMatches = UrlRegex.Matches(text);
+        if (urlMatches.Count == 1 && urlMatches[0].Captures[0].Value == text && IsImageUrl(text))
+        {
+            return FormatImageUrl(text);
+        }
+
         text = BoldRegex.Replace(text, "<span class=\"bold\">${content}</span>");
         text = ItalicsRegex.Replace(text, "<span class=\"italics\">${content}</span>");
         text = InlineCodeRegex.Replace(text, "<span class=\"inline-code\">${content}</span>");
@@ -196,6 +202,16 @@
         text = text.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
         return text;
+    }
+
+    bool IsImageUrl(string url)
+    {
+        return url.EndsWith(".gif") || url.EndsWith(".jpg") || url.EndsWith(".jpeg") || url.EndsWith(".png");
+    }
+
+    string FormatImageUrl(string url)
+    {
+        return $"<a href=\"{url}\">{url}</a><br /><img src={url} />";
     }
 
     class Message
