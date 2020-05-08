@@ -45,7 +45,7 @@ namespace Hsbot.Core.MessageHandlers
 
         public override Task HandleAsync(IInboundMessageContext context)
         {
-            return context.SendResponse(GetRandomCannedResponse());
+            return context.SendResponse($":magic8ball: {GetRandomCannedResponse()}");
         }
 
         protected override bool CanHandle(InboundMessage message)
