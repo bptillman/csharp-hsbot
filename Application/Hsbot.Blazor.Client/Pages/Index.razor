@@ -179,7 +179,7 @@
     }
 
     static readonly Regex BoldRegex = new Regex(@"\*(?<content>.*)\*");
-    static readonly Regex ItalicsRegex = new Regex(@"_(?<content>.*)_");
+    static readonly Regex ItalicsRegex = new Regex(@"\b_(?<content>.*)_\b");
     static readonly Regex InlineCodeRegex = new Regex(@"`(?<content>.*)`");
     static readonly Regex AtMentionRegex = new Regex(@"(?<content>@(\w+)\b)");
     static readonly Regex UrlRegex = new Regex(@"(?<content>(www|http:|https:)+[^\s]+[\w])");
