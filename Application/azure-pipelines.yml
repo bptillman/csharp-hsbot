@@ -39,16 +39,9 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
 
-- task: ArchiveFiles@2
-  displayName: zip
-  inputs:
-    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/bot'
-    includeRootFolder: false
-    archiveFile: '$(Build.ArtifactStagingDirectory)/release/$(Build.BuildId).zip'
-
 - task: PublishBuildArtifacts@1
   displayName: 'publish to release pipeline'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/release/'
+    PathtoPublish: '$(build.artifactStagingDirectory)/bot'
     ArtifactName: 'build-artifacts'
   condition: eq(variables['Build.SourceBranch'], 'master')
