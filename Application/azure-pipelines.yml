@@ -35,13 +35,13 @@ steps:
     command: publish
     publishWebProjects: false
     projects: Application/Hsbot.Hosting.Web/Hsbot.Hosting.Web.csproj
-    arguments: '-o $(build.artifactStagingDirectory)/bot'
+    arguments: '-o $(build.ArtifactStagingDirectory)/bot --no-build'
     zipAfterPublish: false
     modifyOutputPath: false
 
 - task: PublishBuildArtifacts@1
   displayName: 'publish to release pipeline'
   inputs:
-    PathtoPublish: '$(build.artifactStagingDirectory)/bot'
+    PathtoPublish: '$(build.ArtifactStagingDirectory)/bot'
     ArtifactName: 'build-artifacts'
   condition: eq(variables['Build.SourceBranch'], 'master')
