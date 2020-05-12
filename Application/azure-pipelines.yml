@@ -44,4 +44,4 @@ steps:
   inputs:
     PathtoPublish: '$(build.ArtifactStagingDirectory)/bot'
     ArtifactName: 'build-artifacts'
-  condition: eq(variables['Build.SourceBranch'], 'master')
+  condition: eq(variables['Build.SourceBranchName'], 'master')
