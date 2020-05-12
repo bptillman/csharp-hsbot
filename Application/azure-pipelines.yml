@@ -35,7 +35,7 @@ steps:
     command: publish
     publishWebProjects: false
     projects: Application/Hsbot.Hosting.Web/Hsbot.Hosting.Web.csproj
-    arguments: '-o $(build.ArtifactStagingDirectory)/bot --no-build'
+    arguments: '--no-build -o $(build.ArtifactStagingDirectory)/bot'
     zipAfterPublish: false
     modifyOutputPath: false
 
