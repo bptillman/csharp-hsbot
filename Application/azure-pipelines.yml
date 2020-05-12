@@ -9,9 +9,6 @@ trigger:
     include:
     - '*'
 
-pr:
-- 'master'
-
 pool:
   vmImage: 'windows-latest'
 
