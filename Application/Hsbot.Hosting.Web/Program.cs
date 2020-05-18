@@ -25,6 +25,7 @@ namespace Hsbot.Hosting.Web
                 logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
                 logging.AddConsole();
                 logging.AddDebug();
+                logging.AddAzureWebAppDiagnostics();
               })
               .UseStartup<Startup>();
     }
