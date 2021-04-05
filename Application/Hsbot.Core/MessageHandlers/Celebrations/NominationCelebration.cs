@@ -11,7 +11,7 @@ namespace Hsbot.Core.MessageHandlers.Celebrations
 {
     public class NominationCelebration : ICelebration
     {
-        private readonly Regex _nominationRegex = new Regex(@"hva *(to *|for *)?<@([a-zA-Z0-9.-]+)> *for *(DFE|PAV|COM|PLG|OWN|GRIT|HUMILITY|CANDOR|CURIOSITY|AGENCY) (.*)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private readonly Regex _nominationRegex = new Regex(@"hva *(to *|for *)?<@([a-zA-Z0-9.-]+)> *for *(DFE|PAV|COM|PLG|OWN|GRIT|HUMILITY|CANDOR|CURIOSITY|AGENCY)[\s\.]*(.+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private readonly string[] _errorBarks =
         {
             "My time circuits must be shorting out, I couldn't do that :sad_panda:, please don't let me get struck by lightning :build:",
