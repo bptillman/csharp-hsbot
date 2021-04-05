@@ -19,6 +19,9 @@ namespace Hsbot.Core.Tests.MessageHandler
         protected override string[] MessageTextsThatShouldBeHandled => new []
         {
             "hva for <@bob> for dfe this is a long time coming",
+            "hva for <@bob> for dfe. this is a long time coming",
+            "hva for <@bob> for dfe . this is a long time coming",
+            "hva for <@bob> for dfe .this is a long time coming",
             "hva for <@bob> for dfe because",
             "hva to <@bob> for dfe this is a long time coming",
             "hva <@bob> for dfe this is a long time coming",
