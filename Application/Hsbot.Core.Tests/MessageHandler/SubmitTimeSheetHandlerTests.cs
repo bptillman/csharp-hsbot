@@ -18,7 +18,7 @@ namespace Hsbot.Core.Tests.MessageHandler
 
             var response = await messageHandler.TestHandleAsync();
             response.SentMessages.Count.ShouldBe(1);
-            response.SentMessages.First().Text.ShouldBe("https://media.giphy.com/media/A5RlxnMGaf5h6bBdsz/giphy.gif");
+            response.SentMessages.First().Text.ShouldBe("https://media.giphy.com/media/QNv4mKyspa8j6/giphy.gif");
         }
     }
 }
