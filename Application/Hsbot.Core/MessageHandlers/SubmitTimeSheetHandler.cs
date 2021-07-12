@@ -12,7 +12,6 @@ namespace Hsbot.Core.MessageHandlers
 
         public override string[] CannedResponses => new[]
         {
-            "https://media.giphy.com/media/A5RlxnMGaf5h6bBdsz/giphy.gif", // Danny DeVito
             "https://media.giphy.com/media/QNv4mKyspa8j6/giphy.gif", // Mad Men
             "https://imgflip.com/gif/2ipx84", // Elf Elevator
             "https://makeagif.com/i/cOFbWG", // Steve Ballmer
@@ -47,7 +46,15 @@ namespace Hsbot.Core.MessageHandlers
             "https://clockify.me/blog/wp-content/uploads/2019/01/timesheet-meme-66.jpg", // Alright alright alright
             "https://www.timecamp.com/blog/wp-content/uploads/2018/10/fill-in-timesheets.jpg", // Darth Vader
             "https://i.pinimg.com/originals/11/7a/be/117abe92096613b88f845d05ae36a643.jpg", // The North remembers
-            "http://www.quickmeme.com/img/84/841d5e51ea29e70586a490b891adad4e2bed54c231ff824e75e7241c88139e3b.jpg" // by nap time
+            "http://www.quickmeme.com/img/84/841d5e51ea29e70586a490b891adad4e2bed54c231ff824e75e7241c88139e3b.jpg", // by nap time
+            "https://i.imgflip.com/3opgdg.jpg", // Sam L Jackson
+            "https://www.memesmonkey.com/images/memesmonkey/88/888ca81f54ff79246a1c7870fd4e7e50.jpeg", // bigger timesheet reminder
+            "https://blog-cdn.everhour.com/blog/wp-content/uploads/2019/09/images.jpeg", // putin
+            "https://www.timecamp.com/blog/wp-content/uploads/2020/11/boss-and-timesheet-meme.jpg", // michael meyers
+            "https://i.imgflip.com/215u5v.jpg", // timesheets, actually
+            "https://www.timecamp.com/blog/wp-content/uploads/2020/11/Spiderman-and-timesheets-1.jpg", // spiderman
+            "https://www.memecreator.org/static/images/memes/4011684.jpg", // panda bear
+            "https://i.imgflip.com/2hwxbq.jpg" // airplane
         };
 
         public SubmitTimeSheetHandler(IRandomNumberGenerator randomNumberGenerator) : base(randomNumberGenerator)
