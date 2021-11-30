@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30002.166
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.31903.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Hosting.Web", "Hsbot.Hosting.Web\Hsbot.Hosting.Web.csproj", "{03B176DF-306F-4BA0-8A4B-077A14D7C6CD}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Azure", "Hsbot.Azure\Hsbot.Azure.csproj", "{877093C0-0AC5-4536-A305-10BA513F741D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Blazor.Client", "Hsbot.Blazor.Client\Hsbot.Blazor.Client.csproj", "{7EB96890-EA10-48C0-98D5-BB132C4B032D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Blazor.Client.New", "Hsbot.Blazor.Client.New\Hsbot.Blazor.Client.New.csproj", "{8BB86FCC-97BE-4222-A20E-5196418FB627}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7EB96890-EA10-48C0-98D5-BB132C4B032D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BB86FCC-97BE-4222-A20E-5196418FB627}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BB86FCC-97BE-4222-A20E-5196418FB627}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BB86FCC-97BE-4222-A20E-5196418FB627}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BB86FCC-97BE-4222-A20E-5196418FB627}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

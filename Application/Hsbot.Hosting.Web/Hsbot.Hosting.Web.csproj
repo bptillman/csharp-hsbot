@@ -4,6 +4,14 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <Folder Include="wwwroot\" />
   </ItemGroup>
@@ -16,9 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hsbot.Azure\Hsbot.Azure.csproj" />
-    <ProjectReference Include="..\Hsbot.Blazor.Client\Hsbot.Blazor.Client.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
+    <ProjectReference Include="..\Hsbot.Blazor.Client.New\Hsbot.Blazor.Client.New.csproj" />
     <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
     <ProjectReference Include="..\Hsbot.Slack\Hsbot.Slack.csproj" />
   </ItemGroup>
