@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Hsbot.Core.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Hsbot.Blazor.Client.New
+namespace Hsbot.Blazor.Client
 {
     public class ChatClient : IAsyncDisposable
     {

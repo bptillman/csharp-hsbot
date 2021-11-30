@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Slack", "Hsbot.Slack\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Azure", "Hsbot.Azure\Hsbot.Azure.csproj", "{877093C0-0AC5-4536-A305-10BA513F741D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Blazor.Client.New", "Hsbot.Blazor.Client.New\Hsbot.Blazor.Client.New.csproj", "{8BB86FCC-97BE-4222-A20E-5196418FB627}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hsbot.Blazor.Client", "Hsbot.Blazor.Client\Hsbot.Blazor.Client.csproj", "{8BB86FCC-97BE-4222-A20E-5196418FB627}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

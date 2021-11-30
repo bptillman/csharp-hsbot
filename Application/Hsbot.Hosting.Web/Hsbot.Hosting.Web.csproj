@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hsbot.Azure\Hsbot.Azure.csproj" />
-    <ProjectReference Include="..\Hsbot.Blazor.Client.New\Hsbot.Blazor.Client.New.csproj" />
+    <ProjectReference Include="..\Hsbot.Blazor.Client\Hsbot.Blazor.Client.csproj" />
     <ProjectReference Include="..\Hsbot.Core\Hsbot.Core.csproj" />
     <ProjectReference Include="..\Hsbot.Slack\Hsbot.Slack.csproj" />
   </ItemGroup>

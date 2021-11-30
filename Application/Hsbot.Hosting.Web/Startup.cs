@@ -83,7 +83,7 @@ namespace Hsbot.Hosting.Web
                         return Task.CompletedTask;
                     });
                     endpoints.MapHub<LocalDebug.Hubs.ChatHub>("/LocalDebug/Chat");
-                    endpoints.MapFallbackToFile("_content/Hsbot.Blazor.Client.New/index.html");
+                    endpoints.MapFallbackToFile("_content/Hsbot.Blazor.Client/index.html");
                 });
             }
 

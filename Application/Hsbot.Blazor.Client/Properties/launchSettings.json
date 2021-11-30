@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Hsbot.Blazor.Client.New": {
+    "Hsbot.Blazor.Client": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

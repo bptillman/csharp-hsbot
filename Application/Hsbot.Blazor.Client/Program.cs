@@ -1,4 +1,4 @@
-using Hsbot.Blazor.Client.New;
+using Hsbot.Blazor.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
