@@ -1,4 +1,4 @@
-@using Index = Hsbot.Blazor.Client.Pages.Index
+﻿@using Index = Hsbot.Blazor.Client.Pages.Index
 
 @code
 {
@@ -8,6 +8,7 @@
 <Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
         <RouteView RouteData="@_defaultRoute" DefaultLayout="@typeof(MainLayout)" />
