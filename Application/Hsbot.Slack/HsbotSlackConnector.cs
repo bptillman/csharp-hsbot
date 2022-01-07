@@ -231,26 +231,34 @@ namespace Hsbot.Slack
 
         private async Task<InboundMessage> TransformSlackMessage(SlackMessage message)
         {
-            var userChannel = await GetUserChannel(message);
-
-            var inboundMessage = new InboundMessage
+            try
             {
-                RawText = message.RawData,
-                FullText = message.Text,
-                TextWithoutBotName = message.GetTextWithoutBotName(AddressableNames),
-                UserId = message.User.Id,
-                Username = message.User.Name,
-                UserEmail = message.User.Email,
-                Channel = message.ChatHub.Id,
-                ChannelName = message.ChatHub.Name,
-                MessageRecipientType = message.ChatHub.Type.ToMessageRecipientType(),
-                UserChannel = userChannel,
-                BotName = Name,
-                BotId = Id,
-                BotIsMentioned = message.MentionsBot
-            };
+                var userChannel = await GetUserChannel(message);
 
-            return inboundMessage;
+                var inboundMessage = new InboundMessage
+                {
+                    RawText = message.RawData,
+                    FullText = message.Text,
+                    TextWithoutBotName = message.GetTextWithoutBotName(AddressableNames),
+                    UserId = message.User.Id,
+                    Username = message.User.Name,
+                    UserEmail = message.User.Email,
+                    Channel = message.ChatHub.Id,
+                    ChannelName = message.ChatHub.Name,
+                    MessageRecipientType = message.ChatHub.Type.ToMessageRecipientType(),
+                    UserChannel = userChannel,
+                    BotName = Name,
+                    BotId = Id,
+                    BotIsMentioned = message.MentionsBot
+                };
+
+                return inboundMessage;
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, "Error during TransformSlackMessage");
+                throw;
+            }
         }
     }
 }
