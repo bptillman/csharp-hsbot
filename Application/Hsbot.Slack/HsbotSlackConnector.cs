@@ -257,7 +257,7 @@ namespace Hsbot.Slack
             catch (Exception e)
             {
                 _log.LogError(e, "Error during TransformSlackMessage");
-                throw;
+                return null;
             }
         }
     }
