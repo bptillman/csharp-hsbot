@@ -124,6 +124,13 @@ namespace Hsbot.Core
 
         private async Task OnMessageReceived(InboundMessage message)
         {
+            if (message == null)
+            {
+                // something went wrong, it should've been logged already, so just return
+                // TODO: return a failed response to let people know I'm alive, but I couldn't process that message
+                return;
+            }
+            
             if (message.StartsWith("help"))
             {
                 var response = GetHelpResponse(message);
