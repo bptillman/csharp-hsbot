@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 
 namespace Hsbot.Hosting.Web
 {
+    using Infrastructure;
+
     public class Startup
     {
         private readonly IConfiguration _config;
@@ -43,6 +45,8 @@ namespace Hsbot.Hosting.Web
                     .AddBrainStorageProvider<AzureBrainStorage>()
                     .AddChatServices<HsbotSlackConnector, SlackChatMessageTextFormatter>();
             }
+
+            services.AddSingleton<ISecurityHeadersPolicy, DefaultSecurityHeadersPolicy>();
 
             //This registration is what will actually run hsbot as a background
             //process within the website.  We'll need an external keep-alive to
@@ -92,6 +96,10 @@ namespace Hsbot.Hosting.Web
                 //We're not actually serving up any web content at present.
                 //This website is only acting as a host for the hsbot service,
                 //so no need to wire up anything other than a static reply.
+                app.UseHsts();
+                app.UseSecurityHeadersPolicy();
+                app.UseHttpsRedirection();
+
                 app.Run(async (context) =>
                 {
                     await context.Response.WriteAsync("Beep boop bop");
