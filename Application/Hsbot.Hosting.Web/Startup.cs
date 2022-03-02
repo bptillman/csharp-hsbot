@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Hsbot.Azure;
 using Hsbot.Core;
+using Hsbot.Hosting.Web.Infrastructure;
 using Hsbot.Hosting.Web.LocalDebug;
 using Hsbot.Slack;
 using Microsoft.AspNetCore.Builder;
@@ -12,8 +13,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace Hsbot.Hosting.Web
 {
-    using Infrastructure;
-
     public class Startup
     {
         private readonly IConfiguration _config;
