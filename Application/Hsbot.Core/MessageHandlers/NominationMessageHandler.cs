@@ -40,59 +40,16 @@ namespace Hsbot.Core.MessageHandlers
                     continue;
                 }
 
-                var nominator = await context.GetChatUserById(message.UserId);
-                if (nominator == null) throw new MessageHandlerException("", $"Could not locate user with id {message.UserId} via the chat connector");
-
-                var nominees = celebration.GetNomineeUserIds(match);
-
-                var successes = new List<(string FullName, string Key)>();
-                foreach (var nomineeUserId in nominees)
+                var celebrationType = celebration.GetType() == typeof(BragCelebration) ? "brag" : "HVA";
+                var responseMessage = new OutboundResponse
                 {
-                    var nominee = await context.GetChatUserById(nomineeUserId);
-                    if (nominee == null)
-                    {
-                        await context.SendResponse($"Sorry, I couldn't locate a user with id {nomineeUserId}");
-                        continue;
-                    }
-
-                    if (!nominee.IsEmployee)
-                    {
-                        await context.SendResponse(celebration.EmployeesOnlyMessage);
-                        continue;
-                    }
-
-                    if (nominee.Id == nominator.Id)
-                    {
-                        await context.SendResponse(celebration.SelfAggrandizingMessage);
-                        continue;
-                    }
-
-                    var result = await celebration.Submit(nominator, nominee, match);
-                    if (string.IsNullOrWhiteSpace(result.ErrorMessage))
-                    {
-                        successes.Add((nominee.FullName, result.Key));
-                        continue;
-                    }
-
-                    await context.SendResponse($":doh: {result.ErrorMessage}");
-                }
-
-                if (successes.Any())
-                {
-                    await context.SendResponse(celebration.GetRoomMessage(successes));
-                }
-
-                if (message.ChannelName != _bragAndAwardChannel && successes.Any())
-                {
-                    var hvaSuccessMessage = new OutboundResponse
-                    {
-                        Channel = _bragAndAwardChannel,
-                        Text = celebration.GetAwardRoomMessage(successes, nominator.FullName, match),
-                        UserId = message.BotId,
-                    };
-
-                    await context.SendResponse(hvaSuccessMessage);
-                }
+                    Channel = _bragAndAwardChannel,
+                    Text =
+                        $"That's a great {celebrationType} {message.Username}, but right now I am unable to process brags and HVA's via Slack. " +
+                        " So to make sure this gets captured so we can celebrate it in our weekly meetings, could you please submit it here: https://headspring.atlassian.net/servicedesk/customer/portal/7 . :thanks:",
+                    UserId = message.BotId
+                };
+                await context.SendResponse(responseMessage);
             }
         }
     }

@@ -13,6 +13,8 @@ Convert.ToBase64String(Encoding.UTF8.GetBytes($"{JIRA Username}:{JIRA Authorizat
 
 Update the file with the *devbot* API key and you're off to the races.
 
+When testing out things like brags/HVA's where you have to tag a person, to get the regex to match you need to enter the user as <@alias> with the <> otherwise it does not work with the Regex match.
+
 # Licensing
 
 Note that some code in this project was adapted from [Noobot](https://github.com/noobot/noobot).  Even though this project is internal only, below is license text just to be safe.
